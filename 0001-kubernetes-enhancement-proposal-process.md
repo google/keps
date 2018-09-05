@@ -1,45 +1,26 @@
----
-kep-number: 1
-title: Kubernetes Enhancement Proposal Process
-authors:
-  - "@calebamiles"
-  - "@jbeda"
-owning-sig: sig-architecture
-participating-sigs:
-  - kubernetes-wide
-reviewers:
-  - name: "@timothysc"
-approvers:
-  - name: "@bgrant0607"
-editor:
-  name: "@jbeda"
-creation-date: 2017-08-22
-status: implementable
----
-
 # Kubernetes Enhancement Proposal Process
 
 ## Table of Contents
-
 * [Kubernetes Enhancement Proposal Process](#kubernetes-enhancement-proposal-process)
-  * [Metadata](#metadata)
-  * [Table of Contents](#table-of-contents)
-  * [Summary](#summary)
-  * [Motivation](#motivation)
-  * [Reference-level explanation](#reference-level-explanation)
+   * [Table of Contents](#table-of-contents)
+   * [Summary](#summary)
+   * [Motivation](#motivation)
+   * [Guide for Developers](#guide-for-developers)
       * [What type of work should be tracked by a KEP](#what-type-of-work-should-be-tracked-by-a-kep)
-      * [KEP Template](#kep-template)
+      * [KEP Directory Structure](#kep-directory-structure)
       * [KEP Metadata](#kep-metadata)
       * [KEP Workflow](#kep-workflow)
       * [Git and GitHub Implementation](#git-and-github-implementation)
+      * [When to Merge](#when-to-merge)
+      * [How to assign a number](#how-to-assign-a-number)
       * [KEP Editor Role](#kep-editor-role)
       * [Important Metrics](#important-metrics)
       * [Prior Art](#prior-art)
-  * [Graduation Criteria](#graduation-criteria)
-  * [Drawbacks](#drawbacks)
-  * [Alternatives](#alternatives)
-  * [Unresolved Questions](#unresolved-questions)
-  * [Mentors](#mentors)
+   * [Drawbacks](#drawbacks)
+   * [Alternatives](#alternatives)
+      * [Github issues vs. KEPs](#github-issues-vs-keps)
+   * [Unresolved Questions](#unresolved-questions)
+   * [Metadata](#metadata)
 
 ## Summary
 
@@ -105,7 +86,7 @@ for SIGs to deliberate.
 [design proposals]: /contributors/design-proposals
 
 
-## Reference-level explanation
+## Guide for Developers
 
 ### What type of work should be tracked by a KEP
 
@@ -137,102 +118,137 @@ The KEP process is the way that SIGs can negotiate and communicate changes that 
 KEPs will also be used to drive large changes that will cut across all parts of the project.
 These KEPs will be owned by SIG-architecture and should be seen as a way to communicate the most fundamental aspects of what Kubernetes is.
 
-### KEP Template
+### KEP Directory Structure
 
-The template for a KEP is precisely defined [here](0000-kep-template.md)
+The canonical format for a KEP is changing from a
+[single flat file](0000-kep-template.md) checked into source control to a
+directory structure in order to
+
+- support the extraction of metadata required for web rendering of KEPs from
+  the metadata for the KEP process itself
+- provide a location for diagrams or other associated content
+- provide a location to store experience reports associated with a KEP
+- make it easier to build tooling to validate KEP metadata
+- further reinforce the idea that KEP process is iterative by breaking up the
+  sections of a KEP into individual files
+- allow KEP authors, reviewers, approvers, and editors to take advantage of the
+  `OWNERS` process
+
+A typical KEP under active development will have have the following directory
+structure
+
+```
+├── 001-introduction.md (required)
+├── 002-motivation.md (required)
+├── 003-goals.md
+├── 004-non-goals.md
+├── 005-guide-for-developers.md (required)
+├── 006-guide-for-teachers.md (required)
+├── 007-guide-for-operators.md (required)
+├── 008-guide-for-project-maintainers.md
+├── 009-graduation-criteria.md (required)
+├── 010-implementation-history.md
+├── experience_reports (required)
+│   ├── alpha-feedback.md
+│   └── beta-feedback.md
+├── features
+│   ├── feature-01.md
+│   ├── feature-02.md
+│   └── feature-03.md
+├── index.json (required)
+├── metadata.yaml (required)
+└── OWNERS
+```
+
+In most cases the directory structure should be created by dedicated tooling.
+
 
 ### KEP Metadata
 
 There is a place in each KEP for a YAML document that has standard metadata.
-This will be used to support tooling around filtering and display.  It is also
-critical to clearly communicate the status of a KEP.
+This will be used to support tooling around filtering and display. It is also
+critical to clearly communicate the status of a KEP. As KEPs are migrated from
+a single flat file to the [Directory Structure](#kep-directory-structure) the
+metadata will be extracted to a `metadata.yaml` file in the directory for the
+KEP. KEP metadata has the following format
 
-Metadata items:
-* **kep-number** Required
-  * Each proposal has a number.  This is to make all references to proposals as
-    clear as possible.  This is especially important as we create a network
-    cross references between proposals.
-  * Before having the `Approved` status, the number for the KEP will be in the
-    form of `draft-YYYYMMDD`.  The `YYYYMMDD` is replaced with the current date
-    when first creating the KEP.  The goal is to enable fast parallel merges of
-    pre-acceptance KEPs.
-  * On acceptance a sequential dense number will be assigned.  This will be done
-    by the editor and will be done in such a way as to minimize the chances of
-    conflicts.  The final number for a KEP will have no prefix.
-* **title** Required
-  * The title of the KEP in plain language.  The title will also be used in the
-    KEP filename.  See the template for instructions and details.
-* **status** Required
-  * The current state of the KEP.
-  * Must be one of `provisional`, `implementable`, `implemented`, `deferred`, `rejected`, `withdrawn`, or `replaced`.
-* **authors** Required
-  * A list of authors for the KEP.
-    This is simply the github ID.
-    In the future we may enhance this to include other types of identification.
-* **owning-sig** Required
-  * The SIG that is most closely associated with this KEP. If there is code or
-    other artifacts that will result from this KEP, then it is expected that
-    this SIG will take responsibility for the bulk of those artifacts.
-  * Sigs are listed as `sig-abc-def` where the name matches up with the
-    directory in the `kubernetes/community` repo.
-* **participating-sigs** Optional
-  * A list of SIGs that are involved or impacted by this KEP.
-  * A special value of `kubernetes-wide` will indicate that this KEP has impact
-    across the entire project.
-* **reviewers** Required
-  * Reviewer(s) chosen after triage according to proposal process
-  * If not yet chosen replace with `TBD`
-  * Same name/contact scheme as `authors`
-  * Reviewers should be a distinct set from authors.
-* **approvers** Required
-  * Approver(s) chosen after triage according to proposal process
-  * Approver(s) are drawn from the impacted SIGs.
-    It is up to the individual SIGs to determine how they pick approvers for KEPs impacting them.
-    The approvers are speaking for the SIG in the process of approving this KEP.
-    The SIGs in question can modify this list as necessary.
-  * The approvers are the individuals that make the call to move this KEP to the `approved` state.
-  * Approvers should be a distinct set from authors.
-  * If not yet chosen replace with `TBD`
-  * Same name/contact scheme as `authors`
-* **editor** Required
-  * Someone to keep things moving forward.
-  * If not yet chosen replace with `TBD`
-  * Same name/contact scheme as `authors`
-* **creation-date** Required
-  * The date that the KEP was first submitted in a PR.
-  * In the form `yyyy-mm-dd`
-  * While this info will also be in source control, it is helpful to have the set of KEP files stand on their own.
-* **last-updated** Optional
-  * The date that the KEP was last changed significantly.
-  * In the form `yyyy-mm-dd`
-* **see-also** Optional
-  * A list of other KEPs that are relevant to this KEP.
-  * In the form `KEP-123`
-* **replaces** Optional
-  * A list of KEPs that this KEP replaces.  Those KEPs should list this KEP in
-    their `superseded-by`.
-  * In the form `KEP-123`
-* **superseded-by**
-  * A list of KEPs that supersede this KEP. Use of this should be paired with
-    this KEP moving into the `Replaced` status.
-  * In the form `KEP-123`
-
+```
+---
+authors: # required
+  - "calebamiles" # just a GitHub handle for now
+  - "jbeda"
+title: "Kubernetes Enhancement Proposal process"
+number: 42 # required, use the number from the pull rquest marking the KEP as "accepted"
+owning-sig: "sig-pm" # required
+participating-sigs:
+  - "sig-architecture"
+  - "sig-contributor-experience"
+approvers: # required
+  - "bgrant0607" # just a GitHub handle for now
+reviewers:
+  - "justaugustus"  # just a GitHub handle for now
+  - "jdumars"
+editors:
+  - null # generally omit empty/null fields
+status: "active" # required
+github:
+  issues:
+    - null # GitHub url
+  pull_requests:
+    - null # GitHub url
+  projects:
+    - project_id: null
+      card_id: null
+releases: # required
+  - k8s_version: v1.9
+    kep_status: "active"
+    k8s_status: "alpha" # one of alpha|beta|GA
+  - k8s_version: v1.10
+    kep_status: "active"
+    k8s_status: "alpha"
+replaces:
+  - kep_location: null
+superseded-by:
+  - kep_location: null
+created: 2018-01-22 # in YYYY-MM-DD
+updated: 2018-09-04
+```
 
 ### KEP Workflow
 
 A KEP has the following states
 
-- `provisional`: The KEP has been proposed and is actively being defined.
-  This is the starting state while the KEP is being fleshed out and actively defined and discussed.
-  The owning SIG has accepted that this is work that needs to be done.
-- `implementable`: The approvers have approved this KEP for implementation.
-- `implemented`: The KEP has been implemented and is no longer actively changed.
-- `deferred`: The KEP is proposed but not actively being worked on.
-- `rejected`: The approvers and authors have decided that this KEP is not moving forward.
+- `draft`: the author(s) would like to document some agreement by checking in a
+  partial KEP but the content has not been approved by the SIG for implementation
+- `accepted`: The owning SIG agrees with the `Motivation` and is committing to
+  supporting further iteration on the KEP before implementation
+- `implementable`: The approvers have approved the design and draft
+  documentation of the KEP for implementation.
+- `active`: The KEP is under active development
+- `retired`: The functionality described by the KEP has been retired by the
+  project
+- `deferred`: The KEP is proposed but will not be considered for approval at
+  this time.
+- `rejected`: The approvers and authors have decided that this KEP is not moving
+  forward.
   The KEP is kept around as a historical document.
 - `withdrawn`: The KEP has been withdrawn by the authors.
-- `replaced`: The KEP has been replaced by a new KEP.
+- `superseded`: The KEP has been superseded by a new KEP.
   The `superseded-by` metadata value should point to the new KEP.
+
+A KEP will typically take one of the following paths through state space
+
+
+1. `draft -> accepted -> implementatble -> active`
+1. `draft -> accepted -> implementatble -> active -> retired`
+1. `draft -> rejected`
+1. `draft -> deferred`
+
+and the initial PR for a KEP should set the status to either `draft` or
+`accepted` unless through previous communication with the SIG it has been agreed
+to accept a fully formed KEP document in the initial PR. When merging a full
+KEP in a single PR the status should likely be set to `implementable` or
+`active` depending on whether work is already in flight.
 
 ### Git and GitHub Implementation
 
@@ -245,6 +261,25 @@ As significant work is done on the KEP the authors can assign a KEP number.
 This is done by taking the next number in the NEXT_KEP_NUMBER file, incrementing that number, and renaming the KEP.
 No other changes should be put in that PR so that it can be approved quickly and minimize merge conflicts.
 The KEP number can also be done as part of the initial submission if the PR is likely to be uncontested and merged quickly.
+
+### When to Merge
+
+In general Kubernetes uses a [lazy consensus][] process for decision making. The
+correct time to merge a pull request is whenever consensus has been reached on a
+section of a KEP with the goal being that large requests don't remain open
+indefinitely. It is expected that a decision on the `Introduction` and `Motivation`
+sections should happen relatively quickly while the detailed design documents
+(`guide-for-{developers, teacher, operators, project-maintainers}.md`) may take
+longer to merge as consensus forms.
+
+[lazy consensus]: https://openoffice.apache.org/docs/governance/lazyConsensus.html
+
+### How to assign a number
+
+The `kep-number` should be taken from the pull request number which marks the
+KEP as `accepted` which is a handy source of monotonically increasing numbers
+and will hopefully mitigate "number squatting".
+
 
 ### KEP Editor Role
 
@@ -356,7 +391,40 @@ and durable storage.
 
 ## Unresolved Questions
 
-- How reviewers and approvers are assigned to a KEP
+- ~~How reviewers and approvers are assigned to a KEP~~ blunderbus like any
+  other repo using the `OWNERS` process
 - Example schedule, deadline, and time frame for each stage of a KEP
 - Communication/notification mechanisms
 - Review meetings and escalation procedure
+
+## Metadata
+```
+---
+kep-number: 1
+title: Kubernetes Enhancement Proposal Process
+authors:
+  - "@calebamiles"
+  - "@jbeda"
+owning-sig: sig-architecture
+participating-sigs:
+  - sig-api-machinery
+  - sig-apps
+  - sig-auth
+  - sig-aws
+  - sig-azure
+  - sig-cli
+  - sig-cloud-provider
+  - sig-cluster-lifecycle
+  - sig-contributor-experience
+  - sig-network
+  - sig-node
+  - sig-scheduling
+reviewers:
+  - name: "@timothysc"
+approvers:
+  - name: "@bgrant0607"
+editor:
+  name: "@jbeda"
+creation-date: 2017-08-22
+status: implementable
+```
