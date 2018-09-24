@@ -1,7 +1,17 @@
+- [ ] helpers
+  - [ ] create list of sigs from template (in progress)
+  - [ ] create sig <-> subproject mapping from template
+- [ ] metadata
+  - [ ] define struct (in progress)
+  - [ ] build routing info from path (in progress)
+- [ ] templates
+  - [ ] introduction (summary + motivation)
+- [ ] index
+  - [ ] update from directory walk
+  - [ ] build cache from index
 - [ ] kep propose
-  - [ ] creates metadata
+  - [ ] creates metadata file
   - [ ] creates introduction
-  - [ ] creates motivation
   - [ ] cli
 - [ ] kep plan
 - [ ] kep check
