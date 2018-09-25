@@ -1,5 +1,6 @@
 - [ ] helpers
   - [ ] create list of sigs from template (in progress)
+    - breadcrumb: https://play.golang.org/p/VdsddNNwLNv
   - [ ] create sig <-> subproject mapping from template
 - [ ] metadata
   - [ ] define struct (in progress)
