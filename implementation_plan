@@ -1,7 +1,7 @@
 - [ ] helpers
-  - [ ] create list of sigs from template (in progress)
+  - [x] create list of sigs from template
     - breadcrumb: https://play.golang.org/p/VdsddNNwLNv
-  - [ ] create sig <-> subproject mapping from template
+  - [x] create sig <-> subproject mapping from template
 - [ ] metadata
   - [ ] define struct (in progress)
   - [ ] build routing info from path (in progress)
