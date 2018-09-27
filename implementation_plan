@@ -31,10 +31,10 @@
   - [ ] adds to index
 - [ ] kep start
   - [ ] checks enhancements existence
-- [ ] kep deliver
-  - [ ] checks experience reports
 - [ ] kep check
 
 ## Future Work:
 - [ ] keps update-tracking-boards
 - [ ] keps update-tracking-issues
+- [ ] kep deliver
+  - [ ] checks experience reports
