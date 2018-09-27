@@ -1,20 +1,39 @@
+## Backlog:
 - [ ] helpers
   - [x] create list of sigs from template
     - breadcrumb: https://play.golang.org/p/VdsddNNwLNv
   - [x] create sig <-> subproject mapping from template
 - [ ] metadata
   - [ ] define struct (in progress)
-  - [ ] build routing info from path (in progress)
 - [ ] templates
   - [ ] introduction (summary + motivation)
+- [ ] kep init
+  - [ ] creates metadata file
+  - [ ] creates summary.md
+  - [ ] creates motivation.md
+  - [ ] creates README.md
+  - [ ] cli
+- [ ] kep propose
+  - [ ] checks metadata
+  - [ ] checks summary existence
+  - [ ] checks motivation existence 
+- [ ] kep accept
+  - [ ] set metadata to "provisional" or similar
+- [ ] kep plan
+  - [ ] checks guides existence
+  - [ ] checks graduation criteria existence
 - [ ] index
   - [ ] update from directory walk
   - [ ] build cache from index
-- [ ] kep propose
-  - [ ] creates metadata file
-  - [ ] creates introduction
-  - [ ] cli
-- [ ] kep plan
+- [ ] kep approve
+  - [ ] assigns number
+  - [ ] adds to index
+- [ ] kep start
+  - [ ] checks enhancements existence
+- [ ] kep deliver
+  - [ ] checks experience reports
 - [ ] kep check
+
+## Future Work:
 - [ ] keps update-tracking-boards
 - [ ] keps update-tracking-issues
