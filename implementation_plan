@@ -8,12 +8,16 @@
   - [ ] define struct (in progress)
 - [ ] templates
   - [ ] introduction (summary + motivation)
+- [ ] keps
+  - [ ] find KEP content root
+  - [ ] Collection
+  - [ ] Collection.Create
 - [ ] kep init
   - [ ] creates metadata file
   - [ ] creates summary.md
   - [ ] creates motivation.md
   - [ ] creates README.md
-  - [ ] cli
+- [ ] cobra skeleton
 - [ ] kep propose
   - [ ] checks metadata
   - [ ] checks summary existence
