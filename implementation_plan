@@ -4,6 +4,7 @@
     - breadcrumb: https://play.golang.org/p/VdsddNNwLNv
   - [x] create sig <-> subproject mapping from template
 - [ ] metadata
+  - [x] build routing info from path
   - [ ] define struct (in progress)
 - [ ] templates
   - [ ] introduction (summary + motivation)
