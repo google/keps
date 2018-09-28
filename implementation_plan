@@ -14,12 +14,13 @@
   - [ ] find KEP content root
   - [ ] Collection
   - [ ] Collection.Create
-- [ ] kep init
+- [ ] workflow stages
   - [ ] creates metadata file
   - [ ] creates summary.md
   - [ ] creates motivation.md
   - [ ] creates README.md
 - [ ] cobra skeleton
+- [ ] kep init
 - [ ] kep propose
   - [ ] checks metadata
   - [ ] checks summary existence
