@@ -3,6 +3,8 @@
   - [x] create list of sigs from template
     - breadcrumb: https://play.golang.org/p/VdsddNNwLNv
   - [x] create sig <-> subproject mapping from template
+- [x] sigs
+  - [x] extract metadata from path
 - [ ] metadata
   - [x] build routing info from path
   - [ ] define struct (in progress)

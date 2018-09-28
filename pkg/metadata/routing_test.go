@@ -3,35 +3,45 @@ package metadata_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"github.com/calebamiles/keps/pkg/metadata"
 )
 
 var _ = Describe("Routing Metadata", func() {
-	Describe("extracting routing information from a path string", func() {
-		Context("with a valid SIG and subproject", func() {
-			It("extracts SIG information from a path string", func() {
-				Expect(sigs.ExtractFromPath("content/sig-node/kubelet")).To(Equal("sig-node"))
-			})
+	Describe("NewRoutingFromPath()", func() {
+		Context("when the SIG and subproject exist", func() {
+			It("returns routing info with SIG and subproject", func() {
+				p := "content/sig-node/kubelet/device-plugins"
 
-			It("extracts subproject information from a path string", func() {
-				Expect(sigs.ExtractSubprojectFromPath("content/sig-node/kubelet")).To(Equal("sig-node"))
-			})
-		})
+				routingInfo, err := metadata.NewRoutingFromPath(p)
+				Expect(err).ToNot(HaveOccurred())
 
-		Context("with an invalid SIG and/or subproject", func() {
-			It("returns an empty string for the invalid component", func() {
-				By("parsing the SIG")
-				Expect(sigs.ExtractFromPath("content/sig-node/not-real-subproject")).To(Equal("sig-node"))
-				Expect(sigs.ExtractFromPath("content/sig-not-real/kubelet")).To(BeEmpty())
-
-				By("parsing the subproject")
-				Expect(sigs.ExtractSubprojectFromPath("content/sig-not-real/kubelet")).To(Equal("kubelet"))
-				Expect(sigs.ExtractSubprojectFromPath("content/sig-not-real/not-real-subproject")).To(BeEmpty())
+				Expect(routingInfo.OwningSIG).To(Equal("sig-node"))
+				Expect(routingInfo.AffectedSubprojects).To(HaveLen(1))
+				Expect(routingInfo.AffectedSubprojects).To(ContainElement("kubelet"))
 			})
 		})
 
-		Context("with a missing SIG and/or subproject", func() {
-			It("returns an empty string for the missing component", func() {
+		Context("when the SIG does not exist", func() {
+			It("returns an error", func() {
+				p := "content/sig-not-real/kublet/device-plugins"
 
+				_, err := metadata.NewRoutingFromPath(p)
+				Expect(err.Error()).To(ContainSubstring("no SIG information"))
+			})
+		})
+
+		Context("when the SIG exists but the subproject does not", func() {
+			It("returns routing info with SIG", func() {
+				By("treating subproject information as optional")
+
+				p := "content/sig-node/not-a-subproject/lost-idea"
+
+				routingInfo, err := metadata.NewRoutingFromPath(p)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(routingInfo.OwningSIG).To(Equal("sig-node"))
+				Expect(routingInfo.AffectedSubprojects).To(BeEmpty())
 			})
 		})
 	})
