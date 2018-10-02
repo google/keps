@@ -1,24 +1,49 @@
 ## Backlog:
-- [ ] helpers
+- [x] helpers
   - [x] create list of sigs from template
     - breadcrumb: https://play.golang.org/p/VdsddNNwLNv
   - [x] create sig <-> subproject mapping from template
-- [x] sigs
-  - [x] extract metadata from path
+- [x] settings
+  - [x] read KEP content root from saved settings file
+  - [x] save content root to file
+- [ ] sigs
+  - [x] extract name from path
+  - [ ] IsLastDir()
+  - [ ] set "project-wide" if path ends at KEP content root
 - [ ] metadata
   - [x] build routing info from path
-  - [ ] define struct (in progress)
+  - [x] initial struct definition
+  - [ ] set kubernetes wide, rather than error if created under project root
+  - [ ] set sig wide if not created under subproject
 - [ ] templates
-  - [ ] introduction (summary + motivation)
+  - [ ] summary.md
+  - [ ] motivation.md
+  - [ ] README.md
+  - [ ] guides/developers.md
+  - [ ] guides/operators.md
+  - [ ] guides/teachers.md 
+  - [ ] graduation_criteria.md
 - [ ] keps
   - [ ] find KEP content root
+  - [ ] extract path after content root
   - [ ] Collection
-  - [ ] Collection.Create
+  - [ ] Collection.Add
+  - [ ] Collection.Filter
+  - [ ] Collection.Save
+  - [ ] Collection.Render
 - [ ] workflow stages
   - [ ] creates metadata file
   - [ ] creates summary.md
   - [ ] creates motivation.md
   - [ ] creates README.md
+- [ ] demos
+  - [ ] demo/init
+  - [ ] demo/propose
+  - [ ] demo/accept
+  - [ ] demo/reject
+  - [ ] demo/postpone
+  - [ ] demo/plan
+  - [ ] demo/approve
 - [ ] cobra skeleton
 - [ ] kep init
 - [ ] kep propose
@@ -39,6 +64,8 @@
 - [ ] kep start
   - [ ] checks enhancements existence
 - [ ] kep check
+
+## Done
 
 ## Future Work:
 - [ ] keps update-tracking-boards
