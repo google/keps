@@ -24,7 +24,7 @@
   - [ ] guides/teachers.md 
   - [ ] graduation_criteria.md
 - [ ] keps
-  - [ ] find KEP content root
+  - [x] find KEP content root
   - [ ] extract path after content root
   - [ ] Collection
   - [ ] Collection.Add
