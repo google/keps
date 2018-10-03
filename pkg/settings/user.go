@@ -41,6 +41,13 @@ func SaveContentRoot(p string) error {
 		return err
 	}
 
+	settingsDir := filepath.Dir(settingsFileLocation)
+	err = os.MkdirAll(settingsDir, os.ModePerm)
+	if err != nil {
+		log.Error("failed to create settings directory")
+		return err
+	}
+
 	s := &User{}
 	err = readSettingsFile(settingsFileLocation, s)
 	switch {
