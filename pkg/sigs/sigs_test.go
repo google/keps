@@ -36,52 +36,58 @@ var _ = Describe("the SIGs helper package", func() {
 		})
 	})
 
-	Describe("ExtractNameFromPath()", func() {
-		Context("when the SIG exists", func() {
-			It("extracts the SIG name from a given path", func() {
-				p := "content/sig-node/kubelet"
-				Expect(sigs.ExtractNameFromPath(p)).To(Equal("sig-node"))
+	Describe("BuildRoutingFromPath", func() {
+		Context("when the path is the content root", func() {
+			It("returns kubernetes wide information", func() {
+				contentRoot := "/home/user/workspace/keps/content/"
+				givenPath := "/home/user/workspace/keps/content"
+
+				info, err := sigs.BuildRoutingFromPath(contentRoot, givenPath)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(info.OwningSIG).To(Equal("sig-architecture"))
+				Expect(info.KubernetesWide).To(BeTrue())
 			})
 		})
 
-		Context("when the SIG does not exist", func() {
-			It("returns an empty string", func() {
-				p := "content/sig-not-real/kubelet"
-				Expect(sigs.ExtractNameFromPath(p)).To(BeEmpty())
+		Context("when the path is at a SIG root", func() {
+			It("returns SIG wide information", func() {
+				contentRoot := "/home/user/workspace/keps/content/"
+				givenPath := "/home/user/workspace/keps/content/sig-node"
+
+				info, err := sigs.BuildRoutingFromPath(contentRoot, givenPath)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(info.OwningSIG).To(Equal("sig-node"))
+				Expect(info.SIGWide).To(BeTrue())
 			})
 		})
 
-		Context("when there are multiple SIG names in a given path", func() {
-			It("returns an empty string", func() {
-				p := "content/sig-node/sig-architecture/kublet"
-				Expect(sigs.ExtractNameFromPath(p)).To(BeEmpty())
+		Context("when the path does not include a SIG", func() {
+			It("returns an error", func() {
+				contentRoot := "/home/user/workspace/keps/content/"
+				givenPath := "/home/user/workspace/keps/content/sig-not-real"
+
+				_, err := sigs.BuildRoutingFromPath(contentRoot, givenPath)
+				Expect(err.Error()).To(ContainSubstring("unable to determine SIG information for given path"))
+			})
+		})
+
+		Context("when the path includes a SIG and subproject", func() {
+			It("returns SIG and subproject information", func() {
+				contentRoot := "/home/user/workspace/keps/content/"
+				givenPath := "/home/user/workspace/keps/content/sig-node/kubelet"
+
+				info, err := sigs.BuildRoutingFromPath(contentRoot, givenPath)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(info.OwningSIG).To(Equal("sig-node"))
+				Expect(info.SIGWide).To(BeFalse())
+				Expect(info.AffectedSubprojects).To(ContainElement("kubelet"))
 			})
 		})
 	})
 
-	Describe("ExtractSubprojectNameFromPath()", func() {
-		Context("when the subproject is immediately nested under the SIG", func() {
-			It("extracts the subproject name from a given path", func() {
-				p := "content/sig-node/kubelet"
-				Expect(sigs.ExtractSubprojectNameFromPath(p)).To(Equal("kubelet"))
-			})
-
-		})
-
-		Context("when the subproject is not immediately nested under the SIG", func() {
-			It("returns an empty string", func() {
-				p := "content/sig-node/some-dir/kubelet"
-				Expect(sigs.ExtractSubprojectNameFromPath(p)).To(BeEmpty())
-			})
-		})
-
-		Context("when the subproject is not owned by the SIG it is nested under", func() {
-			It("returns an empty string", func() {
-				p := "content/sig-networking/kubelet"
-				Expect(sigs.ExtractSubprojectNameFromPath(p)).To(BeEmpty())
-			})
-		})
-	})
 })
 
 func fetchUpstreamSIGNames() []string {
