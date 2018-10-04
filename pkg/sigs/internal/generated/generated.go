@@ -9,6 +9,749 @@ package generated
 // this file SHOULD NOT export any methods as its intention is simply to
 // provide data for eventually exported functions
 
+const (
+	ContentRoot = "content"
+)
+
+type PathInfo struct {
+	OwningSIG      string
+	Subproject     string
+	KubernetesWide bool
+	SIGWide        bool
+}
+
+var InfoForPath = map[string]*PathInfo{
+	".": &PathInfo{
+		OwningSIG:      "sig-architecture",
+		KubernetesWide: true,
+	},
+
+	ContentRoot: &PathInfo{
+		OwningSIG:      "sig-architecture",
+		KubernetesWide: true,
+	},
+
+	"sig-api-machinery": &PathInfo{
+		OwningSIG: "sig-api-machinery",
+		SIGWide:   true,
+	},
+
+	"sig-apps": &PathInfo{
+		OwningSIG: "sig-apps",
+		SIGWide:   true,
+	},
+
+	"sig-architecture": &PathInfo{
+		OwningSIG: "sig-architecture",
+		SIGWide:   true,
+	},
+
+	"sig-auth": &PathInfo{
+		OwningSIG: "sig-auth",
+		SIGWide:   true,
+	},
+
+	"sig-autoscaling": &PathInfo{
+		OwningSIG: "sig-autoscaling",
+		SIGWide:   true,
+	},
+
+	"sig-aws": &PathInfo{
+		OwningSIG: "sig-aws",
+		SIGWide:   true,
+	},
+
+	"sig-azure": &PathInfo{
+		OwningSIG: "sig-azure",
+		SIGWide:   true,
+	},
+
+	"sig-big-data": &PathInfo{
+		OwningSIG: "sig-big-data",
+		SIGWide:   true,
+	},
+
+	"sig-cli": &PathInfo{
+		OwningSIG: "sig-cli",
+		SIGWide:   true,
+	},
+
+	"sig-cloud-provider": &PathInfo{
+		OwningSIG: "sig-cloud-provider",
+		SIGWide:   true,
+	},
+
+	"sig-cluster-lifecycle": &PathInfo{
+		OwningSIG: "sig-cluster-lifecycle",
+		SIGWide:   true,
+	},
+
+	"sig-cluster-ops": &PathInfo{
+		OwningSIG: "sig-cluster-ops",
+		SIGWide:   true,
+	},
+
+	"sig-contributor-experience": &PathInfo{
+		OwningSIG: "sig-contributor-experience",
+		SIGWide:   true,
+	},
+
+	"sig-docs": &PathInfo{
+		OwningSIG: "sig-docs",
+		SIGWide:   true,
+	},
+
+	"sig-gcp": &PathInfo{
+		OwningSIG: "sig-gcp",
+		SIGWide:   true,
+	},
+
+	"sig-ibmcloud": &PathInfo{
+		OwningSIG: "sig-ibmcloud",
+		SIGWide:   true,
+	},
+
+	"sig-instrumentation": &PathInfo{
+		OwningSIG: "sig-instrumentation",
+		SIGWide:   true,
+	},
+
+	"sig-multicluster": &PathInfo{
+		OwningSIG: "sig-multicluster",
+		SIGWide:   true,
+	},
+
+	"sig-network": &PathInfo{
+		OwningSIG: "sig-network",
+		SIGWide:   true,
+	},
+
+	"sig-node": &PathInfo{
+		OwningSIG: "sig-node",
+		SIGWide:   true,
+	},
+
+	"sig-openstack": &PathInfo{
+		OwningSIG: "sig-openstack",
+		SIGWide:   true,
+	},
+
+	"sig-pm": &PathInfo{
+		OwningSIG: "sig-pm",
+		SIGWide:   true,
+	},
+
+	"sig-release": &PathInfo{
+		OwningSIG: "sig-release",
+		SIGWide:   true,
+	},
+
+	"sig-scalability": &PathInfo{
+		OwningSIG: "sig-scalability",
+		SIGWide:   true,
+	},
+
+	"sig-scheduling": &PathInfo{
+		OwningSIG: "sig-scheduling",
+		SIGWide:   true,
+	},
+
+	"sig-service-catalog": &PathInfo{
+		OwningSIG: "sig-service-catalog",
+		SIGWide:   true,
+	},
+
+	"sig-storage": &PathInfo{
+		OwningSIG: "sig-storage",
+		SIGWide:   true,
+	},
+
+	"sig-testing": &PathInfo{
+		OwningSIG: "sig-testing",
+		SIGWide:   true,
+	},
+
+	"sig-ui": &PathInfo{
+		OwningSIG: "sig-ui",
+		SIGWide:   true,
+	},
+
+	"sig-vmware": &PathInfo{
+		OwningSIG: "sig-vmware",
+		SIGWide:   true,
+	},
+
+	"sig-windows": &PathInfo{
+		OwningSIG: "sig-windows",
+		SIGWide:   true,
+	},
+
+	"sig-api-machinery/server-binaries": &PathInfo{
+		OwningSIG:  "sig-api-machinery",
+		Subproject: "server-binaries",
+	},
+
+	"sig-api-machinery/control-plane-features": &PathInfo{
+		OwningSIG:  "sig-api-machinery",
+		Subproject: "control-plane-features",
+	},
+
+	"sig-api-machinery/universal-machinery": &PathInfo{
+		OwningSIG:  "sig-api-machinery",
+		Subproject: "universal-machinery",
+	},
+
+	"sig-api-machinery/server-frameworks": &PathInfo{
+		OwningSIG:  "sig-api-machinery",
+		Subproject: "server-frameworks",
+	},
+
+	"sig-api-machinery/server-crd": &PathInfo{
+		OwningSIG:  "sig-api-machinery",
+		Subproject: "server-crd",
+	},
+
+	"sig-api-machinery/server-api-aggregation": &PathInfo{
+		OwningSIG:  "sig-api-machinery",
+		Subproject: "server-api-aggregation",
+	},
+
+	"sig-api-machinery/server-sdk": &PathInfo{
+		OwningSIG:  "sig-api-machinery",
+		Subproject: "server-sdk",
+	},
+
+	"sig-api-machinery/idl-schema-client-pipeline": &PathInfo{
+		OwningSIG:  "sig-api-machinery",
+		Subproject: "idl-schema-client-pipeline",
+	},
+
+	"sig-api-machinery/kubernetes-clients": &PathInfo{
+		OwningSIG:  "sig-api-machinery",
+		Subproject: "kubernetes-clients",
+	},
+
+	"sig-apps/examples": &PathInfo{
+		OwningSIG:  "sig-apps",
+		Subproject: "examples",
+	},
+
+	"sig-apps/kompose": &PathInfo{
+		OwningSIG:  "sig-apps",
+		Subproject: "kompose",
+	},
+
+	"sig-apps/workloads-api": &PathInfo{
+		OwningSIG:  "sig-apps",
+		Subproject: "workloads-api",
+	},
+
+	"sig-apps/application": &PathInfo{
+		OwningSIG:  "sig-apps",
+		Subproject: "application",
+	},
+
+	"sig-architecture/api": &PathInfo{
+		OwningSIG:  "sig-architecture",
+		Subproject: "api",
+	},
+
+	"sig-architecture/kubernetes-template-project": &PathInfo{
+		OwningSIG:  "sig-architecture",
+		Subproject: "kubernetes-template-project",
+	},
+
+	"sig-architecture/spartakus": &PathInfo{
+		OwningSIG:  "sig-architecture",
+		Subproject: "spartakus",
+	},
+
+	"sig-architecture/steering": &PathInfo{
+		OwningSIG:  "sig-architecture",
+		Subproject: "steering",
+	},
+
+	"sig-architecture/architecture-tracking": &PathInfo{
+		OwningSIG:  "sig-architecture",
+		Subproject: "architecture-tracking",
+	},
+
+	"sig-architecture/universal-utils": &PathInfo{
+		OwningSIG:  "sig-architecture",
+		Subproject: "universal-utils",
+	},
+
+	"sig-architecture/contrib": &PathInfo{
+		OwningSIG:  "sig-architecture",
+		Subproject: "contrib",
+	},
+
+	"sig-autoscaling/scale-client": &PathInfo{
+		OwningSIG:  "sig-autoscaling",
+		Subproject: "scale-client",
+	},
+
+	"sig-autoscaling/cluster-autoscaler": &PathInfo{
+		OwningSIG:  "sig-autoscaling",
+		Subproject: "cluster-autoscaler",
+	},
+
+	"sig-autoscaling/vertical-pod-autoscaler": &PathInfo{
+		OwningSIG:  "sig-autoscaling",
+		Subproject: "vertical-pod-autoscaler",
+	},
+
+	"sig-autoscaling/horizontal-pod-autoscaler": &PathInfo{
+		OwningSIG:  "sig-autoscaling",
+		Subproject: "horizontal-pod-autoscaler",
+	},
+
+	"sig-autoscaling/cluster-proportional-vertical-autoscaler": &PathInfo{
+		OwningSIG:  "sig-autoscaling",
+		Subproject: "cluster-proportional-vertical-autoscaler",
+	},
+
+	"sig-autoscaling/cluster-proportional-autoscaler": &PathInfo{
+		OwningSIG:  "sig-autoscaling",
+		Subproject: "cluster-proportional-autoscaler",
+	},
+
+	"sig-autoscaling/addon-resizer": &PathInfo{
+		OwningSIG:  "sig-autoscaling",
+		Subproject: "addon-resizer",
+	},
+
+	"sig-aws/cloud-provider-aws": &PathInfo{
+		OwningSIG:  "sig-aws",
+		Subproject: "cloud-provider-aws",
+	},
+
+	"sig-aws/aws-alb-ingress-controller": &PathInfo{
+		OwningSIG:  "sig-aws",
+		Subproject: "aws-alb-ingress-controller",
+	},
+
+	"sig-aws/aws-iam-authenticator": &PathInfo{
+		OwningSIG:  "sig-aws",
+		Subproject: "aws-iam-authenticator",
+	},
+
+	"sig-aws/aws-encryption-provider": &PathInfo{
+		OwningSIG:  "sig-aws",
+		Subproject: "aws-encryption-provider",
+	},
+
+	"sig-azure/cloud-provider-azure": &PathInfo{
+		OwningSIG:  "sig-azure",
+		Subproject: "cloud-provider-azure",
+	},
+
+	"sig-cli/kubectl": &PathInfo{
+		OwningSIG:  "sig-cli",
+		Subproject: "kubectl",
+	},
+
+	"sig-cli/kustomize": &PathInfo{
+		OwningSIG:  "sig-cli",
+		Subproject: "kustomize",
+	},
+
+	"sig-cli/cli-sdk": &PathInfo{
+		OwningSIG:  "sig-cli",
+		Subproject: "cli-sdk",
+	},
+
+	"sig-cloud-provider/kubernetes-cloud-provider": &PathInfo{
+		OwningSIG:  "sig-cloud-provider",
+		Subproject: "kubernetes-cloud-provider",
+	},
+
+	"sig-cloud-provider/cloud-provider-gcp": &PathInfo{
+		OwningSIG:  "sig-cloud-provider",
+		Subproject: "cloud-provider-gcp",
+	},
+
+	"sig-cloud-provider/cloud-provider-openstack": &PathInfo{
+		OwningSIG:  "sig-cloud-provider",
+		Subproject: "cloud-provider-openstack",
+	},
+
+	"sig-cloud-provider/cloud-provider-vsphere": &PathInfo{
+		OwningSIG:  "sig-cloud-provider",
+		Subproject: "cloud-provider-vsphere",
+	},
+
+	"sig-cluster-lifecycle/bootkube": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "bootkube",
+	},
+
+	"sig-cluster-lifecycle/cluster-api": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "cluster-api",
+	},
+
+	"sig-cluster-lifecycle/cluster-api-provider-aws": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "cluster-api-provider-aws",
+	},
+
+	"sig-cluster-lifecycle/cluster-api-provider-gcp": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "cluster-api-provider-gcp",
+	},
+
+	"sig-cluster-lifecycle/cluster-api-provider-openstack": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "cluster-api-provider-openstack",
+	},
+
+	"sig-cluster-lifecycle/kops": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "kops",
+	},
+
+	"sig-cluster-lifecycle/kube-aws": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "kube-aws",
+	},
+
+	"sig-cluster-lifecycle/kube-deploy": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "kube-deploy",
+	},
+
+	"sig-cluster-lifecycle/kube-up": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "kube-up",
+	},
+
+	"sig-cluster-lifecycle/kubeadm": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "kubeadm",
+	},
+
+	"sig-cluster-lifecycle/kubeadm-dind-cluster": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "kubeadm-dind-cluster",
+	},
+
+	"sig-cluster-lifecycle/kubernetes-anywhere": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "kubernetes-anywhere",
+	},
+
+	"sig-cluster-lifecycle/kubespray": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "kubespray",
+	},
+
+	"sig-cluster-lifecycle/minikube": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "minikube",
+	},
+
+	"sig-contributor-experience/community": &PathInfo{
+		OwningSIG:  "sig-contributor-experience",
+		Subproject: "community",
+	},
+
+	"sig-contributor-experience/community-management": &PathInfo{
+		OwningSIG:  "sig-contributor-experience",
+		Subproject: "community-management",
+	},
+
+	"sig-contributor-experience/github-management": &PathInfo{
+		OwningSIG:  "sig-contributor-experience",
+		Subproject: "github-management",
+	},
+
+	"sig-contributor-experience/contributors-documentation": &PathInfo{
+		OwningSIG:  "sig-contributor-experience",
+		Subproject: "contributors-documentation",
+	},
+
+	"sig-contributor-experience/devstats": &PathInfo{
+		OwningSIG:  "sig-contributor-experience",
+		Subproject: "devstats",
+	},
+
+	"sig-contributor-experience/k8s.io": &PathInfo{
+		OwningSIG:  "sig-contributor-experience",
+		Subproject: "k8s.io",
+	},
+
+	"sig-contributor-experience/mentoring": &PathInfo{
+		OwningSIG:  "sig-contributor-experience",
+		Subproject: "mentoring",
+	},
+
+	"sig-contributor-experience/repo-infra": &PathInfo{
+		OwningSIG:  "sig-contributor-experience",
+		Subproject: "repo-infra",
+	},
+
+	"sig-docs/kubernetes-docs-ja": &PathInfo{
+		OwningSIG:  "sig-docs",
+		Subproject: "kubernetes-docs-ja",
+	},
+
+	"sig-docs/kubernetes-docs-ko": &PathInfo{
+		OwningSIG:  "sig-docs",
+		Subproject: "kubernetes-docs-ko",
+	},
+
+	"sig-docs/kubernetes-docs-zh": &PathInfo{
+		OwningSIG:  "sig-docs",
+		Subproject: "kubernetes-docs-zh",
+	},
+
+	"sig-docs/reference-docs": &PathInfo{
+		OwningSIG:  "sig-docs",
+		Subproject: "reference-docs",
+	},
+
+	"sig-docs/website": &PathInfo{
+		OwningSIG:  "sig-docs",
+		Subproject: "website",
+	},
+
+	"sig-gcp/gcp-compute-persistent-disk-csi-driver": &PathInfo{
+		OwningSIG:  "sig-gcp",
+		Subproject: "gcp-compute-persistent-disk-csi-driver",
+	},
+
+	"sig-gcp/gcp-filestore-csi-driver": &PathInfo{
+		OwningSIG:  "sig-gcp",
+		Subproject: "gcp-filestore-csi-driver",
+	},
+
+	"sig-instrumentation/custom-metrics-apiserver": &PathInfo{
+		OwningSIG:  "sig-instrumentation",
+		Subproject: "custom-metrics-apiserver",
+	},
+
+	"sig-instrumentation/heapster": &PathInfo{
+		OwningSIG:  "sig-instrumentation",
+		Subproject: "heapster",
+	},
+
+	"sig-instrumentation/kube-state-metrics": &PathInfo{
+		OwningSIG:  "sig-instrumentation",
+		Subproject: "kube-state-metrics",
+	},
+
+	"sig-instrumentation/metrics-server": &PathInfo{
+		OwningSIG:  "sig-instrumentation",
+		Subproject: "metrics-server",
+	},
+
+	"sig-instrumentation/metrics": &PathInfo{
+		OwningSIG:  "sig-instrumentation",
+		Subproject: "metrics",
+	},
+
+	"sig-multicluster/federation-v1": &PathInfo{
+		OwningSIG:  "sig-multicluster",
+		Subproject: "federation-v1",
+	},
+
+	"sig-multicluster/federation-v2": &PathInfo{
+		OwningSIG:  "sig-multicluster",
+		Subproject: "federation-v2",
+	},
+
+	"sig-multicluster/cluster-registry": &PathInfo{
+		OwningSIG:  "sig-multicluster",
+		Subproject: "cluster-registry",
+	},
+
+	"sig-multicluster/kubemci": &PathInfo{
+		OwningSIG:  "sig-multicluster",
+		Subproject: "kubemci",
+	},
+
+	"sig-network/services": &PathInfo{
+		OwningSIG:  "sig-network",
+		Subproject: "services",
+	},
+
+	"sig-network/kube-dns": &PathInfo{
+		OwningSIG:  "sig-network",
+		Subproject: "kube-dns",
+	},
+
+	"sig-network/external-dns": &PathInfo{
+		OwningSIG:  "sig-network",
+		Subproject: "external-dns",
+	},
+
+	"sig-network/ingress": &PathInfo{
+		OwningSIG:  "sig-network",
+		Subproject: "ingress",
+	},
+
+	"sig-network/pod-networking": &PathInfo{
+		OwningSIG:  "sig-network",
+		Subproject: "pod-networking",
+	},
+
+	"sig-network/network-policy": &PathInfo{
+		OwningSIG:  "sig-network",
+		Subproject: "network-policy",
+	},
+
+	"sig-node/cri-o": &PathInfo{
+		OwningSIG:  "sig-node",
+		Subproject: "cri-o",
+	},
+
+	"sig-node/cri-tools": &PathInfo{
+		OwningSIG:  "sig-node",
+		Subproject: "cri-tools",
+	},
+
+	"sig-node/frakti": &PathInfo{
+		OwningSIG:  "sig-node",
+		Subproject: "frakti",
+	},
+
+	"sig-node/kubelet": &PathInfo{
+		OwningSIG:  "sig-node",
+		Subproject: "kubelet",
+	},
+
+	"sig-node/node-feature-discovery": &PathInfo{
+		OwningSIG:  "sig-node",
+		Subproject: "node-feature-discovery",
+	},
+
+	"sig-node/node-problem-detector": &PathInfo{
+		OwningSIG:  "sig-node",
+		Subproject: "node-problem-detector",
+	},
+
+	"sig-node/rktlet": &PathInfo{
+		OwningSIG:  "sig-node",
+		Subproject: "rktlet",
+	},
+
+	"sig-pm/features": &PathInfo{
+		OwningSIG:  "sig-pm",
+		Subproject: "features",
+	},
+
+	"sig-release/hyperkube": &PathInfo{
+		OwningSIG:  "sig-release",
+		Subproject: "hyperkube",
+	},
+
+	"sig-release/release": &PathInfo{
+		OwningSIG:  "sig-release",
+		Subproject: "release",
+	},
+
+	"sig-release/sig-release": &PathInfo{
+		OwningSIG:  "sig-release",
+		Subproject: "sig-release",
+	},
+
+	"sig-scalability/kubemark": &PathInfo{
+		OwningSIG:  "sig-scalability",
+		Subproject: "kubemark",
+	},
+
+	"sig-scalability/perf-tests": &PathInfo{
+		OwningSIG:  "sig-scalability",
+		Subproject: "perf-tests",
+	},
+
+	"sig-scheduling/cluster-capacity": &PathInfo{
+		OwningSIG:  "sig-scheduling",
+		Subproject: "cluster-capacity",
+	},
+
+	"sig-scheduling/descheduler": &PathInfo{
+		OwningSIG:  "sig-scheduling",
+		Subproject: "descheduler",
+	},
+
+	"sig-scheduling/kube-batch": &PathInfo{
+		OwningSIG:  "sig-scheduling",
+		Subproject: "kube-batch",
+	},
+
+	"sig-scheduling/scheduler": &PathInfo{
+		OwningSIG:  "sig-scheduling",
+		Subproject: "scheduler",
+	},
+
+	"sig-scheduling/poseidon": &PathInfo{
+		OwningSIG:  "sig-scheduling",
+		Subproject: "poseidon",
+	},
+
+	"sig-service-catalog/service-catalog": &PathInfo{
+		OwningSIG:  "sig-service-catalog",
+		Subproject: "service-catalog",
+	},
+
+	"sig-storage/kubernetes-csi": &PathInfo{
+		OwningSIG:  "sig-storage",
+		Subproject: "kubernetes-csi",
+	},
+
+	"sig-storage/external-storage": &PathInfo{
+		OwningSIG:  "sig-storage",
+		Subproject: "external-storage",
+	},
+
+	"sig-storage/git-sync": &PathInfo{
+		OwningSIG:  "sig-storage",
+		Subproject: "git-sync",
+	},
+
+	"sig-storage/nfs-provisioner": &PathInfo{
+		OwningSIG:  "sig-storage",
+		Subproject: "nfs-provisioner",
+	},
+
+	"sig-storage/volumes": &PathInfo{
+		OwningSIG:  "sig-storage",
+		Subproject: "volumes",
+	},
+
+	"sig-testing/kind": &PathInfo{
+		OwningSIG:  "sig-testing",
+		Subproject: "kind",
+	},
+
+	"sig-testing/repo-publishing": &PathInfo{
+		OwningSIG:  "sig-testing",
+		Subproject: "repo-publishing",
+	},
+
+	"sig-testing/testing-commons": &PathInfo{
+		OwningSIG:  "sig-testing",
+		Subproject: "testing-commons",
+	},
+
+	"sig-testing/test-infra": &PathInfo{
+		OwningSIG:  "sig-testing",
+		Subproject: "test-infra",
+	},
+
+	"sig-ui/dashboard": &PathInfo{
+		OwningSIG:  "sig-ui",
+		Subproject: "dashboard",
+	},
+
+	"sig-vmware/cluster-api-provider-vsphere": &PathInfo{
+		OwningSIG:  "sig-vmware",
+		Subproject: "cluster-api-provider-vsphere",
+	},
+}
+
 // SIGSet is the set of SIGs generated by KEP tooling helpers
 // DO NOT EDIT BY HAND
 var SIGSet = map[string]bool{
@@ -345,7 +1088,7 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 
 		"descheduler": true,
 
-		"kube-arbitrator": true,
+		"kube-batch": true,
 
 		"scheduler": true,
 

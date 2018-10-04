@@ -1,4 +1,4 @@
-package keps
+package settings
 
 import (
 	"fmt"
@@ -8,13 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/calebamiles/keps/pkg/settings"
 	"github.com/calebamiles/keps/pkg/sigs"
 )
 
 const (
-	contentRootDirectory = "content"
-	contentRootHelper    = ".keps"
 	ContentRootEnv       = "KEP_CONTENT_ROOT"
 )
 
@@ -30,7 +27,7 @@ func FindContentRoot() (string, error) {
 	}
 
 	envRoot := os.Getenv(ContentRootEnv)
-	cachedRoot, err := settings.ContentRoot()
+	cachedRoot, err := contentRoot()
 	if err != nil {
 		return "", err
 	}
@@ -74,6 +71,22 @@ func FindContentRoot() (string, error) {
 	return foundRoot, nil
 }
 
+func contentRoot() (string, error) {
+	settingsFileLocation, err := findSettingsFile()
+	if err != nil {
+		return "", err
+	}
+
+	s := &User{}
+	err = readSettingsFile(settingsFileLocation, s)
+	if err != nil {
+		log.Warn("reading user settings file")
+		return "", nil
+	}
+
+	return s.ContentRoot, nil
+}
+
 func hasDirForEachSIG(p string) bool {
 	knownSIGs := sigs.All()
 	for _, s := range knownSIGs {
@@ -105,13 +118,13 @@ func contentSearchRoot() (string, error) {
 		return "", err
 	}
 
-	prependedSlashToPath, err := filepath.Abs(pathRelativeToHome)
+	rootedPathRelativeToHome, err := filepath.Abs(pathRelativeToHome)
 	if err != nil {
 		log.Error("checking that $PWD is under $HOME")
 		return "", err
 	}
 
-	if prependedSlashToPath == invokedDir {
+	if rootedPathRelativeToHome == invokedDir {
 		log.Error("$PWD seems to not share elements with $HOME")
 		return "", fmt.Errorf("file search must start at location under $HOME: %s, not: %s", homeDir, invokedDir)
 	}
