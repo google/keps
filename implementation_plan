@@ -15,7 +15,9 @@
     - [x] handles sig wide keps
 - [ ] metadata
   - [x] initial struct definition
-  - [ ] moved as keps/ subpackage
+  - [x] moved as keps/ subpackage
+  - [x] metadata.New
+  - [x] metadata getters (protect all fields and eventually add lifecycle hooks e.g. `accept`, `reject`)
 - [ ] templates
   - [ ] summary.md
   - [ ] motivation.md
@@ -25,11 +27,14 @@
   - [ ] guides/teachers.md 
   - [ ] graduation_criteria.md
 - [ ] keps
-  - [ ] Collection
-  - [ ] Collection.Add
-  - [ ] Collection.Filter
-  - [ ] Collection.Save
-  - [ ] Collection.Render
+  - [ ] keps/skeleton
+    - [ ] New
+    - [ ] AddSections
+  - [ ] keps/collection
+    - [ ] Collection.Add
+    - [ ] Collection.Filter
+    - [ ] Collection.Save
+    - [ ] Collection.Render
 - [ ] workflow stages
   - [ ] creates metadata file
   - [ ] creates summary.md
