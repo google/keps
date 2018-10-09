@@ -10,7 +10,6 @@ import (
 	"github.com/go-yaml/yaml"
 
 	"github.com/calebamiles/keps/pkg/keps/states"
-	"github.com/calebamiles/keps/pkg/sigs"
 )
 
 type KEP interface {
@@ -20,7 +19,7 @@ type KEP interface {
 	Reviewers() []string
 	Approvers() []string
 	Editors() []string
-	State() states.State
+	State() states.Name
 	Replaces() string
 	DevelopmentThemes() []string
 	LastUpdated() time.Time
@@ -36,7 +35,16 @@ type KEP interface {
 	Persist() error
 }
 
-func New(authors []string, title string, routingInfo sigs.RoutingInfo) (KEP, error) {
+type routingInfoProvider interface {
+	OwningSIG() string
+	AffectedSubprojects() []string
+	ParticipatingSIGs() []string
+	KubernetesWide() bool
+	SIGWide() bool
+	ContentDir() string
+}
+
+func New(authors []string, title string, routingInfo routingInfoProvider) (KEP, error) {
 	k := &kep{
 		AuthorsField:             authors,
 		TitleField:               title,
@@ -71,25 +79,25 @@ func Open(p string) (KEP, error) {
 }
 
 type kep struct {
-	AuthorsField           []string     `yaml:"authors"`
-	TitleField             string       `yaml"title"`
-	NumberField            int          `yaml:"kep_number"`
-	ReviewersField         []string     `yaml:"reviewers"`
-	ApproversField         []string     `yaml:"approvers"`
-	EditorsField           []string     `yaml:"editors"`
-	StateField             states.State `yaml:"state"`
-	ReplacesField          string       `yaml:"replaces"`
-	DevelopmentThemesField []string     `yaml:"development_themes"`
-	LastUpdatedField       time.Time    `yaml:"last_updated"`
+	AuthorsField           []string    `yaml:"authors"`
+	TitleField             string      `yaml"title"`
+	NumberField            int         `yaml:"kep_number"`
+	ReviewersField         []string    `yaml:"reviewers"`
+	ApproversField         []string    `yaml:"approvers"`
+	EditorsField           []string    `yaml:"editors"`
+	StateField             states.Name `yaml:"state"`
+	ReplacesField          string      `yaml:"replaces"`
+	DevelopmentThemesField []string    `yaml:"development_themes"`
+	LastUpdatedField       time.Time   `yaml:"last_updated"`
 
 	OwningSIGField           string   `yaml:"owning_sig"`
 	AffectedSubprojectsField []string `yaml:"affected_subprojects"`
 	ParticipatingSIGsField   []string `yaml:"participating_sigs"`
 	KubernetesWideField      bool     `yaml:"kubernetes_wide"`
 	SIGWideField             bool     `yaml:"sig_wide"`
-	contentDir               string   `yaml:"-"` // do not persist this
 
-	lock sync.RWMutex `yaml:"-"` // do not persist this
+	contentDir string       `yaml:"-"` // do not persist this
+	lock       sync.RWMutex `yaml:"-"` // do not persist this
 }
 
 func (k *kep) Persist() error {
@@ -154,7 +162,7 @@ func (k *kep) Editors() []string {
 	return k.EditorsField
 }
 
-func (k *kep) State() states.State {
+func (k *kep) State() states.Name {
 	k.lock.RLock()
 	defer k.lock.RUnlock()
 

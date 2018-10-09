@@ -48,12 +48,12 @@ const (
 )
 
 type routingInfo struct {
-	OwningSIGField           string   `yaml:"owning_sig"`
-	AffectedSubprojectsField []string `yaml:"affected_subprojects"`
-	ParticipatingSIGsField   []string `yaml:"participating_sigs"`
-	KubernetesWideField      bool     `yaml:"kubernetes_wide"`
-	SIGWideField             bool     `yaml:"sig_wid"`
-	contentRoot              string   `yaml:"-"`
+	OwningSIGField           string
+	AffectedSubprojectsField []string
+	ParticipatingSIGsField   []string
+	KubernetesWideField      bool
+	SIGWideField             bool
+	contentRoot              string
 }
 
 func (i *routingInfo) ContentDir() string {
@@ -67,7 +67,7 @@ func (i *routingInfo) ContentDir() string {
 	return filepath.Join(i.contentRoot, i.OwningSIGField, sigWideDir)
 }
 
-func (i *routingInfo) OwningSIG() string { return i.OwningSIGField }
+func (i *routingInfo) OwningSIG() string             { return i.OwningSIGField }
 func (i *routingInfo) AffectedSubprojects() []string { return i.AffectedSubprojectsField }
 func (i *routingInfo) ParticipatingSIGs() []string   { return i.ParticipatingSIGsField }
 func (i *routingInfo) KubernetesWide() bool          { return i.KubernetesWideField }

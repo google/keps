@@ -10,7 +10,6 @@ import (
 
 	"github.com/calebamiles/keps/pkg/keps/metadata"
 	"github.com/calebamiles/keps/pkg/keps/states"
-	"github.com/calebamiles/keps/pkg/sigs/sigsfakes"
 )
 
 var _ = Describe("KEP Metdata", func() {
@@ -19,12 +18,15 @@ var _ = Describe("KEP Metdata", func() {
 			author := "Dawn Chen"
 			title := "kubelet"
 			owningSIG := "sig-node"
-			subproject := "kubelet"
+			subprojects := []string{"kubelet"}
 
-			info := new(sigsfakes.FakeRoutingInfo)
-			info.OwningSIGReturns(owningSIG)
-			info.AffectedSubprojectsReturns([]string{subproject})
-			info.SIGWideReturns(true)
+			info := newMockRoutingInfoProvider()
+			info.OwningSIGOutput.Ret0 <- owningSIG
+			info.AffectedSubprojectsOutput.Ret0 <- subprojects
+			info.SIGWideOutput.Ret0 <- true
+			info.KubernetesWideOutput.Ret0 <- false
+			info.ParticipatingSIGsOutput.Ret0 <- []string{}
+			info.ContentDirOutput.Ret0 <- ""
 
 			m, err := metadata.New([]string{author}, title, info)
 			Expect(err).ToNot(HaveOccurred())
@@ -32,7 +34,7 @@ var _ = Describe("KEP Metdata", func() {
 			Expect(m.Authors()).To(ContainElement(author))
 			Expect(m.Title()).To(Equal(title))
 			Expect(m.OwningSIG()).To(Equal(owningSIG))
-			Expect(m.AffectedSubprojects()).To(ContainElement(subproject))
+			Expect(m.AffectedSubprojects()).To(ContainElement(subprojects[0]))
 			Expect(m.State()).To(Equal(states.Provisional))
 		})
 	})
@@ -46,14 +48,16 @@ var _ = Describe("KEP Metdata", func() {
 			author := "Dawn Chen"
 			title := "kubelet"
 			owningSIG := "sig-node"
-			subproject := "kubelet"
+			subprojects := []string{"kubelet"}
 			now := time.Now()
 
-			info := new(sigsfakes.FakeRoutingInfo)
-			info.OwningSIGReturns(owningSIG)
-			info.AffectedSubprojectsReturns([]string{subproject})
-			info.SIGWideReturns(true)
-			info.ContentDirReturns(tmpDir)
+			info := newMockRoutingInfoProvider()
+			info.OwningSIGOutput.Ret0 <- owningSIG
+			info.AffectedSubprojectsOutput.Ret0 <- subprojects
+			info.SIGWideOutput.Ret0 <- true
+			info.KubernetesWideOutput.Ret0 <- false
+			info.ParticipatingSIGsOutput.Ret0 <- []string{}
+			info.ContentDirOutput.Ret0 <- tmpDir
 
 			m, err := metadata.New([]string{author}, title, info)
 			Expect(err).ToNot(HaveOccurred())
@@ -70,7 +74,7 @@ var _ = Describe("KEP Metdata", func() {
 			Expect(readMetadata.Authors()).To(ContainElement(author))
 			Expect(readMetadata.Title()).To(Equal(title))
 			Expect(readMetadata.OwningSIG()).To(Equal(owningSIG))
-			Expect(readMetadata.AffectedSubprojects()).To(ContainElement(subproject))
+			Expect(readMetadata.AffectedSubprojects()).To(ContainElement(subprojects[0]))
 
 			lastUpdated := readMetadata.LastUpdated()
 			lastUpdatedMinute := lastUpdated.Round(time.Minute)

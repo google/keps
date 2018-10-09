@@ -1,13 +1,13 @@
 package states
 
-type State string
+type Name string
 
 const (
-	Provisional   State = "provisional"
-	Implementable State = "implementable"
-	Implemented   State = "implemented"
-	Deferred      State = "deferred"
-	Rejected      State = "rejected"
-	Withdrawn     State = "withdrawn"
-	Replaced      State = "replaced"
+	Provisional   Name = "provisional"
+	Implementable Name = "implementable"
+	Implemented   Name = "implemented"
+	Deferred      Name = "deferred"
+	Rejected      Name = "rejected"
+	Withdrawn     Name = "withdrawn"
+	Replaced      Name = "replaced"
 )
