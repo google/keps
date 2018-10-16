@@ -12,7 +12,6 @@ type Collection interface {
 
 type collection struct {
 	sections []section
-	readme   section
 	locker   sync.Mutex
 }
 
@@ -54,10 +53,6 @@ func (c *collection) persist() error {
 		if err != nil {
 			return err
 		}
-	}
-
-	if c.readme != nil {
-		return c.readme.Persist()
 	}
 
 	return nil

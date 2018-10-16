@@ -36,8 +36,6 @@ func ForProvisionalState(renderingInfo renderingInfoProvider) (Collection, error
 		},
 	}
 
-	c.readme = readme
-
 	return c, nil
 }
 
@@ -100,8 +98,6 @@ func ForImplementableState(renderingInfo renderingInfoProvider) (Collection, err
 			readme,
 		},
 	}
-
-	c.readme = readme
 
 	return c, nil
 }
