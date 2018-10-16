@@ -13,19 +13,24 @@
   - [x] build routing info from path
     - [x] handles kubernetes wide keps
     - [x] handles sig wide keps
+  - [ ] add a display friendly SIG name method
 - [ ] metadata
   - [x] initial struct definition
   - [x] moved as keps/ subpackage
   - [x] metadata.New
   - [x] metadata getters (protect all fields and eventually add lifecycle hooks e.g. `accept`, `reject`)
 - [ ] templates
-  - [ ] summary.md
-  - [ ] motivation.md
-  - [ ] README.md
-  - [ ] guides/developers.md
-  - [ ] guides/operators.md
-  - [ ] guides/teachers.md 
-  - [ ] graduation_criteria.md
+  - [x] summary.md
+  - [x] motivation.md
+  - [x] README.md
+  - [x] guides/developers.md
+  - [x] guides/operators.md
+  - [x] guides/teachers.md 
+  - [x] graduation_criteria.md
+- [ ] section rendering
+  - [x] for templated sections
+  - [x] support writable sections for newly rendered content
+  - [x] support read only sections for content already on disk (in progress)
 - [ ] keps
   - [ ] keps/skeleton
     - [ ] New
@@ -35,11 +40,6 @@
     - [ ] Collection.Filter
     - [ ] Collection.Save
     - [ ] Collection.Render
-- [ ] workflow stages
-  - [ ] creates metadata file
-  - [ ] creates summary.md
-  - [ ] creates motivation.md
-  - [ ] creates README.md
 - [ ] demos
   - [ ] demo/init
   - [ ] demo/propose
