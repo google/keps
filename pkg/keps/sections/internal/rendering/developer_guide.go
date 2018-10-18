@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"text/template"
 
-	"github.com/calebamiles/keps/pkg/keps/section/internal/unrendered"
+	"github.com/calebamiles/keps/pkg/keps/sections/internal/unrendered"
 )
 
 const (

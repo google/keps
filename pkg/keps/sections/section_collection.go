@@ -1,4 +1,4 @@
-package section
+package sections
 
 import (
 	"sync"

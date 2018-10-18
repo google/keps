@@ -1,4 +1,4 @@
-package section_test
+package sections_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/calebamiles/keps/pkg/keps/section"
-	"github.com/calebamiles/keps/pkg/keps/section/internal/rendering"
+	"github.com/calebamiles/keps/pkg/keps/sections"
+	"github.com/calebamiles/keps/pkg/keps/sections/internal/rendering"
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
@@ -18,14 +18,14 @@ var _ = Describe("Creating a KEP section", func() {
 	Describe("New()", func() {
 		Context("when the section name does not exist", func() {
 			It("returns an error", func() {
-				_, err := section.New("this-is-not-a-section", nil)
+				_, err := sections.New("this-is-not-a-section", nil)
 				Expect(err.Error()).To(ContainSubstring("no top level KEP section: this-is-not-a-section exists"))
 			})
 		})
 
 		Context("when the section is the README", func() {
 			It("returns an error", func() {
-				_, err := section.New(rendering.ReadmeName, nil)
+				_, err := sections.New(rendering.ReadmeName, nil)
 				Expect(err).To(MatchError("cannot render README section using section.New(), use section.NewReadme()"))
 			})
 		})
@@ -51,7 +51,7 @@ var _ = Describe("Creating a KEP section", func() {
 				info.OwningSIGOutput.Ret0 <- owningSIG
 				info.ContentDirOutput.Ret0 <- tmpDir
 
-				sec, err := section.New(rendering.SummaryName, info)
+				sec, err := sections.New(rendering.SummaryName, info)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(sec.Content()).To(Equal(existingContent))
@@ -80,7 +80,7 @@ var _ = Describe("Creating a KEP section", func() {
 				info.OwningSIGOutput.Ret0 <- owningSIG
 				info.ContentDirOutput.Ret0 <- tmpDir
 
-				sec, err := section.New(rendering.SummaryName, info)
+				sec, err := sections.New(rendering.SummaryName, info)
 				Expect(err).ToNot(HaveOccurred())
 
 				err = sec.Erase()
@@ -115,7 +115,7 @@ var _ = Describe("Creating a KEP section", func() {
 				info.OwningSIGOutput.Ret0 <- owningSIG
 				info.ContentDirOutput.Ret0 <- tmpDir
 
-				sec, err := section.New(rendering.SummaryName, info)
+				sec, err := sections.New(rendering.SummaryName, info)
 				Expect(err).ToNot(HaveOccurred())
 
 				err = sec.Persist()
@@ -144,7 +144,7 @@ var _ = Describe("Creating a KEP section", func() {
 				info.OwningSIGOutput.Ret0 <- owningSIG
 				info.ContentDirOutput.Ret0 <- tmpDir
 
-				sec, err := section.New(rendering.SummaryName, info)
+				sec, err := sections.New(rendering.SummaryName, info)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(sec.Content()).To(ContainSubstring(title))
@@ -168,7 +168,7 @@ var _ = Describe("Creating a KEP section", func() {
 				info.OwningSIGOutput.Ret0 <- owningSIG
 				info.ContentDirOutput.Ret0 <- tmpDir
 
-				sec, err := section.New(rendering.SummaryName, info)
+				sec, err := sections.New(rendering.SummaryName, info)
 				Expect(err).ToNot(HaveOccurred())
 
 				err = sec.Persist()
@@ -201,7 +201,7 @@ var _ = Describe("Creating a KEP section", func() {
 				info.OwningSIGOutput.Ret0 <- owningSIG
 				info.ContentDirOutput.Ret0 <- tmpDir
 
-				sec, err := section.New(rendering.SummaryName, info)
+				sec, err := sections.New(rendering.SummaryName, info)
 				Expect(err).ToNot(HaveOccurred())
 
 				err = sec.Persist()
@@ -238,7 +238,7 @@ var _ = Describe("Creating a KEP section", func() {
 				info.LastUpdatedOutput.Ret0 <- now
 			}
 
-			summary, err := section.New(rendering.SummaryName, info)
+			summary, err := sections.New(rendering.SummaryName, info)
 			Expect(err).ToNot(HaveOccurred())
 
 			ss := []rendering.SectionProvider{summary}
@@ -248,7 +248,7 @@ var _ = Describe("Creating a KEP section", func() {
 				ss:           ss,
 			}
 
-			readme, err := section.NewReadme(infoWithSections)
+			readme, err := sections.NewReadme(infoWithSections)
 			Expect(err).ToNot(HaveOccurred())
 
 			err = readme.Persist()

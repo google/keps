@@ -1,4 +1,4 @@
-package section_test
+package sections_test
 
 import (
 	"testing"

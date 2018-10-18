@@ -1,4 +1,4 @@
-package section
+package sections
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/calebamiles/keps/pkg/keps/section/internal/rendering"
+	"github.com/calebamiles/keps/pkg/keps/sections/internal/rendering"
 )
 
 // New creates a new rendered section, either by reading existing content on disk

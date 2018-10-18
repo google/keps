@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/calebamiles/keps/pkg/keps/section/internal/rendering"
+	"github.com/calebamiles/keps/pkg/keps/sections/internal/rendering"
 )
 
 var _ = Describe("The Motivation Section", func() {

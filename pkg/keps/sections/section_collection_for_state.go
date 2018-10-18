@@ -1,7 +1,7 @@
-package section
+package sections
 
 import (
-	"github.com/calebamiles/keps/pkg/keps/section/internal/rendering"
+	"github.com/calebamiles/keps/pkg/keps/sections/internal/rendering"
 )
 
 func ForProvisionalState(renderingInfo renderingInfoProvider) (Collection, error) {

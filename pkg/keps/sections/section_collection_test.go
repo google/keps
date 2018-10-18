@@ -1,4 +1,4 @@
-package section_test
+package sections_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/calebamiles/keps/pkg/keps/section"
-	"github.com/calebamiles/keps/pkg/keps/section/internal/rendering"
+	"github.com/calebamiles/keps/pkg/keps/sections"
+	"github.com/calebamiles/keps/pkg/keps/sections/internal/rendering"
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
@@ -39,7 +39,7 @@ var _ = Describe("A collection of sections", func() {
 					info.LastUpdatedOutput.Ret0 <- now
 				}
 
-				col, err := section.ForProvisionalState(info)
+				col, err := sections.ForProvisionalState(info)
 				Expect(err).ToNot(HaveOccurred())
 
 				summaryLoc := filepath.Join(tmpDir, rendering.SummaryFilename)
@@ -79,7 +79,7 @@ var _ = Describe("A collection of sections", func() {
 					info.LastUpdatedOutput.Ret0 <- now
 				}
 
-				col, err := section.ForProvisionalState(info)
+				col, err := sections.ForProvisionalState(info)
 				Expect(err).ToNot(HaveOccurred())
 
 				By("persisting a README.md to disk")
@@ -128,7 +128,7 @@ var _ = Describe("A collection of sections", func() {
 					info.StateOutput.Ret0 <- kepState
 					info.LastUpdatedOutput.Ret0 <- now
 
-					col, err := section.ForProvisionalState(info)
+					col, err := sections.ForProvisionalState(info)
 					Expect(err).ToNot(HaveOccurred())
 
 					summaryLoc := filepath.Join(tmpDir, rendering.SummaryFilename)
@@ -166,7 +166,7 @@ var _ = Describe("A collection of sections", func() {
 					info.LastUpdatedOutput.Ret0 <- now
 				}
 
-				col, err := section.ForProvisionalState(info)
+				col, err := sections.ForProvisionalState(info)
 				Expect(err).ToNot(HaveOccurred())
 
 				summaryLoc := filepath.Join(tmpDir, rendering.SummaryFilename)
@@ -209,7 +209,7 @@ var _ = Describe("A collection of sections", func() {
 					info.LastUpdatedOutput.Ret0 <- now
 				}
 
-				col, err := section.ForProvisionalState(info)
+				col, err := sections.ForProvisionalState(info)
 				Expect(err).ToNot(HaveOccurred())
 
 				secs := col.Sections()

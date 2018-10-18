@@ -1,4 +1,4 @@
-package section
+package sections
 
 type readOnlySection struct {
 	*commonSectionInfo

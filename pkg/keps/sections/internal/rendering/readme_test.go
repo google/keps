@@ -6,8 +6,8 @@ import (
 
 	"time"
 
-	"github.com/calebamiles/keps/pkg/keps/section"
-	"github.com/calebamiles/keps/pkg/keps/section/internal/rendering"
+	"github.com/calebamiles/keps/pkg/keps/sections"
+	"github.com/calebamiles/keps/pkg/keps/sections/internal/rendering"
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
@@ -32,10 +32,10 @@ var _ = Describe("The README section", func() {
 				info.LastUpdatedOutput.Ret0 <- now
 			}
 
-			summary, err := section.New(rendering.SummaryName, info)
+			summary, err := sections.New(rendering.SummaryName, info)
 			Expect(err).ToNot(HaveOccurred())
 
-			motivation, err := section.New(rendering.MotivationName, info)
+			motivation, err := sections.New(rendering.MotivationName, info)
 			Expect(err).ToNot(HaveOccurred())
 
 			secs := []rendering.SectionProvider{summary, motivation}

@@ -1,9 +1,9 @@
-package section
+package sections
 
 import (
 	"time"
 
-	"github.com/calebamiles/keps/pkg/keps/section/internal/rendering"
+	"github.com/calebamiles/keps/pkg/keps/sections/internal/rendering"
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
 

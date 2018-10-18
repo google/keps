@@ -3,7 +3,7 @@
 // doing.  Expect any changes made manually to be overwritten
 // the next time hel regenerates this file.
 
-package section_test
+package sections_test
 
 import (
 	"time"
