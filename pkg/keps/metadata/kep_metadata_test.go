@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/calebamiles/keps/pkg/keps/metadata"
+	"github.com/calebamiles/keps/pkg/keps/sections"
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
@@ -39,6 +40,53 @@ var _ = Describe("KEP Metdata", func() {
 		})
 	})
 
+	Describe("#AddSections", func() {
+		It("adds section information to the metadata", func() {
+			author := "Dawn Chen"
+			title := "kubelet"
+			owningSIG := "sig-node"
+			subprojects := []string{"kubelet"}
+
+			info := newMockRoutingInfoProvider()
+			info.OwningSIGOutput.Ret0 <- owningSIG
+			info.AffectedSubprojectsOutput.Ret0 <- subprojects
+			info.SIGWideOutput.Ret0 <- true
+			info.KubernetesWideOutput.Ret0 <- false
+			info.ParticipatingSIGsOutput.Ret0 <- []string{}
+			info.ContentDirOutput.Ret0 <- ""
+
+			m, err := metadata.New([]string{author}, title, info)
+			Expect(err).ToNot(HaveOccurred())
+
+			ss := []sections.Info{&testSection{}}
+			m.AddSections(ss)
+			Expect(m.Sections()).To(HaveLen(1))
+		})
+
+		It("dedupes by section name", func() {
+			author := "Dawn Chen"
+			title := "kubelet"
+			owningSIG := "sig-node"
+			subprojects := []string{"kubelet"}
+
+			info := newMockRoutingInfoProvider()
+			info.OwningSIGOutput.Ret0 <- owningSIG
+			info.AffectedSubprojectsOutput.Ret0 <- subprojects
+			info.SIGWideOutput.Ret0 <- true
+			info.KubernetesWideOutput.Ret0 <- false
+			info.ParticipatingSIGsOutput.Ret0 <- []string{}
+			info.ContentDirOutput.Ret0 <- ""
+
+			m, err := metadata.New([]string{author}, title, info)
+			Expect(err).ToNot(HaveOccurred())
+
+			ss := []sections.Info{&testSection{}}
+			m.AddSections(ss)
+			m.AddSections(ss)
+			Expect(m.Sections()).To(HaveLen(1))
+		})
+	})
+
 	Describe("#Persist()", func() {
 		It("writes a YAML representation to disk", func() {
 			tmpDir, err := ioutil.TempDir("", "kep-content")
@@ -62,6 +110,9 @@ var _ = Describe("KEP Metdata", func() {
 			m, err := metadata.New([]string{author}, title, info)
 			Expect(err).ToNot(HaveOccurred())
 
+			ss := []sections.Info{&testSection{}}
+			m.AddSections(ss)
+
 			err = m.Persist()
 			Expect(err).ToNot(HaveOccurred())
 
@@ -75,6 +126,7 @@ var _ = Describe("KEP Metdata", func() {
 			Expect(readMetadata.Title()).To(Equal(title))
 			Expect(readMetadata.OwningSIG()).To(Equal(owningSIG))
 			Expect(readMetadata.AffectedSubprojects()).To(ContainElement(subprojects[0]))
+			Expect(readMetadata.Sections()).To(HaveLen(1))
 
 			lastUpdated := readMetadata.LastUpdated()
 			lastUpdatedMinute := lastUpdated.Round(time.Minute)
@@ -84,3 +136,13 @@ var _ = Describe("KEP Metdata", func() {
 		})
 	})
 })
+
+type testSection struct{}
+
+func (s *testSection) Filename() string { return testSectionName }
+func (s *testSection) Name() string     { return testSectionFilename }
+
+const (
+	testSectionName     = "Test Section"
+	testSectionFilename = "test_section.md"
+)
