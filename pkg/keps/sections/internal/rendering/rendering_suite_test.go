@@ -9,5 +9,5 @@ import (
 
 func TestRendered(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Rendered Suite")
+	RunSpecs(t, "Rendering Suite")
 }

@@ -7,7 +7,7 @@ import (
 type Collection interface {
 	Persist() error
 	Erase() error
-	Sections() []Info
+	Sections() []string
 }
 
 type collection struct {
@@ -35,16 +35,16 @@ func (c *collection) Erase() error {
 	return c.erase()
 }
 
-func (c *collection) Sections() []Info {
+func (c *collection) Sections() []string {
 	c.locker.Lock()
 	defer c.locker.Unlock()
 
-	infos := []Info{}
+	sectionFilenames := []string{}
 	for i := range c.sections {
-		infos = append(infos, c.sections[i])
+		sectionFilenames = append(sectionFilenames, c.sections[i].Filename())
 	}
 
-	return infos
+	return sectionFilenames
 }
 
 func (c *collection) persist() error {

@@ -35,17 +35,11 @@ var _ = Describe("A Collection of Sections for a KEP state", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			secs := col.Sections()
-			Expect(secs).ToNot(BeEmpty())
 
-			sectionNames := []string{}
-			for _, s := range secs {
-				sectionNames = append(sectionNames, s.Name())
-			}
-
-			Expect(sectionNames).To(HaveLen(3))
-			Expect(sectionNames[0]).To(Equal(rendering.SummaryName))
-			Expect(sectionNames[1]).To(Equal(rendering.MotivationName))
-			Expect(sectionNames[2]).To(Equal(rendering.ReadmeName))
+			Expect(secs).To(HaveLen(3))
+			Expect(secs[0]).To(Equal(rendering.SummaryFilename))
+			Expect(secs[1]).To(Equal(rendering.MotivationFilename))
+			Expect(secs[2]).To(Equal(rendering.ReadmeFilename))
 		})
 	})
 
@@ -73,19 +67,14 @@ var _ = Describe("A Collection of Sections for a KEP state", func() {
 			secs := col.Sections()
 			Expect(secs).ToNot(BeEmpty())
 
-			sectionNames := []string{}
-			for _, s := range secs {
-				sectionNames = append(sectionNames, s.Name())
-			}
-
-			Expect(sectionNames).To(HaveLen(7))
-			Expect(sectionNames[0]).To(Equal(rendering.SummaryName))
-			Expect(sectionNames[1]).To(Equal(rendering.MotivationName))
-			Expect(sectionNames[2]).To(Equal(rendering.DeveloperGuideName))
-			Expect(sectionNames[3]).To(Equal(rendering.OperatorGuideName))
-			Expect(sectionNames[4]).To(Equal(rendering.TeacherGuideName))
-			Expect(sectionNames[5]).To(Equal(rendering.GraduationCriteriaName))
-			Expect(sectionNames[6]).To(Equal(rendering.ReadmeName))
+			Expect(secs).To(HaveLen(7))
+			Expect(secs[0]).To(Equal(rendering.SummaryFilename))
+			Expect(secs[1]).To(Equal(rendering.MotivationFilename))
+			Expect(secs[2]).To(Equal(rendering.DeveloperGuideFilename))
+			Expect(secs[3]).To(Equal(rendering.OperatorGuideFilename))
+			Expect(secs[4]).To(Equal(rendering.TeacherGuideFilename))
+			Expect(secs[5]).To(Equal(rendering.GraduationCriteriaFilename))
+			Expect(secs[6]).To(Equal(rendering.ReadmeFilename))
 		})
 	})
 })

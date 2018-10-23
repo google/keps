@@ -188,7 +188,7 @@ var _ = Describe("A collection of sections", func() {
 		})
 
 		Describe("#Sections", func() {
-			It("returns basic info for the sections in the collection", func() {
+			It("returns the filenames of the sections in the collection", func() {
 				title := "The Kubernetes Enhancement Proposal Process"
 				authors := []string{"jbeda", "calebamiles"}
 				owningSIG := "sig-architecture"
@@ -213,14 +213,9 @@ var _ = Describe("A collection of sections", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				secs := col.Sections()
-				sectionNames := []string{}
 
-				for i := range secs {
-					sectionNames = append(sectionNames, secs[i].Name())
-				}
-
-				Expect(sectionNames).To(ContainElement(rendering.SummaryName))
-				Expect(sectionNames).To(ContainElement(rendering.MotivationName))
+				Expect(secs).To(ContainElement(rendering.SummaryFilename))
+				Expect(secs).To(ContainElement(rendering.MotivationFilename))
 			})
 		})
 	})

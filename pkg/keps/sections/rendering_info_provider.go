@@ -7,6 +7,7 @@ import (
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
+//TODO clean up this interface (e.g. whether it should be exported or not)
 type renderingInfoProvider interface {
 	Title() string
 	Authors() []string

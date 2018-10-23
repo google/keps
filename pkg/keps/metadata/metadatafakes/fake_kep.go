@@ -10,6 +10,11 @@ import (
 )
 
 type FakeKEP struct {
+	AddSectionsStub        func([]string)
+	addSectionsMutex       sync.RWMutex
+	addSectionsArgsForCall []struct {
+		arg1 []string
+	}
 	AffectedSubprojectsStub        func() []string
 	affectedSubprojectsMutex       sync.RWMutex
 	affectedSubprojectsArgsForCall []struct {
@@ -49,6 +54,16 @@ type FakeKEP struct {
 	}
 	contentDirReturnsOnCall map[int]struct {
 		result1 string
+	}
+	CreatedStub        func() time.Time
+	createdMutex       sync.RWMutex
+	createdArgsForCall []struct {
+	}
+	createdReturns struct {
+		result1 time.Time
+	}
+	createdReturnsOnCall map[int]struct {
+		result1 time.Time
 	}
 	DevelopmentThemesStub        func() []string
 	developmentThemesMutex       sync.RWMutex
@@ -110,14 +125,14 @@ type FakeKEP struct {
 	owningSIGReturnsOnCall map[int]struct {
 		result1 string
 	}
-	ParticpiatingSIGsStub        func() []string
-	particpiatingSIGsMutex       sync.RWMutex
-	particpiatingSIGsArgsForCall []struct {
+	ParticipatingSIGsStub        func() []string
+	participatingSIGsMutex       sync.RWMutex
+	participatingSIGsArgsForCall []struct {
 	}
-	particpiatingSIGsReturns struct {
+	participatingSIGsReturns struct {
 		result1 []string
 	}
-	particpiatingSIGsReturnsOnCall map[int]struct {
+	participatingSIGsReturnsOnCall map[int]struct {
 		result1 []string
 	}
 	PersistStub        func() error
@@ -160,6 +175,16 @@ type FakeKEP struct {
 	sIGWideReturnsOnCall map[int]struct {
 		result1 bool
 	}
+	SectionsStub        func() []string
+	sectionsMutex       sync.RWMutex
+	sectionsArgsForCall []struct {
+	}
+	sectionsReturns struct {
+		result1 []string
+	}
+	sectionsReturnsOnCall map[int]struct {
+		result1 []string
+	}
 	StateStub        func() states.Name
 	stateMutex       sync.RWMutex
 	stateArgsForCall []struct {
@@ -180,8 +205,48 @@ type FakeKEP struct {
 	titleReturnsOnCall map[int]struct {
 		result1 string
 	}
+	UniqueIDStub        func() string
+	uniqueIDMutex       sync.RWMutex
+	uniqueIDArgsForCall []struct {
+	}
+	uniqueIDReturns struct {
+		result1 string
+	}
+	uniqueIDReturnsOnCall map[int]struct {
+		result1 string
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeKEP) AddSections(arg1 []string) {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.addSectionsMutex.Lock()
+	fake.addSectionsArgsForCall = append(fake.addSectionsArgsForCall, struct {
+		arg1 []string
+	}{arg1Copy})
+	fake.recordInvocation("AddSections", []interface{}{arg1Copy})
+	fake.addSectionsMutex.Unlock()
+	if fake.AddSectionsStub != nil {
+		fake.AddSectionsStub(arg1)
+	}
+}
+
+func (fake *FakeKEP) AddSectionsCallCount() int {
+	fake.addSectionsMutex.RLock()
+	defer fake.addSectionsMutex.RUnlock()
+	return len(fake.addSectionsArgsForCall)
+}
+
+func (fake *FakeKEP) AddSectionsArgsForCall(i int) []string {
+	fake.addSectionsMutex.RLock()
+	defer fake.addSectionsMutex.RUnlock()
+	argsForCall := fake.addSectionsArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeKEP) AffectedSubprojects() []string {
@@ -349,6 +414,48 @@ func (fake *FakeKEP) ContentDirReturnsOnCall(i int, result1 string) {
 	}
 	fake.contentDirReturnsOnCall[i] = struct {
 		result1 string
+	}{result1}
+}
+
+func (fake *FakeKEP) Created() time.Time {
+	fake.createdMutex.Lock()
+	ret, specificReturn := fake.createdReturnsOnCall[len(fake.createdArgsForCall)]
+	fake.createdArgsForCall = append(fake.createdArgsForCall, struct {
+	}{})
+	fake.recordInvocation("Created", []interface{}{})
+	fake.createdMutex.Unlock()
+	if fake.CreatedStub != nil {
+		return fake.CreatedStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.createdReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeKEP) CreatedCallCount() int {
+	fake.createdMutex.RLock()
+	defer fake.createdMutex.RUnlock()
+	return len(fake.createdArgsForCall)
+}
+
+func (fake *FakeKEP) CreatedReturns(result1 time.Time) {
+	fake.CreatedStub = nil
+	fake.createdReturns = struct {
+		result1 time.Time
+	}{result1}
+}
+
+func (fake *FakeKEP) CreatedReturnsOnCall(i int, result1 time.Time) {
+	fake.CreatedStub = nil
+	if fake.createdReturnsOnCall == nil {
+		fake.createdReturnsOnCall = make(map[int]struct {
+			result1 time.Time
+		})
+	}
+	fake.createdReturnsOnCall[i] = struct {
+		result1 time.Time
 	}{result1}
 }
 
@@ -604,44 +711,44 @@ func (fake *FakeKEP) OwningSIGReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
-func (fake *FakeKEP) ParticpiatingSIGs() []string {
-	fake.particpiatingSIGsMutex.Lock()
-	ret, specificReturn := fake.particpiatingSIGsReturnsOnCall[len(fake.particpiatingSIGsArgsForCall)]
-	fake.particpiatingSIGsArgsForCall = append(fake.particpiatingSIGsArgsForCall, struct {
+func (fake *FakeKEP) ParticipatingSIGs() []string {
+	fake.participatingSIGsMutex.Lock()
+	ret, specificReturn := fake.participatingSIGsReturnsOnCall[len(fake.participatingSIGsArgsForCall)]
+	fake.participatingSIGsArgsForCall = append(fake.participatingSIGsArgsForCall, struct {
 	}{})
-	fake.recordInvocation("ParticpiatingSIGs", []interface{}{})
-	fake.particpiatingSIGsMutex.Unlock()
-	if fake.ParticpiatingSIGsStub != nil {
-		return fake.ParticpiatingSIGsStub()
+	fake.recordInvocation("ParticipatingSIGs", []interface{}{})
+	fake.participatingSIGsMutex.Unlock()
+	if fake.ParticipatingSIGsStub != nil {
+		return fake.ParticipatingSIGsStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.particpiatingSIGsReturns
+	fakeReturns := fake.participatingSIGsReturns
 	return fakeReturns.result1
 }
 
-func (fake *FakeKEP) ParticpiatingSIGsCallCount() int {
-	fake.particpiatingSIGsMutex.RLock()
-	defer fake.particpiatingSIGsMutex.RUnlock()
-	return len(fake.particpiatingSIGsArgsForCall)
+func (fake *FakeKEP) ParticipatingSIGsCallCount() int {
+	fake.participatingSIGsMutex.RLock()
+	defer fake.participatingSIGsMutex.RUnlock()
+	return len(fake.participatingSIGsArgsForCall)
 }
 
-func (fake *FakeKEP) ParticpiatingSIGsReturns(result1 []string) {
-	fake.ParticpiatingSIGsStub = nil
-	fake.particpiatingSIGsReturns = struct {
+func (fake *FakeKEP) ParticipatingSIGsReturns(result1 []string) {
+	fake.ParticipatingSIGsStub = nil
+	fake.participatingSIGsReturns = struct {
 		result1 []string
 	}{result1}
 }
 
-func (fake *FakeKEP) ParticpiatingSIGsReturnsOnCall(i int, result1 []string) {
-	fake.ParticpiatingSIGsStub = nil
-	if fake.particpiatingSIGsReturnsOnCall == nil {
-		fake.particpiatingSIGsReturnsOnCall = make(map[int]struct {
+func (fake *FakeKEP) ParticipatingSIGsReturnsOnCall(i int, result1 []string) {
+	fake.ParticipatingSIGsStub = nil
+	if fake.participatingSIGsReturnsOnCall == nil {
+		fake.participatingSIGsReturnsOnCall = make(map[int]struct {
 			result1 []string
 		})
 	}
-	fake.particpiatingSIGsReturnsOnCall[i] = struct {
+	fake.participatingSIGsReturnsOnCall[i] = struct {
 		result1 []string
 	}{result1}
 }
@@ -814,6 +921,48 @@ func (fake *FakeKEP) SIGWideReturnsOnCall(i int, result1 bool) {
 	}{result1}
 }
 
+func (fake *FakeKEP) Sections() []string {
+	fake.sectionsMutex.Lock()
+	ret, specificReturn := fake.sectionsReturnsOnCall[len(fake.sectionsArgsForCall)]
+	fake.sectionsArgsForCall = append(fake.sectionsArgsForCall, struct {
+	}{})
+	fake.recordInvocation("Sections", []interface{}{})
+	fake.sectionsMutex.Unlock()
+	if fake.SectionsStub != nil {
+		return fake.SectionsStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.sectionsReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeKEP) SectionsCallCount() int {
+	fake.sectionsMutex.RLock()
+	defer fake.sectionsMutex.RUnlock()
+	return len(fake.sectionsArgsForCall)
+}
+
+func (fake *FakeKEP) SectionsReturns(result1 []string) {
+	fake.SectionsStub = nil
+	fake.sectionsReturns = struct {
+		result1 []string
+	}{result1}
+}
+
+func (fake *FakeKEP) SectionsReturnsOnCall(i int, result1 []string) {
+	fake.SectionsStub = nil
+	if fake.sectionsReturnsOnCall == nil {
+		fake.sectionsReturnsOnCall = make(map[int]struct {
+			result1 []string
+		})
+	}
+	fake.sectionsReturnsOnCall[i] = struct {
+		result1 []string
+	}{result1}
+}
+
 func (fake *FakeKEP) State() states.Name {
 	fake.stateMutex.Lock()
 	ret, specificReturn := fake.stateReturnsOnCall[len(fake.stateArgsForCall)]
@@ -898,9 +1047,53 @@ func (fake *FakeKEP) TitleReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
+func (fake *FakeKEP) UniqueID() string {
+	fake.uniqueIDMutex.Lock()
+	ret, specificReturn := fake.uniqueIDReturnsOnCall[len(fake.uniqueIDArgsForCall)]
+	fake.uniqueIDArgsForCall = append(fake.uniqueIDArgsForCall, struct {
+	}{})
+	fake.recordInvocation("UniqueID", []interface{}{})
+	fake.uniqueIDMutex.Unlock()
+	if fake.UniqueIDStub != nil {
+		return fake.UniqueIDStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.uniqueIDReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeKEP) UniqueIDCallCount() int {
+	fake.uniqueIDMutex.RLock()
+	defer fake.uniqueIDMutex.RUnlock()
+	return len(fake.uniqueIDArgsForCall)
+}
+
+func (fake *FakeKEP) UniqueIDReturns(result1 string) {
+	fake.UniqueIDStub = nil
+	fake.uniqueIDReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeKEP) UniqueIDReturnsOnCall(i int, result1 string) {
+	fake.UniqueIDStub = nil
+	if fake.uniqueIDReturnsOnCall == nil {
+		fake.uniqueIDReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.uniqueIDReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeKEP) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.addSectionsMutex.RLock()
+	defer fake.addSectionsMutex.RUnlock()
 	fake.affectedSubprojectsMutex.RLock()
 	defer fake.affectedSubprojectsMutex.RUnlock()
 	fake.approversMutex.RLock()
@@ -909,6 +1102,8 @@ func (fake *FakeKEP) Invocations() map[string][][]interface{} {
 	defer fake.authorsMutex.RUnlock()
 	fake.contentDirMutex.RLock()
 	defer fake.contentDirMutex.RUnlock()
+	fake.createdMutex.RLock()
+	defer fake.createdMutex.RUnlock()
 	fake.developmentThemesMutex.RLock()
 	defer fake.developmentThemesMutex.RUnlock()
 	fake.editorsMutex.RLock()
@@ -921,8 +1116,8 @@ func (fake *FakeKEP) Invocations() map[string][][]interface{} {
 	defer fake.numberMutex.RUnlock()
 	fake.owningSIGMutex.RLock()
 	defer fake.owningSIGMutex.RUnlock()
-	fake.particpiatingSIGsMutex.RLock()
-	defer fake.particpiatingSIGsMutex.RUnlock()
+	fake.participatingSIGsMutex.RLock()
+	defer fake.participatingSIGsMutex.RUnlock()
 	fake.persistMutex.RLock()
 	defer fake.persistMutex.RUnlock()
 	fake.replacesMutex.RLock()
@@ -931,10 +1126,14 @@ func (fake *FakeKEP) Invocations() map[string][][]interface{} {
 	defer fake.reviewersMutex.RUnlock()
 	fake.sIGWideMutex.RLock()
 	defer fake.sIGWideMutex.RUnlock()
+	fake.sectionsMutex.RLock()
+	defer fake.sectionsMutex.RUnlock()
 	fake.stateMutex.RLock()
 	defer fake.stateMutex.RUnlock()
 	fake.titleMutex.RLock()
 	defer fake.titleMutex.RUnlock()
+	fake.uniqueIDMutex.RLock()
+	defer fake.uniqueIDMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/calebamiles/keps/pkg/keps/metadata"
-	"github.com/calebamiles/keps/pkg/keps/sections"
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
@@ -58,8 +57,7 @@ var _ = Describe("KEP Metdata", func() {
 			m, err := metadata.New([]string{author}, title, info)
 			Expect(err).ToNot(HaveOccurred())
 
-			ss := []sections.Info{&testSection{}}
-			m.AddSections(ss)
+			m.AddSections([]string{"test_section.md"})
 			Expect(m.Sections()).To(HaveLen(1))
 		})
 
@@ -80,9 +78,7 @@ var _ = Describe("KEP Metdata", func() {
 			m, err := metadata.New([]string{author}, title, info)
 			Expect(err).ToNot(HaveOccurred())
 
-			ss := []sections.Info{&testSection{}}
-			m.AddSections(ss)
-			m.AddSections(ss)
+			m.AddSections([]string{"test_section.md", "test_section.md"})
 			Expect(m.Sections()).To(HaveLen(1))
 		})
 	})
@@ -110,8 +106,7 @@ var _ = Describe("KEP Metdata", func() {
 			m, err := metadata.New([]string{author}, title, info)
 			Expect(err).ToNot(HaveOccurred())
 
-			ss := []sections.Info{&testSection{}}
-			m.AddSections(ss)
+			m.AddSections([]string{"test_section.md"})
 
 			err = m.Persist()
 			Expect(err).ToNot(HaveOccurred())
@@ -136,13 +131,3 @@ var _ = Describe("KEP Metdata", func() {
 		})
 	})
 })
-
-type testSection struct{}
-
-func (s *testSection) Filename() string { return testSectionName }
-func (s *testSection) Name() string     { return testSectionFilename }
-
-const (
-	testSectionName     = "Test Section"
-	testSectionFilename = "test_section.md"
-)

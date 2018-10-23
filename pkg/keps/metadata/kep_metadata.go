@@ -9,12 +9,13 @@ import (
 	"time"
 
 	"github.com/go-yaml/yaml"
+	"github.com/google/uuid"
 
-	"github.com/calebamiles/keps/pkg/keps/sections"
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
 type KEP interface {
+	UniqueID() string
 	Authors() []string
 	Title() string
 	Number() int
@@ -24,29 +25,21 @@ type KEP interface {
 	State() states.Name
 	Replaces() string
 	DevelopmentThemes() []string
+	Created() time.Time
 	LastUpdated() time.Time
 
 	// Flattened routing info
-	OwningSIG() string
-	AffectedSubprojects() []string
-	ParticpiatingSIGs() []string
-	KubernetesWide() bool
-	SIGWide() bool
-	ContentDir() string
-
-	AddSections([]sections.Info)
-	Sections() []sections.Info
-
-	Persist() error
-}
-
-type routingInfoProvider interface {
 	OwningSIG() string
 	AffectedSubprojects() []string
 	ParticipatingSIGs() []string
 	KubernetesWide() bool
 	SIGWide() bool
 	ContentDir() string
+
+	AddSections([]string)
+	Sections() []string
+
+	Persist() error
 }
 
 func New(authors []string, title string, routingInfo routingInfoProvider) (KEP, error) {
@@ -58,7 +51,9 @@ func New(authors []string, title string, routingInfo routingInfoProvider) (KEP, 
 		ParticipatingSIGsField:   routingInfo.ParticipatingSIGs(),
 		KubernetesWideField:      routingInfo.KubernetesWide(),
 		SIGWideField:             routingInfo.SIGWide(),
+		CreatedField:             time.Now().UTC(),
 		LastUpdatedField:         time.Now().UTC(),
+		UniqueIDField:            uuid.New().String(), // note: will panic on error
 		StateField:               states.Provisional,
 		contentDir:               routingInfo.ContentDir(),
 		sectionNames:             make(map[string]bool),
@@ -83,12 +78,11 @@ func Open(p string) (KEP, error) {
 	k.sectionNames = make(map[string]bool)
 
 	for _, s := range k.SectionsField {
-		switch k.sectionNames[sectionKey(s.Name())] {
+		switch k.sectionNames[sectionKey(s)] {
 		case false:
-			k.sectionNames[sectionKey(s.Name())] = true
+			k.sectionNames[sectionKey(s)] = true
 
-			uniqueSection := kepSection{NameField: s.Name(), FilenameField: s.Filename()}
-			k.uniqueSections = append(k.uniqueSections, uniqueSection)
+			k.uniqueSections = append(k.uniqueSections, s)
 		default:
 			// do nothing if name exists
 		}
@@ -98,25 +92,27 @@ func Open(p string) (KEP, error) {
 }
 
 type kepSection struct {
-	FilenameField string `yaml"filename"`
-	NameField     string `yaml"name"`
+	FilenameField string `yaml:"filename"`
+	NameField     string `yaml:"name"`
 }
 
 func (s *kepSection) Name() string     { return s.NameField }
 func (s *kepSection) Filename() string { return s.FilenameField }
 
 type kep struct {
-	AuthorsField           []string     `yaml:"authors"`
-	TitleField             string       `yaml"title"`
-	NumberField            int          `yaml:"kep_number"`
-	ReviewersField         []string     `yaml:"reviewers"`
-	ApproversField         []string     `yaml:"approvers"`
-	EditorsField           []string     `yaml:"editors"`
-	StateField             states.Name  `yaml:"state"`
-	ReplacesField          string       `yaml:"replaces"`
-	DevelopmentThemesField []string     `yaml:"development_themes"`
-	LastUpdatedField       time.Time    `yaml:"last_updated"`
-	SectionsField          []kepSection `yaml:"sections"`
+	AuthorsField           []string    `yaml:"authors"`
+	TitleField             string      `yaml:"title"`
+	NumberField            *int        `yaml:"kep_number",omitempty`
+	ReviewersField         []string    `yaml:"reviewers"`
+	ApproversField         []string    `yaml:"approvers"`
+	EditorsField           []string    `yaml:"editors"`
+	StateField             states.Name `yaml:"state"`
+	ReplacesField          string      `yaml:"replaces"`
+	DevelopmentThemesField []string    `yaml:"development_themes"`
+	LastUpdatedField       time.Time   `yaml:"last_updated"`
+	CreatedField           time.Time   `yaml:"created"`
+	UniqueIDField          string      `yaml:"uuid"`
+	SectionsField          []string    `yaml:"sections"`
 
 	OwningSIGField           string   `yaml:"owning_sig"`
 	AffectedSubprojectsField []string `yaml:"affected_subprojects"`
@@ -125,7 +121,7 @@ type kep struct {
 	SIGWideField             bool     `yaml:"sig_wide"`
 
 	sectionNames   map[string]bool `yaml:"-"` // do not persist this
-	uniqueSections []kepSection    `yaml"-"`  // do not persist this
+	uniqueSections []string        `yaml:"-"` // do not persist this
 	contentDir     string          `yaml:"-"` // do not persist this
 	lock           sync.RWMutex    `yaml:"-"` // do not persist this
 }
@@ -153,33 +149,27 @@ func (k *kep) Persist() error {
 	return nil
 }
 
-func (k *kep) AddSections(ss []sections.Info) {
+func (k *kep) AddSections(paths []string) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
 
-	for _, s := range ss {
-		switch k.sectionNames[sectionKey(s.Name())] {
+	for _, s := range paths {
+		switch k.sectionNames[s] {
 		case false:
-			k.sectionNames[sectionKey(s.Name())] = true
+			k.sectionNames[sectionKey(s)] = true
 
-			uniqueSection := kepSection{NameField: s.Name(), FilenameField: s.Filename()}
-			k.uniqueSections = append(k.uniqueSections, uniqueSection)
+			k.uniqueSections = append(k.uniqueSections, s)
 		default:
-			// do nothing if name exists
+			// silently do nothing if name exists
 		}
 	}
 }
 
-func (k *kep) Sections() []sections.Info {
+func (k *kep) Sections() []string {
 	k.lock.RLock()
 	defer k.lock.RUnlock()
 
-	secs := []sections.Info{}
-	for i := range k.uniqueSections {
-		secs = append(secs, &k.uniqueSections[i])
-	}
-
-	return secs
+	return k.uniqueSections
 }
 
 func (k *kep) Authors() []string {
@@ -200,7 +190,18 @@ func (k *kep) Number() int {
 	k.lock.RLock()
 	defer k.lock.RUnlock()
 
-	return k.NumberField
+	if k.NumberField != nil {
+		return *k.NumberField
+	}
+
+	return UnsetKEPNumber
+}
+
+func (k *kep) UniqueID() string {
+	k.lock.RLock()
+	defer k.lock.RUnlock()
+
+	return k.UniqueIDField
 }
 
 func (k *kep) Reviewers() []string {
@@ -252,6 +253,13 @@ func (k *kep) LastUpdated() time.Time {
 	return k.LastUpdatedField
 }
 
+func (k *kep) Created() time.Time {
+	k.lock.RLock()
+	defer k.lock.RUnlock()
+
+	return k.CreatedField
+}
+
 func (k *kep) OwningSIG() string {
 	k.lock.RLock()
 	defer k.lock.RUnlock()
@@ -266,7 +274,7 @@ func (k *kep) AffectedSubprojects() []string {
 	return k.AffectedSubprojectsField
 }
 
-func (k *kep) ParticpiatingSIGs() []string {
+func (k *kep) ParticipatingSIGs() []string {
 	k.lock.RLock()
 	defer k.lock.RUnlock()
 
@@ -294,8 +302,18 @@ func (k *kep) ContentDir() string {
 	return k.contentDir
 }
 
+type routingInfoProvider interface {
+	OwningSIG() string
+	AffectedSubprojects() []string
+	ParticipatingSIGs() []string
+	KubernetesWide() bool
+	SIGWide() bool
+	ContentDir() string
+}
+
 const (
-	metadataFilename = "metdata.yaml"
+	metadataFilename = "metadata.yaml"
+	UnsetKEPNumber   = -1
 )
 
 func sectionKey(s string) string {
