@@ -1,0 +1,6 @@
+- Objective: The KEP Process is a useful change management tool
+  - KR: At least two SIGs adopt KEPs as the primary tool for planning
+    - by adding documentation to charter
+    - by blockading `github.com/kubernetes/community/contributors/design-proposals`
+  - KR: 75% of existing KEP content migrated to new format
+  - KR: 5 KEPs created using tooling
