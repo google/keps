@@ -36,54 +36,43 @@ var _ = Describe("the SIGs helper package", func() {
 		})
 	})
 
-	Describe("BuildRoutingFromPath", func() {
-		Context("when the path is the content root", func() {
-			It("returns kubernetes wide information", func() {
-				contentRoot := "/home/user/workspace/keps/content/"
-				givenPath := "/home/user/workspace/keps/content"
+	Describe("SubprojectExists()", func() {
+		It("returns wether a specific subproject exists", func() {
+			upstreamList := fetchUpstreamSIGList()
 
-				info, err := sigs.BuildRoutingFromPath(contentRoot, givenPath)
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(info.OwningSIG).To(Equal("sig-architecture"))
-				Expect(info.KubernetesWide).To(BeTrue())
-			})
+			for _, s := range upstreamList.SIGs {
+				for _, sp := range s.Subprojects {
+					Expect(sigs.SubprojectExists(sp.Name)).To(BeTrue())
+				}
+			}
 		})
+	})
 
+	Describe("BuildRoutingFromPath", func() {
 		Context("when the path is at a SIG root", func() {
 			It("returns SIG wide information", func() {
 				contentRoot := "/home/user/workspace/keps/content/"
-				givenPath := "/home/user/workspace/keps/content/sig-node"
+				givenPath := "/home/user/workspace/keps/content/sig-node/device-plugins"
 
 				info, err := sigs.BuildRoutingFromPath(contentRoot, givenPath)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(info.OwningSIG).To(Equal("sig-node"))
-				Expect(info.SIGWide).To(BeTrue())
-			})
-		})
-
-		Context("when the path does not include a SIG", func() {
-			It("returns an error", func() {
-				contentRoot := "/home/user/workspace/keps/content/"
-				givenPath := "/home/user/workspace/keps/content/sig-not-real"
-
-				_, err := sigs.BuildRoutingFromPath(contentRoot, givenPath)
-				Expect(err.Error()).To(ContainSubstring("unable to determine SIG information for given path"))
+				Expect(info.OwningSIG()).To(Equal("sig-node"))
+				Expect(info.SIGWide()).To(BeTrue())
 			})
 		})
 
 		Context("when the path includes a SIG and subproject", func() {
 			It("returns SIG and subproject information", func() {
 				contentRoot := "/home/user/workspace/keps/content/"
-				givenPath := "/home/user/workspace/keps/content/sig-node/kubelet"
+				givenPath := "/home/user/workspace/keps/content/sig-node/kubelet/dynamic-kubelet-configuration"
 
 				info, err := sigs.BuildRoutingFromPath(contentRoot, givenPath)
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(info.OwningSIG).To(Equal("sig-node"))
-				Expect(info.SIGWide).To(BeFalse())
-				Expect(info.AffectedSubprojects).To(ContainElement("kubelet"))
+				Expect(info.OwningSIG()).To(Equal("sig-node"))
+				Expect(info.SIGWide()).To(BeFalse())
+				Expect(info.AffectedSubprojects()).To(ContainElement("kubelet"))
 			})
 		})
 	})
@@ -91,6 +80,16 @@ var _ = Describe("the SIGs helper package", func() {
 })
 
 func fetchUpstreamSIGNames() []string {
+	names := []string{}
+	upstreamList := fetchUpstreamSIGList()
+	for _, sig := range upstreamList.SIGs {
+		names = append(names, sig.Name)
+	}
+
+	return names
+}
+
+func fetchUpstreamSIGList() *upstreamSIGList {
 	resp, err := http.Get(upstreamSIGListURL)
 	defer resp.Body.Close()
 
@@ -104,12 +103,7 @@ func fetchUpstreamSIGNames() []string {
 	Expect(err).ToNot(HaveOccurred(), "unmarshalling SIG list")
 	Expect(sl.SIGs).ToNot(BeEmpty(), "unmarshalled SIG list is empty")
 
-	names := []string{}
-	for i := range sl.SIGs {
-		names = append(names, sl.SIGs[i].Name)
-	}
-
-	return names
+	return sl
 }
 
 type upstreamSIGList struct {
@@ -117,7 +111,12 @@ type upstreamSIGList struct {
 }
 
 type upstreamSIGEntry struct {
-	Name string `yaml:"dir"` // we actually want to look at what the SIG is called on disk
+	Name        string                    `yaml:"dir"` // we actually want to look at what the SIG is called on disk
+	Subprojects []upstreamSubprojectEntry `yaml:"subprojects"`
+}
+
+type upstreamSubprojectEntry struct {
+	Name string `yaml:"name"`
 }
 
 const upstreamSIGListURL = "https://raw.githubusercontent.com/kubernetes/community/master/sigs.yaml"

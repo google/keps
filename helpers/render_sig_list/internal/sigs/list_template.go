@@ -69,6 +69,20 @@ var SIGSet = map[string]bool{
         {{ end }}
 }
 
+// FlattedSubprojectSet is the flattened collection of SIG subprojects
+// DO NOT EDIT BY HAND
+var FlattenedSubprojectSet = map[string]bool{
+         {{ with .SIGs }}
+                {{ range . }}
+                	{{ with .Subprojects }}
+                        	{{ range . }}
+                                	"{{ canonicalName .Name }}": true,
+                        	{{ end }}
+                	{{ end }}
+                {{ end }}
+        {{ end }}
+}
+
 // SIGSubprojectMapping groups subprojects by their owning SIG
 // DO NOT EDIT BY HAND
 var SIGSubprojectMapping = map[string]map[string]bool{

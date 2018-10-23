@@ -11,3 +11,7 @@ func All() []string {
 func Exists(s string) bool {
 	return generated.SIGSet[s]
 }
+
+func SubprojectExists(s string) bool {
+	return generated.FlattenedSubprojectSet[s]
+}

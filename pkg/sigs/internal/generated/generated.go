@@ -381,6 +381,11 @@ var InfoForPath = map[string]*PathInfo{
 		Subproject: "cloud-provider-vsphere",
 	},
 
+	"sig-cloud-provider/cloud-provider-extraction": &PathInfo{
+		OwningSIG:  "sig-cloud-provider",
+		Subproject: "cloud-provider-extraction",
+	},
+
 	"sig-cluster-lifecycle/bootkube": &PathInfo{
 		OwningSIG:  "sig-cluster-lifecycle",
 		Subproject: "bootkube",
@@ -489,21 +494,6 @@ var InfoForPath = map[string]*PathInfo{
 	"sig-contributor-experience/repo-infra": &PathInfo{
 		OwningSIG:  "sig-contributor-experience",
 		Subproject: "repo-infra",
-	},
-
-	"sig-docs/kubernetes-docs-ja": &PathInfo{
-		OwningSIG:  "sig-docs",
-		Subproject: "kubernetes-docs-ja",
-	},
-
-	"sig-docs/kubernetes-docs-ko": &PathInfo{
-		OwningSIG:  "sig-docs",
-		Subproject: "kubernetes-docs-ko",
-	},
-
-	"sig-docs/kubernetes-docs-zh": &PathInfo{
-		OwningSIG:  "sig-docs",
-		Subproject: "kubernetes-docs-zh",
 	},
 
 	"sig-docs/reference-docs": &PathInfo{
@@ -819,6 +809,233 @@ var SIGSet = map[string]bool{
 	"sig-windows": true,
 }
 
+// FlattedSubprojectSet is the flattened collection of SIG subprojects
+// DO NOT EDIT BY HAND
+var FlattenedSubprojectSet = map[string]bool{
+
+	"server-binaries": true,
+
+	"control-plane-features": true,
+
+	"universal-machinery": true,
+
+	"server-frameworks": true,
+
+	"server-crd": true,
+
+	"server-api-aggregation": true,
+
+	"server-sdk": true,
+
+	"idl-schema-client-pipeline": true,
+
+	"kubernetes-clients": true,
+
+	"examples": true,
+
+	"kompose": true,
+
+	"workloads-api": true,
+
+	"application": true,
+
+	"api": true,
+
+	"kubernetes-template-project": true,
+
+	"spartakus": true,
+
+	"steering": true,
+
+	"architecture-tracking": true,
+
+	"universal-utils": true,
+
+	"contrib": true,
+
+	"scale-client": true,
+
+	"cluster-autoscaler": true,
+
+	"vertical-pod-autoscaler": true,
+
+	"horizontal-pod-autoscaler": true,
+
+	"cluster-proportional-vertical-autoscaler": true,
+
+	"cluster-proportional-autoscaler": true,
+
+	"addon-resizer": true,
+
+	"cloud-provider-aws": true,
+
+	"aws-alb-ingress-controller": true,
+
+	"aws-iam-authenticator": true,
+
+	"aws-encryption-provider": true,
+
+	"cloud-provider-azure": true,
+
+	"kubectl": true,
+
+	"kustomize": true,
+
+	"cli-sdk": true,
+
+	"kubernetes-cloud-provider": true,
+
+	"cloud-provider-gcp": true,
+
+	"cloud-provider-openstack": true,
+
+	"cloud-provider-vsphere": true,
+
+	"cloud-provider-extraction": true,
+
+	"bootkube": true,
+
+	"cluster-api": true,
+
+	"cluster-api-provider-aws": true,
+
+	"cluster-api-provider-gcp": true,
+
+	"cluster-api-provider-openstack": true,
+
+	"kops": true,
+
+	"kube-aws": true,
+
+	"kube-deploy": true,
+
+	"kube-up": true,
+
+	"kubeadm": true,
+
+	"kubeadm-dind-cluster": true,
+
+	"kubernetes-anywhere": true,
+
+	"kubespray": true,
+
+	"minikube": true,
+
+	"community": true,
+
+	"community-management": true,
+
+	"github-management": true,
+
+	"contributors-documentation": true,
+
+	"devstats": true,
+
+	"k8s.io": true,
+
+	"mentoring": true,
+
+	"repo-infra": true,
+
+	"reference-docs": true,
+
+	"website": true,
+
+	"gcp-compute-persistent-disk-csi-driver": true,
+
+	"gcp-filestore-csi-driver": true,
+
+	"custom-metrics-apiserver": true,
+
+	"heapster": true,
+
+	"kube-state-metrics": true,
+
+	"metrics-server": true,
+
+	"metrics": true,
+
+	"federation-v1": true,
+
+	"federation-v2": true,
+
+	"cluster-registry": true,
+
+	"kubemci": true,
+
+	"services": true,
+
+	"kube-dns": true,
+
+	"external-dns": true,
+
+	"ingress": true,
+
+	"pod-networking": true,
+
+	"network-policy": true,
+
+	"cri-o": true,
+
+	"cri-tools": true,
+
+	"frakti": true,
+
+	"kubelet": true,
+
+	"node-feature-discovery": true,
+
+	"node-problem-detector": true,
+
+	"rktlet": true,
+
+	"features": true,
+
+	"hyperkube": true,
+
+	"release": true,
+
+	"sig-release": true,
+
+	"kubemark": true,
+
+	"perf-tests": true,
+
+	"cluster-capacity": true,
+
+	"descheduler": true,
+
+	"kube-batch": true,
+
+	"scheduler": true,
+
+	"poseidon": true,
+
+	"service-catalog": true,
+
+	"kubernetes-csi": true,
+
+	"external-storage": true,
+
+	"git-sync": true,
+
+	"nfs-provisioner": true,
+
+	"volumes": true,
+
+	"kind": true,
+
+	"repo-publishing": true,
+
+	"testing-commons": true,
+
+	"test-infra": true,
+
+	"dashboard": true,
+
+	"cluster-api-provider-vsphere": true,
+}
+
 // SIGSubprojectMapping groups subprojects by their owning SIG
 // DO NOT EDIT BY HAND
 var SIGSubprojectMapping = map[string]map[string]bool{
@@ -927,6 +1144,8 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 		"cloud-provider-openstack": true,
 
 		"cloud-provider-vsphere": true,
+
+		"cloud-provider-extraction": true,
 	},
 
 	"sig-cluster-lifecycle": map[string]bool{
@@ -982,12 +1201,6 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 	},
 
 	"sig-docs": map[string]bool{
-
-		"kubernetes-docs-ja": true,
-
-		"kubernetes-docs-ko": true,
-
-		"kubernetes-docs-zh": true,
 
 		"reference-docs": true,
 
