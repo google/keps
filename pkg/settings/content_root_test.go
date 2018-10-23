@@ -81,30 +81,6 @@ var _ = Describe("finding KEP content", func() {
 			Expect(foundRoot).To(Equal(contentDir))
 		})
 
-		It("returns an error when attempting to search for content not under $HOME", func() {
-			tempDir, err := ioutil.TempDir("", "kep-content")
-			Expect(err).ToNot(HaveOccurred())
-			defer os.RemoveAll(tempDir)
-
-			// make sure nobody has set the env variable
-			Expect(os.Getenv(settings.ContentRootEnv)).To(BeEmpty())
-
-			// set user cache dir to someplace unused
-			err = os.Setenv(cacheEnv, tempDir)
-			Expect(err).ToNot(HaveOccurred())
-			defer os.Unsetenv(cacheEnv)
-
-			pwd, err := os.Getwd()
-			Expect(err).ToNot(HaveOccurred())
-
-			err = os.Chdir(tempDir)
-			Expect(err).ToNot(HaveOccurred())
-			defer os.Chdir(pwd)
-
-			_, err = settings.FindContentRoot()
-			Expect(err.Error()).To(ContainSubstring("file search must start at location under $HOME"))
-		})
-
 		It("returns an error if no content was found", func() {
 			u, err := user.Current()
 			Expect(err).ToNot(HaveOccurred())

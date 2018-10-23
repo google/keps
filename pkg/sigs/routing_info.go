@@ -18,21 +18,34 @@ type RoutingInfo interface {
 	ContentDir() string
 }
 
-func BuildRoutingFromPath(contentRoot string, p string) (RoutingInfo, error) {
-	pathAfterContentRoot, err := filepath.Rel(contentRoot, p)
+func BuildRoutingFromPath(contentRoot string, targetPath string) (RoutingInfo, error) {
+	// we assume that targetPath will be of the form
+	// keps/content/sig-node/kubelet/device-plugins
+	// where
+	// - content/ is the contentRoot
+	// - sig-node/ is the owning SIG
+	// - kubelet/ is the subproject
+	// - device-plugins/ is the KEP directory
+
+	routingPath := filepath.Dir(targetPath)
+	kepDirName := filepath.Base(targetPath)
+
+	pathAfterContentRoot, err := filepath.Rel(contentRoot, routingPath)
 	if err != nil {
 		return nil, err
 	}
 
 	pathInfo := generated.InfoForPath[pathAfterContentRoot]
 	if pathInfo == nil {
-		return nil, fmt.Errorf("unable to determine SIG information for given path: %s", p)
+		return nil, fmt.Errorf("unable to determine SIG information for given path: %s", targetPath)
 	}
 
 	r := &routingInfo{
 		OwningSIGField:      pathInfo.OwningSIG,
 		KubernetesWideField: pathInfo.KubernetesWide,
 		SIGWideField:        pathInfo.SIGWide,
+		contentRoot:         contentRoot,
+		kepDirName:          kepDirName,
 	}
 
 	if pathInfo.Subproject != "" {
@@ -54,17 +67,19 @@ type routingInfo struct {
 	KubernetesWideField      bool
 	SIGWideField             bool
 	contentRoot              string
+	kepDirName               string
 }
 
 func (i *routingInfo) ContentDir() string {
+	//TODO save this info when creating the routingInfo
 	switch {
 	case i.KubernetesWideField:
-		return filepath.Join(i.contentRoot, kubernetesWideDir)
+		return filepath.Join(i.contentRoot, kubernetesWideDir, i.kepDirName)
 	case len(i.AffectedSubprojectsField) > 0:
-		return filepath.Join(i.contentRoot, i.OwningSIGField, i.AffectedSubprojectsField[0])
+		return filepath.Join(i.contentRoot, i.OwningSIGField, i.AffectedSubprojectsField[0], i.kepDirName)
 	}
 
-	return filepath.Join(i.contentRoot, i.OwningSIGField, sigWideDir)
+	return filepath.Join(i.contentRoot, i.OwningSIGField, sigWideDir, i.kepDirName)
 }
 
 func (i *routingInfo) OwningSIG() string             { return i.OwningSIGField }

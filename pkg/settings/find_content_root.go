@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	ContentRootEnv       = "KEP_CONTENT_ROOT"
+	ContentRootEnv = "KEP_CONTENT_ROOT"
 )
 
 // FindContentRoot looks for a location with the following structure
@@ -49,6 +49,10 @@ func FindContentRoot() (string, error) {
 
 			if !info.IsDir() {
 				return nil
+			}
+
+			if strings.HasPrefix(info.Name(), ".") {
+				return filepath.SkipDir
 			}
 
 			if hasDirForEachSIG(path) {
@@ -106,31 +110,5 @@ func contentSearchRoot() (string, error) {
 	}
 
 	homeDir := usr.HomeDir
-	invokedDir, err := os.Getwd()
-	if err != nil {
-		log.Error("could not get current directory information")
-		return "", err
-	}
-
-	pathRelativeToHome, err := filepath.Rel(homeDir, invokedDir)
-	if err != nil {
-		log.Error("finding $PWD relative to $HOME")
-		return "", err
-	}
-
-	rootedPathRelativeToHome, err := filepath.Abs(pathRelativeToHome)
-	if err != nil {
-		log.Error("checking that $PWD is under $HOME")
-		return "", err
-	}
-
-	if rootedPathRelativeToHome == invokedDir {
-		log.Error("$PWD seems to not share elements with $HOME")
-		return "", fmt.Errorf("file search must start at location under $HOME: %s, not: %s", homeDir, invokedDir)
-	}
-
-	pathRelativeToHomeComponents := strings.Split(pathRelativeToHome, string(filepath.Separator))
-	startLocation := filepath.Join(homeDir, pathRelativeToHomeComponents[0])
-
-	return filepath.Clean(startLocation), nil
+	return homeDir, nil
 }
