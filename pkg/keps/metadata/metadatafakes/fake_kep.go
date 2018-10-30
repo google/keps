@@ -105,16 +105,6 @@ type FakeKEP struct {
 	lastUpdatedReturnsOnCall map[int]struct {
 		result1 time.Time
 	}
-	NumberStub        func() int
-	numberMutex       sync.RWMutex
-	numberArgsForCall []struct {
-	}
-	numberReturns struct {
-		result1 int
-	}
-	numberReturnsOnCall map[int]struct {
-		result1 int
-	}
 	OwningSIGStub        func() string
 	owningSIGMutex       sync.RWMutex
 	owningSIGArgsForCall []struct {
@@ -184,6 +174,16 @@ type FakeKEP struct {
 	}
 	sectionsReturnsOnCall map[int]struct {
 		result1 []string
+	}
+	ShortIDStub        func() int
+	shortIDMutex       sync.RWMutex
+	shortIDArgsForCall []struct {
+	}
+	shortIDReturns struct {
+		result1 int
+	}
+	shortIDReturnsOnCall map[int]struct {
+		result1 int
 	}
 	StateStub        func() states.Name
 	stateMutex       sync.RWMutex
@@ -627,48 +627,6 @@ func (fake *FakeKEP) LastUpdatedReturnsOnCall(i int, result1 time.Time) {
 	}{result1}
 }
 
-func (fake *FakeKEP) Number() int {
-	fake.numberMutex.Lock()
-	ret, specificReturn := fake.numberReturnsOnCall[len(fake.numberArgsForCall)]
-	fake.numberArgsForCall = append(fake.numberArgsForCall, struct {
-	}{})
-	fake.recordInvocation("Number", []interface{}{})
-	fake.numberMutex.Unlock()
-	if fake.NumberStub != nil {
-		return fake.NumberStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	fakeReturns := fake.numberReturns
-	return fakeReturns.result1
-}
-
-func (fake *FakeKEP) NumberCallCount() int {
-	fake.numberMutex.RLock()
-	defer fake.numberMutex.RUnlock()
-	return len(fake.numberArgsForCall)
-}
-
-func (fake *FakeKEP) NumberReturns(result1 int) {
-	fake.NumberStub = nil
-	fake.numberReturns = struct {
-		result1 int
-	}{result1}
-}
-
-func (fake *FakeKEP) NumberReturnsOnCall(i int, result1 int) {
-	fake.NumberStub = nil
-	if fake.numberReturnsOnCall == nil {
-		fake.numberReturnsOnCall = make(map[int]struct {
-			result1 int
-		})
-	}
-	fake.numberReturnsOnCall[i] = struct {
-		result1 int
-	}{result1}
-}
-
 func (fake *FakeKEP) OwningSIG() string {
 	fake.owningSIGMutex.Lock()
 	ret, specificReturn := fake.owningSIGReturnsOnCall[len(fake.owningSIGArgsForCall)]
@@ -963,6 +921,48 @@ func (fake *FakeKEP) SectionsReturnsOnCall(i int, result1 []string) {
 	}{result1}
 }
 
+func (fake *FakeKEP) ShortID() int {
+	fake.shortIDMutex.Lock()
+	ret, specificReturn := fake.shortIDReturnsOnCall[len(fake.shortIDArgsForCall)]
+	fake.shortIDArgsForCall = append(fake.shortIDArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ShortID", []interface{}{})
+	fake.shortIDMutex.Unlock()
+	if fake.ShortIDStub != nil {
+		return fake.ShortIDStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.shortIDReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeKEP) ShortIDCallCount() int {
+	fake.shortIDMutex.RLock()
+	defer fake.shortIDMutex.RUnlock()
+	return len(fake.shortIDArgsForCall)
+}
+
+func (fake *FakeKEP) ShortIDReturns(result1 int) {
+	fake.ShortIDStub = nil
+	fake.shortIDReturns = struct {
+		result1 int
+	}{result1}
+}
+
+func (fake *FakeKEP) ShortIDReturnsOnCall(i int, result1 int) {
+	fake.ShortIDStub = nil
+	if fake.shortIDReturnsOnCall == nil {
+		fake.shortIDReturnsOnCall = make(map[int]struct {
+			result1 int
+		})
+	}
+	fake.shortIDReturnsOnCall[i] = struct {
+		result1 int
+	}{result1}
+}
+
 func (fake *FakeKEP) State() states.Name {
 	fake.stateMutex.Lock()
 	ret, specificReturn := fake.stateReturnsOnCall[len(fake.stateArgsForCall)]
@@ -1112,8 +1112,6 @@ func (fake *FakeKEP) Invocations() map[string][][]interface{} {
 	defer fake.kubernetesWideMutex.RUnlock()
 	fake.lastUpdatedMutex.RLock()
 	defer fake.lastUpdatedMutex.RUnlock()
-	fake.numberMutex.RLock()
-	defer fake.numberMutex.RUnlock()
 	fake.owningSIGMutex.RLock()
 	defer fake.owningSIGMutex.RUnlock()
 	fake.participatingSIGsMutex.RLock()
@@ -1128,6 +1126,8 @@ func (fake *FakeKEP) Invocations() map[string][][]interface{} {
 	defer fake.sIGWideMutex.RUnlock()
 	fake.sectionsMutex.RLock()
 	defer fake.sectionsMutex.RUnlock()
+	fake.shortIDMutex.RLock()
+	defer fake.shortIDMutex.RUnlock()
 	fake.stateMutex.RLock()
 	defer fake.stateMutex.RUnlock()
 	fake.titleMutex.RLock()

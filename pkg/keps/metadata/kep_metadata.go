@@ -18,7 +18,7 @@ type KEP interface {
 	UniqueID() string
 	Authors() []string
 	Title() string
-	Number() int
+	ShortID() int
 	Reviewers() []string
 	Approvers() []string
 	Editors() []string
@@ -40,6 +40,15 @@ type KEP interface {
 	Sections() []string
 
 	Persist() error
+}
+
+type routingInfoProvider interface {
+	OwningSIG() string
+	AffectedSubprojects() []string
+	ParticipatingSIGs() []string
+	KubernetesWide() bool
+	SIGWide() bool
+	ContentDir() string
 }
 
 func New(authors []string, title string, routingInfo routingInfoProvider) (KEP, error) {
@@ -68,13 +77,27 @@ func Open(p string) (KEP, error) {
 		return nil, err
 	}
 
-	k := &kep{}
-	err = yaml.Unmarshal(kepBytes, k)
+	k, err := fromBytes(kepBytes)
 	if err != nil {
 		return nil, err
 	}
 
 	k.contentDir = p
+
+	return k, nil
+}
+
+func FromBytes(b []byte) (KEP, error) {
+	return fromBytes(b)
+}
+
+func fromBytes(b []byte) (*kep, error) {
+	k := &kep{}
+	err := yaml.Unmarshal(b, k)
+	if err != nil {
+		return nil, err
+	}
+
 	k.sectionNames = make(map[string]bool)
 
 	for _, s := range k.SectionsField {
@@ -102,7 +125,7 @@ func (s *kepSection) Filename() string { return s.FilenameField }
 type kep struct {
 	AuthorsField           []string    `yaml:"authors"`
 	TitleField             string      `yaml:"title"`
-	NumberField            *int        `yaml:"kep_number",omitempty`
+	ShortIDField            *int        `yaml:"kep_number",omitempty`
 	ReviewersField         []string    `yaml:"reviewers"`
 	ApproversField         []string    `yaml:"approvers"`
 	EditorsField           []string    `yaml:"editors"`
@@ -186,15 +209,15 @@ func (k *kep) Title() string {
 	return k.TitleField
 }
 
-func (k *kep) Number() int {
+func (k *kep) ShortID() int {
 	k.lock.RLock()
 	defer k.lock.RUnlock()
 
-	if k.NumberField != nil {
-		return *k.NumberField
+	if k.ShortIDField != nil {
+		return *k.ShortIDField
 	}
 
-	return UnsetKEPNumber
+	return UnsetShortID
 }
 
 func (k *kep) UniqueID() string {
@@ -302,18 +325,9 @@ func (k *kep) ContentDir() string {
 	return k.contentDir
 }
 
-type routingInfoProvider interface {
-	OwningSIG() string
-	AffectedSubprojects() []string
-	ParticipatingSIGs() []string
-	KubernetesWide() bool
-	SIGWide() bool
-	ContentDir() string
-}
-
 const (
 	metadataFilename = "metadata.yaml"
-	UnsetKEPNumber   = -1
+	UnsetShortID   = -1
 )
 
 func sectionKey(s string) string {
