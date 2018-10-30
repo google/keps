@@ -31,6 +31,8 @@ var _ = Describe("A Collection of Sections for a KEP state", func() {
 				info.LastUpdatedOutput.Ret0 <- now
 			}
 
+			info.ContentDirOutput.Ret0 <- "" // ContentDir() is called one additional time
+
 			col, err := sections.ForProvisionalState(info)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -60,6 +62,8 @@ var _ = Describe("A Collection of Sections for a KEP state", func() {
 				info.StateOutput.Ret0 <- kepState
 				info.LastUpdatedOutput.Ret0 <- now
 			}
+
+			info.ContentDirOutput.Ret0 <- "" // ContentDir() is called one additional time
 
 			col, err := sections.ForImplementableState(info)
 			Expect(err).ToNot(HaveOccurred())

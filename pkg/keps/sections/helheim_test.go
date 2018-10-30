@@ -11,6 +11,64 @@ import (
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
+type mockSection struct {
+	FilenameCalled chan bool
+	FilenameOutput struct {
+		Ret0 chan string
+	}
+	NameCalled chan bool
+	NameOutput struct {
+		Ret0 chan string
+	}
+	ContentCalled chan bool
+	ContentOutput struct {
+		Ret0 chan []byte
+	}
+	PersistCalled chan bool
+	PersistOutput struct {
+		Ret0 chan error
+	}
+	EraseCalled chan bool
+	EraseOutput struct {
+		Ret0 chan error
+	}
+}
+
+func newMockSection() *mockSection {
+	m := &mockSection{}
+	m.FilenameCalled = make(chan bool, 100)
+	m.FilenameOutput.Ret0 = make(chan string, 100)
+	m.NameCalled = make(chan bool, 100)
+	m.NameOutput.Ret0 = make(chan string, 100)
+	m.ContentCalled = make(chan bool, 100)
+	m.ContentOutput.Ret0 = make(chan []byte, 100)
+	m.PersistCalled = make(chan bool, 100)
+	m.PersistOutput.Ret0 = make(chan error, 100)
+	m.EraseCalled = make(chan bool, 100)
+	m.EraseOutput.Ret0 = make(chan error, 100)
+	return m
+}
+func (m *mockSection) Filename() string {
+	m.FilenameCalled <- true
+	return <-m.FilenameOutput.Ret0
+}
+func (m *mockSection) Name() string {
+	m.NameCalled <- true
+	return <-m.NameOutput.Ret0
+}
+func (m *mockSection) Content() []byte {
+	m.ContentCalled <- true
+	return <-m.ContentOutput.Ret0
+}
+func (m *mockSection) Persist() error {
+	m.PersistCalled <- true
+	return <-m.PersistOutput.Ret0
+}
+func (m *mockSection) Erase() error {
+	m.EraseCalled <- true
+	return <-m.EraseOutput.Ret0
+}
+
 type mockRenderingInfoProvider struct {
 	TitleCalled chan bool
 	TitleOutput struct {
@@ -77,4 +135,32 @@ func (m *mockRenderingInfoProvider) ContentDir() string {
 func (m *mockRenderingInfoProvider) LastUpdated() time.Time {
 	m.LastUpdatedCalled <- true
 	return <-m.LastUpdatedOutput.Ret0
+}
+
+type mockLocationProvider struct {
+	ContentDirCalled chan bool
+	ContentDirOutput struct {
+		Ret0 chan string
+	}
+	SectionsCalled chan bool
+	SectionsOutput struct {
+		Ret0 chan []string
+	}
+}
+
+func newMockLocationProvider() *mockLocationProvider {
+	m := &mockLocationProvider{}
+	m.ContentDirCalled = make(chan bool, 100)
+	m.ContentDirOutput.Ret0 = make(chan string, 100)
+	m.SectionsCalled = make(chan bool, 100)
+	m.SectionsOutput.Ret0 = make(chan []string, 100)
+	return m
+}
+func (m *mockLocationProvider) ContentDir() string {
+	m.ContentDirCalled <- true
+	return <-m.ContentDirOutput.Ret0
+}
+func (m *mockLocationProvider) Sections() []string {
+	m.SectionsCalled <- true
+	return <-m.SectionsOutput.Ret0
 }

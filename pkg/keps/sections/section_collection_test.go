@@ -4,218 +4,142 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"time"
+
+	"github.com/hashicorp/go-multierror"
 
 	"github.com/calebamiles/keps/pkg/keps/sections"
-	"github.com/calebamiles/keps/pkg/keps/sections/internal/rendering"
-	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
 var _ = Describe("A collection of sections", func() {
-	Describe("common operations on collections", func() {
+	Describe("Open", func() {
+		It("returns a collection representing sections on disk", func() {
+			tmpDir, err := ioutil.TempDir("", "kep-collection")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.RemoveAll(tmpDir)
+
+			summaryFilename := "summary.md"
+			motivationFilename := "motivation.md"
+			testContent := []byte("test section content")
+
+			summaryLocation := filepath.Join(tmpDir, summaryFilename)
+			motivationLocation := filepath.Join(tmpDir, motivationFilename)
+
+			err = ioutil.WriteFile(summaryLocation, testContent, os.ModePerm)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = ioutil.WriteFile(motivationLocation, testContent, os.ModePerm)
+			Expect(err).ToNot(HaveOccurred())
+
+			locations := newMockLocationProvider()
+			locations.SectionsOutput.Ret0 <- []string{summaryFilename, motivationFilename}
+			locations.ContentDirOutput.Ret0 <- tmpDir
+
+			col, err := sections.OpenCollection(locations)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(col.Sections()).To(ConsistOf([]string{summaryFilename, motivationFilename}))
+		})
+
+		Context("when there is an error reading one of the sections", func() {
+			It("returns the error after trying to read the remaining sections", func() {
+				tmpDir, err := ioutil.TempDir("", "kep-collection")
+				Expect(err).ToNot(HaveOccurred())
+				defer os.RemoveAll(tmpDir)
+
+				summaryFilename := "summary.md"
+				motivationFilename := "motivation.md"
+
+				locations := newMockLocationProvider()
+				locations.SectionsOutput.Ret0 <- []string{summaryFilename, motivationFilename}
+				locations.ContentDirOutput.Ret0 <- tmpDir
+
+				_, err = sections.OpenCollection(locations)
+				merr, ok := err.(*multierror.Error)
+				Expect(ok).To(BeTrue())
+				Expect(merr.Errors).To(HaveLen(2))
+			})
+		})
+
 		Describe("#Persist", func() {
 			It("persists the sections to disk", func() {
-				title := "The Kubernetes Enhancement Proposal Process"
-				authors := []string{"jbeda", "calebamiles"}
-				owningSIG := "sig-architecture"
-				kepState := states.Implementable
-				now := time.Now().UTC()
-
 				tmpDir, err := ioutil.TempDir("", "kep-collection-test")
 				Expect(err).ToNot(HaveOccurred())
 				defer os.RemoveAll(tmpDir)
 
-				info := newMockRenderingInfoProvider()
+				sectionOne := newMockSection()
+				sectionOne.PersistOutput.Ret0 <- nil // no error when calling Persist()
 
-				for i := 0; i < 3; i++ {
-					info.TitleOutput.Ret0 <- title
-					info.AuthorsOutput.Ret0 <- authors
-					info.OwningSIGOutput.Ret0 <- owningSIG
-					info.ContentDirOutput.Ret0 <- tmpDir
-					info.StateOutput.Ret0 <- kepState
-					info.LastUpdatedOutput.Ret0 <- now
-				}
+				sectionTwo := newMockSection()
+				sectionTwo.PersistOutput.Ret0 <- nil // no error when calling Persist()
 
-				col, err := sections.ForProvisionalState(info)
-				Expect(err).ToNot(HaveOccurred())
-
-				summaryLoc := filepath.Join(tmpDir, rendering.SummaryFilename)
-				motivationLoc := filepath.Join(tmpDir, rendering.MotivationFilename)
-
-				Expect(summaryLoc).ToNot(BeAnExistingFile())
-				Expect(motivationLoc).ToNot(BeAnExistingFile())
-
+				col := sections.NewCollection(tmpDir, sectionOne, sectionTwo)
 				By("persisting each section to disk")
 				err = col.Persist()
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(summaryLoc).To(BeARegularFile())
-				Expect(motivationLoc).To(BeARegularFile())
-
-			})
-
-			It("writes a README.md", func() {
-				title := "The Kubernetes Enhancement Proposal Process"
-				authors := []string{"jbeda", "calebamiles"}
-				owningSIG := "sig-architecture"
-				kepState := states.Implementable
-				now := time.Now().UTC()
-
-				tmpDir, err := ioutil.TempDir("", "kep-collection-test")
-				Expect(err).ToNot(HaveOccurred())
-				defer os.RemoveAll(tmpDir)
-
-				info := newMockRenderingInfoProvider()
-
-				for i := 0; i < 3; i++ {
-					info.TitleOutput.Ret0 <- title
-					info.AuthorsOutput.Ret0 <- authors
-					info.OwningSIGOutput.Ret0 <- owningSIG
-					info.ContentDirOutput.Ret0 <- tmpDir
-					info.StateOutput.Ret0 <- kepState
-					info.LastUpdatedOutput.Ret0 <- now
-				}
-
-				col, err := sections.ForProvisionalState(info)
-				Expect(err).ToNot(HaveOccurred())
-
-				By("persisting a README.md to disk")
-				loc := filepath.Join(tmpDir, rendering.ReadmeFilename)
-				err = col.Persist()
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(loc).To(BeARegularFile())
+				Expect(<-sectionOne.PersistCalled).To(BeTrue())
+				Expect(<-sectionTwo.PersistCalled).To(BeTrue())
 			})
 
 			Context("when a section cannot be written", func() {
 				It("writes none of the sections", func() {
-					title := "The Kubernetes Enhancement Proposal Process"
-					authors := []string{"jbeda", "calebamiles"}
-					owningSIG := "sig-architecture"
-					kepState := states.Implementable
-					now := time.Now().UTC()
+					sectionOne := newMockSection()
+					sectionOne.PersistOutput.Ret0 <- errors.New("test error during persist")
+					sectionOne.EraseOutput.Ret0 <- nil
 
-					tmpDir, err := ioutil.TempDir("", "kep-collection-test")
-					Expect(err).ToNot(HaveOccurred())
-					defer os.RemoveAll(tmpDir)
+					sectionTwo := newMockSection()
+					sectionTwo.PersistOutput.Ret0 <- nil // no error when calling Persist()
+					sectionTwo.EraseOutput.Ret0 <- nil
 
-					info := newMockRenderingInfoProvider()
-
-					// first call: ok
-					info.TitleOutput.Ret0 <- title
-					info.AuthorsOutput.Ret0 <- authors
-					info.OwningSIGOutput.Ret0 <- owningSIG
-					info.ContentDirOutput.Ret0 <- tmpDir
-					info.StateOutput.Ret0 <- kepState
-					info.LastUpdatedOutput.Ret0 <- now
-
-					// second call: bummer
-					info.TitleOutput.Ret0 <- title
-					info.AuthorsOutput.Ret0 <- authors
-					info.OwningSIGOutput.Ret0 <- owningSIG
-					info.ContentDirOutput.Ret0 <- filepath.Join(tmpDir, "not-a-dir")
-					info.StateOutput.Ret0 <- kepState
-					info.LastUpdatedOutput.Ret0 <- now
-
-					// third call: ok
-					info.TitleOutput.Ret0 <- title
-					info.AuthorsOutput.Ret0 <- authors
-					info.OwningSIGOutput.Ret0 <- owningSIG
-					info.ContentDirOutput.Ret0 <- tmpDir
-					info.StateOutput.Ret0 <- kepState
-					info.LastUpdatedOutput.Ret0 <- now
-
-					col, err := sections.ForProvisionalState(info)
-					Expect(err).ToNot(HaveOccurred())
-
-					summaryLoc := filepath.Join(tmpDir, rendering.SummaryFilename)
-					motivationLoc := filepath.Join(tmpDir, rendering.MotivationFilename)
-
-					By("erasing all sections")
-					err = col.Persist()
+					col := sections.NewCollection("nonExistantContentRoot", sectionOne, sectionTwo)
+					err := col.Persist()
 					Expect(err).To(HaveOccurred())
+					Expect(err.Error()).To(ContainSubstring("test error during persist"))
 
-					Expect(summaryLoc).ToNot(BeAnExistingFile())
-					Expect(motivationLoc).ToNot(BeAnExistingFile())
+					By("calling erase on each section")
+					Expect(<-sectionOne.PersistCalled).To(BeTrue())
+					Expect(<-sectionTwo.PersistCalled).To(BeTrue())
+					Expect(<-sectionOne.EraseCalled).To(BeTrue())
+					Expect(<-sectionTwo.EraseCalled).To(BeTrue())
 				})
 			})
 		})
 
 		Describe("#Erase", func() {
 			It("attempts to remove all sections", func() {
-				title := "The Kubernetes Enhancement Proposal Process"
-				authors := []string{"jbeda", "calebamiles"}
-				owningSIG := "sig-architecture"
-				kepState := states.Implementable
-				now := time.Now().UTC()
+				sectionOne := newMockSection()
+				sectionOne.EraseOutput.Ret0 <- nil
 
-				tmpDir, err := ioutil.TempDir("", "kep-collection-test")
-				Expect(err).ToNot(HaveOccurred())
-				defer os.RemoveAll(tmpDir)
+				sectionTwo := newMockSection()
+				sectionTwo.EraseOutput.Ret0 <- nil
 
-				info := newMockRenderingInfoProvider()
-				for i := 0; i < 3; i++ {
-					info.TitleOutput.Ret0 <- title
-					info.AuthorsOutput.Ret0 <- authors
-					info.OwningSIGOutput.Ret0 <- owningSIG
-					info.ContentDirOutput.Ret0 <- tmpDir
-					info.StateOutput.Ret0 <- kepState
-					info.LastUpdatedOutput.Ret0 <- now
-				}
-
-				col, err := sections.ForProvisionalState(info)
+				col := sections.NewCollection("nonExistantContentRoot", sectionOne, sectionTwo)
+				err := col.Erase()
 				Expect(err).ToNot(HaveOccurred())
 
-				summaryLoc := filepath.Join(tmpDir, rendering.SummaryFilename)
-				motivationLoc := filepath.Join(tmpDir, rendering.MotivationFilename)
-
-				err = col.Persist()
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(summaryLoc).To(BeARegularFile())
-				Expect(motivationLoc).To(BeARegularFile())
-
-				By("erasing the section content from disk")
-				err = col.Erase()
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(summaryLoc).ToNot(BeAnExistingFile())
-				Expect(motivationLoc).ToNot(BeAnExistingFile())
+				Expect(<-sectionOne.EraseCalled).To(BeTrue())
+				Expect(<-sectionTwo.EraseCalled).To(BeTrue())
 			})
 		})
 
 		Describe("#Sections", func() {
 			It("returns the filenames of the sections in the collection", func() {
-				title := "The Kubernetes Enhancement Proposal Process"
-				authors := []string{"jbeda", "calebamiles"}
-				owningSIG := "sig-architecture"
-				kepState := states.Implementable
-				now := time.Now().UTC()
+				sectionOneFilename := "section_one.md"
+				sectionTwoFilename := "section_two.md"
 
-				tmpDir, err := ioutil.TempDir("", "kep-collection-test")
-				Expect(err).ToNot(HaveOccurred())
-				defer os.RemoveAll(tmpDir)
+				sectionOne := newMockSection()
+				sectionOne.FilenameOutput.Ret0 <- sectionOneFilename
 
-				info := newMockRenderingInfoProvider()
-				for i := 0; i < 3; i++ {
-					info.TitleOutput.Ret0 <- title
-					info.AuthorsOutput.Ret0 <- authors
-					info.OwningSIGOutput.Ret0 <- owningSIG
-					info.ContentDirOutput.Ret0 <- tmpDir
-					info.StateOutput.Ret0 <- kepState
-					info.LastUpdatedOutput.Ret0 <- now
-				}
+				sectionTwo := newMockSection()
+				sectionTwo.FilenameOutput.Ret0 <- sectionTwoFilename
 
-				col, err := sections.ForProvisionalState(info)
-				Expect(err).ToNot(HaveOccurred())
-
+				col := sections.NewCollection("nonExistantContentRoot", sectionOne, sectionTwo)
 				secs := col.Sections()
-
-				Expect(secs).To(ContainElement(rendering.SummaryFilename))
-				Expect(secs).To(ContainElement(rendering.MotivationFilename))
+				Expect(secs).To(ConsistOf(sectionOneFilename, sectionTwoFilename))
 			})
 		})
 	})

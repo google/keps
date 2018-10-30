@@ -8,6 +8,16 @@ import (
 )
 
 type FakeCollection struct {
+	ContentDirStub        func() string
+	contentDirMutex       sync.RWMutex
+	contentDirArgsForCall []struct {
+	}
+	contentDirReturns struct {
+		result1 string
+	}
+	contentDirReturnsOnCall map[int]struct {
+		result1 string
+	}
 	EraseStub        func() error
 	eraseMutex       sync.RWMutex
 	eraseArgsForCall []struct {
@@ -40,6 +50,48 @@ type FakeCollection struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeCollection) ContentDir() string {
+	fake.contentDirMutex.Lock()
+	ret, specificReturn := fake.contentDirReturnsOnCall[len(fake.contentDirArgsForCall)]
+	fake.contentDirArgsForCall = append(fake.contentDirArgsForCall, struct {
+	}{})
+	fake.recordInvocation("ContentDir", []interface{}{})
+	fake.contentDirMutex.Unlock()
+	if fake.ContentDirStub != nil {
+		return fake.ContentDirStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.contentDirReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeCollection) ContentDirCallCount() int {
+	fake.contentDirMutex.RLock()
+	defer fake.contentDirMutex.RUnlock()
+	return len(fake.contentDirArgsForCall)
+}
+
+func (fake *FakeCollection) ContentDirReturns(result1 string) {
+	fake.ContentDirStub = nil
+	fake.contentDirReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeCollection) ContentDirReturnsOnCall(i int, result1 string) {
+	fake.ContentDirStub = nil
+	if fake.contentDirReturnsOnCall == nil {
+		fake.contentDirReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.contentDirReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeCollection) Erase() error {
@@ -171,6 +223,8 @@ func (fake *FakeCollection) SectionsReturnsOnCall(i int, result1 []string) {
 func (fake *FakeCollection) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.contentDirMutex.RLock()
+	defer fake.contentDirMutex.RUnlock()
 	fake.eraseMutex.RLock()
 	defer fake.eraseMutex.RUnlock()
 	fake.persistMutex.RLock()

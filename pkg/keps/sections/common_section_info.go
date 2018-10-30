@@ -1,13 +1,5 @@
 package sections
 
-type section interface {
-	Filename() string
-	Name() string
-	Content() []byte
-	Persist() error
-	Erase() error
-}
-
 type commonSectionInfo struct {
 	filename   string
 	name       string

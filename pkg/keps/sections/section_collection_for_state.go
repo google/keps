@@ -29,6 +29,7 @@ func ForProvisionalState(renderingInfo renderingInfoProvider) (Collection, error
 	}
 
 	c := &collection{
+		contentDir: renderingInfo.ContentDir(),
 		sections: []section{
 			summary,
 			motivation,
@@ -88,6 +89,7 @@ func ForImplementableState(renderingInfo renderingInfoProvider) (Collection, err
 	}
 
 	c := &collection{
+		contentDir: renderingInfo.ContentDir(),
 		sections: []section{
 			summary,
 			motivation,
