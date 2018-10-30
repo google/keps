@@ -40,7 +40,6 @@ func findSettingsFile() (string, error) {
 	return settingsFileLocation, nil
 }
 
-
 func readSettingsFile(loc string, u *User) error {
 	settingsBytes, err := ioutil.ReadFile(loc)
 	if err != nil {
