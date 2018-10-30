@@ -12,8 +12,40 @@ import (
 	"github.com/hashicorp/go-multierror"
 
 	"github.com/calebamiles/keps/pkg/keps/metadata"
+	"github.com/calebamiles/keps/pkg/keps/states"
 	"github.com/calebamiles/keps/pkg/sigs"
 )
+
+func ThatAllBasicInvariantsAreSatisfied(meta metadata.KEP) error {
+	var errs *multierror.Error
+	var err error
+
+	err = ThatStateIsSet(meta)
+	errs = multierror.Append(errs, err)
+
+	err = ThatAllSectionsExistWithContent(meta)
+	errs = multierror.Append(errs, err)
+
+	err = ThatAllSIGsExist(meta)
+	errs = multierror.Append(errs, err)
+
+	err = ThatTitleIsSet(meta)
+	errs = multierror.Append(errs, err)
+
+	err = ThatAuthorsExist(meta)
+	errs = multierror.Append(errs, err)
+
+	err = ThatKEPHasUUID(meta)
+	errs = multierror.Append(errs, err)
+
+	err = ThatCreatedTimeExists(meta)
+	errs = multierror.Append(errs, err)
+
+	err = ThatLastUpdatedAfterCreated(meta)
+	errs = multierror.Append(errs, err)
+
+	return errs.ErrorOrNil()
+}
 
 func ThatAllSectionsExistWithContent(meta metadata.KEP) error {
 	var errs *multierror.Error
@@ -91,10 +123,38 @@ func ThatKEPHasUUID(meta metadata.KEP) error {
 
 	if meta.UniqueID() == "" {
 		errs = multierror.Append(errs, errors.New("empty string given as UUID"))
+		return errs
 	}
 
 	_, err := uuid.Parse(meta.UniqueID())
 	errs = multierror.Append(errs, err)
+
+	return errs.ErrorOrNil()
+}
+
+func ThatStateIsSet(meta metadata.KEP) error {
+	var errs *multierror.Error
+
+	switch meta.State() {
+	case states.Provisional:
+		// valid state
+	case states.Implementable:
+		// valid state
+	case states.Implemented:
+		// valid state
+	case states.Deferred:
+		// valid state
+	case states.Rejected:
+		// valid state
+	case states.Withdrawn:
+		// valid state
+	case states.Replaced:
+		// valid state
+	case states.Name(""):
+		errs = multierror.Append(errs, errors.New("empty state set"))
+	default:
+		errs = multierror.Append(errs, fmt.Errorf("invalid state: %s, set", meta.State()))
+	}
 
 	return errs.ErrorOrNil()
 }

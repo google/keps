@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/hashicorp/go-multierror"
 	"github.com/google/uuid"
+	"github.com/hashicorp/go-multierror"
 
-	"github.com/calebamiles/keps/pkg/check"
+	"github.com/calebamiles/keps/pkg/keps/check"
 	"github.com/calebamiles/keps/pkg/keps/metadata/metadatafakes"
 )
 
@@ -136,19 +136,13 @@ var _ = Describe("Checking Metadata", func() {
 
 	Describe("Checking that a KEP exists upstream", func() {
 		XIt("ensures that the KEP exists upstream", func() {
-			Fail("not implemented")
+			Fail("test not written until migration")
 		})
 	})
 
 	Describe("Checking that a KEP has been accepted upstream", func() {
 		XIt("checks that the KEP exists upstream with provisional status or greater", func() {
-			Fail("not implemented")
-		})
-	})
-
-	Describe("Checking that a short identifier is not used upstream", func() {
-		XIt("checks that the short identifier is not used upstream", func() {
-			Fail("not implemented")
+			Fail("test not written until migration")
 		})
 	})
 
@@ -315,7 +309,6 @@ var _ = Describe("Checking Metadata", func() {
 		})
 	})
 
-
 	Describe("Checking that the KEP has a UUID", func() {
 		It("checks that UniqueID is set", func() {
 			meta := &metadatafakes.FakeKEP{}
@@ -348,7 +341,7 @@ var _ = Describe("Checking Metadata", func() {
 
 			now := time.Now()
 			before := now.Add(-time.Minute)
-			after  := now.Add(time.Minute)
+			after := now.Add(time.Minute)
 
 			meta.CreatedReturns(after)
 			meta.LastUpdatedReturns(before)

@@ -10,6 +10,22 @@ import (
 	"github.com/calebamiles/keps/pkg/sigs"
 )
 
+func ThatThereAreOwners(meta metadata.KEP) error {
+	var errs *multierror.Error
+	var err error
+
+	err = ThatHasOwningSIG(meta)
+	errs = multierror.Append(errs, err)
+
+	err = ThatThereAreReviewers(meta)
+	errs = multierror.Append(errs, err)
+
+	err = ThatThereAreApprovers(meta)
+	errs = multierror.Append(errs, err)
+
+	return errs.ErrorOrNil()
+}
+
 func ThatThereAreEditors(meta metadata.KEP) error {
 	var errs *multierror.Error
 
@@ -70,22 +86,6 @@ func ThatHasOwningSIG(meta metadata.KEP) error {
 	case !sigs.Exists(meta.OwningSIG()):
 		errs = multierror.Append(errs, fmt.Errorf("Invalid owning SIG %s. No SIG information compiled in. Try updating?", meta.OwningSIG()))
 	}
-
-	return errs.ErrorOrNil()
-}
-
-func ThatThereAreOwners(meta metadata.KEP) error {
-	var errs *multierror.Error
-	var err error
-
-	err = ThatHasOwningSIG(meta)
-	errs = multierror.Append(errs, err)
-
-	err = ThatThereAreReviewers(meta)
-	errs = multierror.Append(errs, err)
-
-	err = ThatThereAreApprovers(meta)
-	errs = multierror.Append(errs, err)
 
 	return errs.ErrorOrNil()
 }
