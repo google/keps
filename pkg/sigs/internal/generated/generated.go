@@ -341,6 +341,11 @@ var InfoForPath = map[string]*PathInfo{
 		Subproject: "aws-encryption-provider",
 	},
 
+	"sig-aws/aws-ebs-csi-driver": &PathInfo{
+		OwningSIG:  "sig-aws",
+		Subproject: "aws-ebs-csi-driver",
+	},
+
 	"sig-azure/cloud-provider-azure": &PathInfo{
 		OwningSIG:  "sig-azure",
 		Subproject: "cloud-provider-azure",
@@ -399,6 +404,11 @@ var InfoForPath = map[string]*PathInfo{
 	"sig-cluster-lifecycle/cluster-api-provider-aws": &PathInfo{
 		OwningSIG:  "sig-cluster-lifecycle",
 		Subproject: "cluster-api-provider-aws",
+	},
+
+	"sig-cluster-lifecycle/cluster-api-provider-digitalocean": &PathInfo{
+		OwningSIG:  "sig-cluster-lifecycle",
+		Subproject: "cluster-api-provider-digitalocean",
 	},
 
 	"sig-cluster-lifecycle/cluster-api-provider-gcp": &PathInfo{
@@ -875,6 +885,8 @@ var FlattenedSubprojectSet = map[string]bool{
 
 	"aws-encryption-provider": true,
 
+	"aws-ebs-csi-driver": true,
+
 	"cloud-provider-azure": true,
 
 	"kubectl": true,
@@ -898,6 +910,8 @@ var FlattenedSubprojectSet = map[string]bool{
 	"cluster-api": true,
 
 	"cluster-api-provider-aws": true,
+
+	"cluster-api-provider-digitalocean": true,
 
 	"cluster-api-provider-gcp": true,
 
@@ -1117,6 +1131,8 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 		"aws-iam-authenticator": true,
 
 		"aws-encryption-provider": true,
+
+		"aws-ebs-csi-driver": true,
 	},
 
 	"sig-azure": map[string]bool{
@@ -1155,6 +1171,8 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 		"cluster-api": true,
 
 		"cluster-api-provider-aws": true,
+
+		"cluster-api-provider-digitalocean": true,
 
 		"cluster-api-provider-gcp": true,
 
