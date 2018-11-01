@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/go-yaml/yaml"
+	"gopkg.in/yaml.v2"
 
 	"github.com/calebamiles/keps/pkg/sigs"
 )
@@ -42,7 +42,7 @@ var _ = Describe("the SIGs helper package", func() {
 
 			for _, s := range upstreamList.SIGs {
 				for _, sp := range s.Subprojects {
-					Expect(sigs.SubprojectExists(sp.Name)).To(BeTrue())
+					Expect(sigs.SubprojectExists(sp.Name)).To(BeTrue(), "expected " + sp.Name + " to exist as subproject")
 				}
 			}
 		})

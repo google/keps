@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-yaml/yaml"
+	"gopkg.in/yaml.v2"
 	"github.com/google/uuid"
 
 	"github.com/calebamiles/keps/pkg/keps/states"

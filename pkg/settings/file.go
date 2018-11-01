@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/go-yaml/yaml"
+	"gopkg.in/yaml.v2"
 	log "github.com/sirupsen/logrus"
 )
 
