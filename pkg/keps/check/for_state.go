@@ -12,10 +12,8 @@ import (
 func ThatIsValidForProvisionalState(meta metadata.KEP) error {
 	var errs *multierror.Error
 	var err error
-	// TODO update Init() to make initial state "proposal/draft"
 
-	err = ThatThereAreOwners(meta)
-	errs = multierror.Append(errs, err)
+	// DISCUSS: should a KEP require identified reviewers and approvers before being marked as `provisional`
 
 	err = ThatHasAllSectionsForProvisionalState(meta)
 	errs = multierror.Append(errs, err)
@@ -49,9 +47,6 @@ func ThatHasAllSectionsForProvisionalState(meta metadata.KEP) error {
 	var err error
 
 	err = thatHasIntroduction(meta)
-	errs = multierror.Append(errs, err)
-
-	err = thatHasGuides(meta)
 	errs = multierror.Append(errs, err)
 
 	return errs.ErrorOrNil()
