@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"gopkg.in/yaml.v2"
 	"github.com/google/uuid"
+	"gopkg.in/yaml.v2"
 
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
@@ -36,7 +36,11 @@ type KEP interface {
 	SIGWide() bool
 	ContentDir() string
 
+	SetState(states.Name)
 	AddSections([]string)
+	AddApprovers([]string)
+	AddReviewers([]string)
+
 	Sections() []string
 
 	Persist() error
@@ -63,9 +67,11 @@ func New(authors []string, title string, routingInfo routingInfoProvider) (KEP, 
 		CreatedField:             time.Now().UTC(),
 		LastUpdatedField:         time.Now().UTC(),
 		UniqueIDField:            uuid.New().String(), // note: will panic on error
-		StateField:               states.Provisional,
+		StateField:               states.Draft,
 		contentDir:               routingInfo.ContentDir(),
-		sectionNames:             make(map[string]bool),
+		hasSectionPath:           make(map[string]bool),
+		inApproversSet:           make(map[string]bool),
+		inReviewersSet:           make(map[string]bool),
 	}
 
 	return k, nil
@@ -92,23 +98,32 @@ func FromBytes(b []byte) (KEP, error) {
 }
 
 func fromBytes(b []byte) (*kep, error) {
-	k := &kep{}
+	k := &kep{
+		hasSectionPath: make(map[string]bool),
+		inApproversSet: make(map[string]bool),
+		inReviewersSet: make(map[string]bool),
+	}
+
 	err := yaml.Unmarshal(b, k)
 	if err != nil {
 		return nil, err
 	}
 
-	k.sectionNames = make(map[string]bool)
+	k.hasSectionPath = make(map[string]bool)
 
 	for _, s := range k.SectionsField {
-		switch k.sectionNames[sectionKey(s)] {
-		case false:
-			k.sectionNames[sectionKey(s)] = true
-
+		if !k.hasSectionPath[sectionKey(s)] {
+			k.hasSectionPath[sectionKey(s)] = true
 			k.uniqueSections = append(k.uniqueSections, s)
-		default:
-			// do nothing if name exists
 		}
+	}
+
+	for _, a := range k.ApproversField {
+		k.inApproversSet[a] = true
+	}
+
+	for _, r := range k.ReviewersField {
+		k.inReviewersSet[r] = true
 	}
 
 	return k, nil
@@ -125,7 +140,7 @@ func (s *kepSection) Filename() string { return s.FilenameField }
 type kep struct {
 	AuthorsField           []string    `yaml:"authors"`
 	TitleField             string      `yaml:"title"`
-	ShortIDField            *int        `yaml:"kep_number",omitempty`
+	ShortIDField           *int        `yaml:"kep_number",omitempty`
 	ReviewersField         []string    `yaml:"reviewers"`
 	ApproversField         []string    `yaml:"approvers"`
 	EditorsField           []string    `yaml:"editors"`
@@ -143,8 +158,10 @@ type kep struct {
 	KubernetesWideField      bool     `yaml:"kubernetes_wide"`
 	SIGWideField             bool     `yaml:"sig_wide"`
 
-	sectionNames   map[string]bool `yaml:"-"` // do not persist this
+	hasSectionPath map[string]bool `yaml:"-"` // do not persist this
 	uniqueSections []string        `yaml:"-"` // do not persist this
+	inApproversSet map[string]bool `yaml:"-"` // do not persist this
+	inReviewersSet map[string]bool `yaml:"-"` // do not persist this
 	contentDir     string          `yaml:"-"` // do not persist this
 	lock           sync.RWMutex    `yaml:"-"` // do not persist this
 }
@@ -155,6 +172,16 @@ func (k *kep) Persist() error {
 
 	k.LastUpdatedField = time.Now().UTC()
 	k.SectionsField = k.uniqueSections
+
+	k.ApproversField = []string{}
+	for approver := range k.inApproversSet {
+		k.ApproversField = append(k.ApproversField, approver)
+	}
+
+	k.ReviewersField = []string{}
+	for reviewer := range k.inReviewersSet {
+		k.ReviewersField = append(k.ReviewersField, reviewer)
+	}
 
 	loc := k.contentDir
 	filename := filepath.Join(loc, metadataFilename)
@@ -177,15 +204,39 @@ func (k *kep) AddSections(paths []string) {
 	defer k.lock.Unlock()
 
 	for _, s := range paths {
-		switch k.sectionNames[s] {
-		case false:
-			k.sectionNames[sectionKey(s)] = true
-
+		if !k.hasSectionPath[s] {
+			k.hasSectionPath[sectionKey(s)] = true
+			// we maintain a separate slice in order to maintain section order
 			k.uniqueSections = append(k.uniqueSections, s)
-		default:
-			// silently do nothing if name exists
 		}
 	}
+}
+
+func (k *kep) AddApprovers(approvers []string) {
+	k.lock.Lock()
+	defer k.lock.Unlock()
+
+	// we don't currently care about the order of approvers when persisting this back to YAML
+	for _, approver := range approvers {
+		k.inApproversSet[approver] = true
+	}
+}
+
+func (k *kep) AddReviewers(reviewers []string) {
+	k.lock.Lock()
+	defer k.lock.Unlock()
+
+	// we don't currently care about the order of reviewers when persisting this back to YAML
+	for _, reviewer := range reviewers {
+		k.inReviewersSet[reviewer] = true
+	}
+}
+
+func (k *kep) SetState(state states.Name) {
+	k.lock.Lock()
+	defer k.lock.Unlock()
+
+	k.StateField = state
 }
 
 func (k *kep) Sections() []string {
@@ -231,14 +282,24 @@ func (k *kep) Reviewers() []string {
 	k.lock.RLock()
 	defer k.lock.RUnlock()
 
-	return k.ReviewersField
+	reviewers := []string{}
+	for reviewer := range k.inReviewersSet {
+		reviewers = append(reviewers, reviewer)
+	}
+
+	return reviewers
 }
 
 func (k *kep) Approvers() []string {
 	k.lock.RLock()
 	defer k.lock.RUnlock()
 
-	return k.ApproversField
+	approvers := []string{}
+	for approver := range k.inApproversSet {
+		approvers = append(approvers, approver)
+	}
+
+	return approvers
 }
 
 func (k *kep) Editors() []string {
@@ -327,7 +388,7 @@ func (k *kep) ContentDir() string {
 
 const (
 	metadataFilename = "metadata.yaml"
-	UnsetShortID   = -1
+	UnsetShortID     = -1
 )
 
 func sectionKey(s string) string {

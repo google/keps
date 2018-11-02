@@ -15,7 +15,7 @@ import (
 var _ = Describe("KEP Metdata", func() {
 	Describe("New()", func() {
 		It("creates metadata", func() {
-			author := "Dawn Chen"
+			author := "dchen1107"
 			title := "kubelet"
 			owningSIG := "sig-node"
 			subprojects := []string{"kubelet"}
@@ -35,34 +35,13 @@ var _ = Describe("KEP Metdata", func() {
 			Expect(m.Title()).To(Equal(title))
 			Expect(m.OwningSIG()).To(Equal(owningSIG))
 			Expect(m.AffectedSubprojects()).To(ContainElement(subprojects[0]))
-			Expect(m.State()).To(Equal(states.Provisional))
+			Expect(m.State()).To(Equal(states.Draft))
 		})
 	})
 
-	Describe("#AddSections", func() {
-		It("adds section information to the metadata", func() {
-			author := "Dawn Chen"
-			title := "kubelet"
-			owningSIG := "sig-node"
-			subprojects := []string{"kubelet"}
-
-			info := newMockRoutingInfoProvider()
-			info.OwningSIGOutput.Ret0 <- owningSIG
-			info.AffectedSubprojectsOutput.Ret0 <- subprojects
-			info.SIGWideOutput.Ret0 <- true
-			info.KubernetesWideOutput.Ret0 <- false
-			info.ParticipatingSIGsOutput.Ret0 <- []string{}
-			info.ContentDirOutput.Ret0 <- ""
-
-			m, err := metadata.New([]string{author}, title, info)
-			Expect(err).ToNot(HaveOccurred())
-
-			m.AddSections([]string{"test_section.md"})
-			Expect(m.Sections()).To(HaveLen(1))
-		})
-
-		It("dedupes by section name", func() {
-			author := "Dawn Chen"
+	Describe("#AddSections()", func() {
+		It("adds section information to the metadata and dedupes", func() {
+			author := "dchen1107"
 			title := "kubelet"
 			owningSIG := "sig-node"
 			subprojects := []string{"kubelet"}
@@ -83,13 +62,82 @@ var _ = Describe("KEP Metdata", func() {
 		})
 	})
 
+	Describe("#AddApprovers()", func() {
+		It("adds approvers and dedupes", func() {
+			author := "dchen1107"
+			title := "kubelet"
+			owningSIG := "sig-node"
+			subprojects := []string{"kubelet"}
+
+			info := newMockRoutingInfoProvider()
+			info.OwningSIGOutput.Ret0 <- owningSIG
+			info.AffectedSubprojectsOutput.Ret0 <- subprojects
+			info.SIGWideOutput.Ret0 <- true
+			info.KubernetesWideOutput.Ret0 <- false
+			info.ParticipatingSIGsOutput.Ret0 <- []string{}
+			info.ContentDirOutput.Ret0 <- ""
+
+			m, err := metadata.New([]string{author}, title, info)
+			Expect(err).ToNot(HaveOccurred())
+
+			m.AddApprovers([]string{"bgrant0607", "bgrant0607"})
+			Expect(m.Approvers()).To(HaveLen(1))
+		})
+	})
+
+	Describe("#AddReviewers()", func() {
+		It("adds reviewers and dedupes", func() {
+			author := "dchen1107"
+			title := "kubelet"
+			owningSIG := "sig-node"
+			subprojects := []string{"kubelet"}
+
+			info := newMockRoutingInfoProvider()
+			info.OwningSIGOutput.Ret0 <- owningSIG
+			info.AffectedSubprojectsOutput.Ret0 <- subprojects
+			info.SIGWideOutput.Ret0 <- true
+			info.KubernetesWideOutput.Ret0 <- false
+			info.ParticipatingSIGsOutput.Ret0 <- []string{}
+			info.ContentDirOutput.Ret0 <- ""
+
+			m, err := metadata.New([]string{author}, title, info)
+			Expect(err).ToNot(HaveOccurred())
+
+			m.AddReviewers([]string{"smarterclayton", "smarterclayton"})
+			Expect(m.Reviewers()).To(HaveLen(1))
+		})
+	})
+
+	Describe("#SetState()", func() {
+		It("sets the state on the metadata", func() {
+			author := "dchen1107"
+			title := "kubelet"
+			owningSIG := "sig-node"
+			subprojects := []string{"kubelet"}
+
+			info := newMockRoutingInfoProvider()
+			info.OwningSIGOutput.Ret0 <- owningSIG
+			info.AffectedSubprojectsOutput.Ret0 <- subprojects
+			info.SIGWideOutput.Ret0 <- true
+			info.KubernetesWideOutput.Ret0 <- false
+			info.ParticipatingSIGsOutput.Ret0 <- []string{}
+			info.ContentDirOutput.Ret0 <- ""
+
+			m, err := metadata.New([]string{author}, title, info)
+			Expect(err).ToNot(HaveOccurred())
+
+			m.SetState(states.Provisional)
+			Expect(m.State()).To(Equal(states.Provisional))
+		})
+	})
+
 	Describe("#Persist()", func() {
 		It("writes a YAML representation to disk", func() {
 			tmpDir, err := ioutil.TempDir("", "kep-content")
 			Expect(err).ToNot(HaveOccurred())
 			defer os.RemoveAll(tmpDir)
 
-			author := "Dawn Chen"
+			author := "dchen1107"
 			title := "kubelet"
 			owningSIG := "sig-node"
 			subprojects := []string{"kubelet"}

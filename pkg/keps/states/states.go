@@ -3,6 +3,7 @@ package states
 type Name string
 
 const (
+	Draft         Name = "draft"
 	Provisional   Name = "provisional"
 	Implementable Name = "implementable"
 	Implemented   Name = "implemented"

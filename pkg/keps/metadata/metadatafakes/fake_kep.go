@@ -10,6 +10,16 @@ import (
 )
 
 type FakeKEP struct {
+	AddApproversStub        func([]string)
+	addApproversMutex       sync.RWMutex
+	addApproversArgsForCall []struct {
+		arg1 []string
+	}
+	AddReviewersStub        func([]string)
+	addReviewersMutex       sync.RWMutex
+	addReviewersArgsForCall []struct {
+		arg1 []string
+	}
 	AddSectionsStub        func([]string)
 	addSectionsMutex       sync.RWMutex
 	addSectionsArgsForCall []struct {
@@ -175,6 +185,11 @@ type FakeKEP struct {
 	sectionsReturnsOnCall map[int]struct {
 		result1 []string
 	}
+	SetStateStub        func(states.Name)
+	setStateMutex       sync.RWMutex
+	setStateArgsForCall []struct {
+		arg1 states.Name
+	}
 	ShortIDStub        func() int
 	shortIDMutex       sync.RWMutex
 	shortIDArgsForCall []struct {
@@ -217,6 +232,66 @@ type FakeKEP struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeKEP) AddApprovers(arg1 []string) {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.addApproversMutex.Lock()
+	fake.addApproversArgsForCall = append(fake.addApproversArgsForCall, struct {
+		arg1 []string
+	}{arg1Copy})
+	fake.recordInvocation("AddApprovers", []interface{}{arg1Copy})
+	fake.addApproversMutex.Unlock()
+	if fake.AddApproversStub != nil {
+		fake.AddApproversStub(arg1)
+	}
+}
+
+func (fake *FakeKEP) AddApproversCallCount() int {
+	fake.addApproversMutex.RLock()
+	defer fake.addApproversMutex.RUnlock()
+	return len(fake.addApproversArgsForCall)
+}
+
+func (fake *FakeKEP) AddApproversArgsForCall(i int) []string {
+	fake.addApproversMutex.RLock()
+	defer fake.addApproversMutex.RUnlock()
+	argsForCall := fake.addApproversArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeKEP) AddReviewers(arg1 []string) {
+	var arg1Copy []string
+	if arg1 != nil {
+		arg1Copy = make([]string, len(arg1))
+		copy(arg1Copy, arg1)
+	}
+	fake.addReviewersMutex.Lock()
+	fake.addReviewersArgsForCall = append(fake.addReviewersArgsForCall, struct {
+		arg1 []string
+	}{arg1Copy})
+	fake.recordInvocation("AddReviewers", []interface{}{arg1Copy})
+	fake.addReviewersMutex.Unlock()
+	if fake.AddReviewersStub != nil {
+		fake.AddReviewersStub(arg1)
+	}
+}
+
+func (fake *FakeKEP) AddReviewersCallCount() int {
+	fake.addReviewersMutex.RLock()
+	defer fake.addReviewersMutex.RUnlock()
+	return len(fake.addReviewersArgsForCall)
+}
+
+func (fake *FakeKEP) AddReviewersArgsForCall(i int) []string {
+	fake.addReviewersMutex.RLock()
+	defer fake.addReviewersMutex.RUnlock()
+	argsForCall := fake.addReviewersArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *FakeKEP) AddSections(arg1 []string) {
@@ -921,6 +996,31 @@ func (fake *FakeKEP) SectionsReturnsOnCall(i int, result1 []string) {
 	}{result1}
 }
 
+func (fake *FakeKEP) SetState(arg1 states.Name) {
+	fake.setStateMutex.Lock()
+	fake.setStateArgsForCall = append(fake.setStateArgsForCall, struct {
+		arg1 states.Name
+	}{arg1})
+	fake.recordInvocation("SetState", []interface{}{arg1})
+	fake.setStateMutex.Unlock()
+	if fake.SetStateStub != nil {
+		fake.SetStateStub(arg1)
+	}
+}
+
+func (fake *FakeKEP) SetStateCallCount() int {
+	fake.setStateMutex.RLock()
+	defer fake.setStateMutex.RUnlock()
+	return len(fake.setStateArgsForCall)
+}
+
+func (fake *FakeKEP) SetStateArgsForCall(i int) states.Name {
+	fake.setStateMutex.RLock()
+	defer fake.setStateMutex.RUnlock()
+	argsForCall := fake.setStateArgsForCall[i]
+	return argsForCall.arg1
+}
+
 func (fake *FakeKEP) ShortID() int {
 	fake.shortIDMutex.Lock()
 	ret, specificReturn := fake.shortIDReturnsOnCall[len(fake.shortIDArgsForCall)]
@@ -1092,6 +1192,10 @@ func (fake *FakeKEP) UniqueIDReturnsOnCall(i int, result1 string) {
 func (fake *FakeKEP) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.addApproversMutex.RLock()
+	defer fake.addApproversMutex.RUnlock()
+	fake.addReviewersMutex.RLock()
+	defer fake.addReviewersMutex.RUnlock()
 	fake.addSectionsMutex.RLock()
 	defer fake.addSectionsMutex.RUnlock()
 	fake.affectedSubprojectsMutex.RLock()
@@ -1126,6 +1230,8 @@ func (fake *FakeKEP) Invocations() map[string][][]interface{} {
 	defer fake.sIGWideMutex.RUnlock()
 	fake.sectionsMutex.RLock()
 	defer fake.sectionsMutex.RUnlock()
+	fake.setStateMutex.RLock()
+	defer fake.setStateMutex.RUnlock()
 	fake.shortIDMutex.RLock()
 	defer fake.shortIDMutex.RUnlock()
 	fake.stateMutex.RLock()
