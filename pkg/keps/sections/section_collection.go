@@ -70,12 +70,14 @@ func (c *collection) Persist() error {
 	c.locker.Lock()
 	defer c.locker.Unlock()
 
-	err := c.persist()
-	if err != nil {
-		return nil
+	var errs *multierror.Error
+
+	errs = multierror.Append(errs, c.persist())
+	if errs.ErrorOrNil() != nil {
+		errs = multierror.Append(errs, c.erase())
 	}
 
-	return nil
+	return errs.ErrorOrNil()
 }
 
 func (c *collection) Erase() error {
@@ -118,8 +120,7 @@ func (c *collection) erase() error {
 	var errs *multierror.Error
 
 	for _, s := range c.sections {
-		err := s.Erase()
-		errs = multierror.Append(errs, err)
+		errs = multierror.Append(errs, s.Erase())
 	}
 
 	return errs.ErrorOrNil()
