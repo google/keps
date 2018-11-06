@@ -251,39 +251,29 @@ var InfoForPath = map[string]*PathInfo{
 		Subproject: "application",
 	},
 
-	"sig-architecture/api": &PathInfo{
+	"sig-architecture/architecture-and-api-governance": &PathInfo{
 		OwningSIG:  "sig-architecture",
-		Subproject: "api",
+		Subproject: "architecture-and-api-governance",
 	},
 
-	"sig-architecture/kubernetes-template-project": &PathInfo{
+	"sig-architecture/conformance-definition": &PathInfo{
 		OwningSIG:  "sig-architecture",
-		Subproject: "kubernetes-template-project",
+		Subproject: "conformance-definition",
 	},
 
-	"sig-architecture/spartakus": &PathInfo{
+	"sig-architecture/kep-adoption-and-reviews": &PathInfo{
 		OwningSIG:  "sig-architecture",
-		Subproject: "spartakus",
+		Subproject: "kep-adoption-and-reviews",
+	},
+
+	"sig-architecture/code-organization": &PathInfo{
+		OwningSIG:  "sig-architecture",
+		Subproject: "code-organization",
 	},
 
 	"sig-architecture/steering": &PathInfo{
 		OwningSIG:  "sig-architecture",
 		Subproject: "steering",
-	},
-
-	"sig-architecture/architecture-tracking": &PathInfo{
-		OwningSIG:  "sig-architecture",
-		Subproject: "architecture-tracking",
-	},
-
-	"sig-architecture/universal-utils": &PathInfo{
-		OwningSIG:  "sig-architecture",
-		Subproject: "universal-utils",
-	},
-
-	"sig-architecture/contrib": &PathInfo{
-		OwningSIG:  "sig-architecture",
-		Subproject: "contrib",
 	},
 
 	"sig-autoscaling/scale-client": &PathInfo{
@@ -849,19 +839,15 @@ var FlattenedSubprojectSet = map[string]bool{
 
 	"application": true,
 
-	"api": true,
+	"architecture-and-api-governance": true,
 
-	"kubernetes-template-project": true,
+	"conformance-definition": true,
 
-	"spartakus": true,
+	"kep-adoption-and-reviews": true,
+
+	"code-organization": true,
 
 	"steering": true,
-
-	"architecture-tracking": true,
-
-	"universal-utils": true,
-
-	"contrib": true,
 
 	"scale-client": true,
 
@@ -1088,19 +1074,15 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 
 	"sig-architecture": map[string]bool{
 
-		"api": true,
+		"architecture-and-api-governance": true,
 
-		"kubernetes-template-project": true,
+		"conformance-definition": true,
 
-		"spartakus": true,
+		"kep-adoption-and-reviews": true,
+
+		"code-organization": true,
 
 		"steering": true,
-
-		"architecture-tracking": true,
-
-		"universal-utils": true,
-
-		"contrib": true,
 	},
 
 	"sig-auth": map[string]bool{},
