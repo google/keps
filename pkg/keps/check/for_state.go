@@ -36,8 +36,9 @@ func ThatIsValidForImplementableState(meta metadata.KEP) error {
 	err = ThatHasAllSectionsForImplementableState(meta)
 	errs = multierror.Append(errs, err)
 
-	err = ThatKEPHasBeenAcceptedUpstream(meta)
-	errs = multierror.Append(errs, err)
+	// DISCUSS: should we confirm that a KEP has been accepted upstream before marking as approved
+	//err = ThatKEPHasBeenAcceptedUpstream(meta)
+	//errs = multierror.Append(errs, err)
 
 	return errs.ErrorOrNil()
 }
