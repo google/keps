@@ -6,6 +6,14 @@ import (
 	"github.com/calebamiles/keps/pkg/settings"
 )
 
+// Propose prepares a KEP for initial proposal to the Kubernetes Community.
+// The KEP process has been designed as an iterative process; taking
+// inspiration from https://blog.golang.org/toward-go2, Propose prepares
+// the author to explain the importance of their change through a KEP
+// Propose currently:
+//  - sets KEP state to `draft`
+// Errors returned by Propose are likely due to file i/o
+// Eventually, Propose may also handle git and GitHub operations
 func Propose(runtime settings.Runtime) error {
 	kep, err := keps.Open(runtime.TargetDir())
 	if err != nil {

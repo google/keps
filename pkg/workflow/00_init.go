@@ -12,6 +12,14 @@ import (
 	"github.com/calebamiles/keps/pkg/sigs"
 )
 
+// Init is responsible for minimizing the busy work of creating a KEP.
+// Currently it:
+// - creates the initial directory structure
+//   - placing KEPs created at the top level of KEP content in a `kubernetes-wide` directory
+//   - places KEPs created at the top level of a SIG directory in a `sig-wide` directory
+// - creates initial metadata with required sections
+// TODO:
+// - discuss using `omitempty` to avoid persisting empty metadata
 func Init(runtime settings.Runtime) error {
 	routingInfo, err := sigs.BuildRoutingFromPath(runtime.ContentRoot(), runtime.TargetDir())
 	if err != nil {

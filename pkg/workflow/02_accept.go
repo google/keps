@@ -6,6 +6,13 @@ import (
 	"github.com/calebamiles/keps/pkg/settings"
 )
 
+// Accept signifies that the rationale for a KEP has been accepted by a sponsoring SIG
+// and that work is underway to design and document an approach to realize the value
+// described by the introduction of a KEP.
+// Currently Accept:
+//  - adds the principal as both an approver and reviewer
+//  - sets the KEP state to `provisional`
+//  - persists the KEP to disk
 func Accept(runtime settings.Runtime) error {
 	kep, err := keps.Open(runtime.TargetDir())
 	if err != nil {
