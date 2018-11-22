@@ -41,3 +41,13 @@ func guessNameFromFilename(filename string) string {
 	filenameNoExtension := strings.Replace(probableFile, ".md", "", 1)
 	return strings.Title(strings.Replace(filenameNoExtension, "_", " ", -1))
 }
+
+const (
+	DeveloperGuide     = rendering.DeveloperGuideName
+	GraduationCriteria = rendering.GraduationCriteriaName
+	Motivation         = rendering.MotivationName
+	OperatorGuide      = rendering.OperatorGuideName
+	Readme             = rendering.ReadmeName
+	Summary            = rendering.SummaryName
+	TeacherGuide       = rendering.TeacherGuideName
+)
