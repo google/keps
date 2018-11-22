@@ -23,8 +23,13 @@ type KEP interface {
 	Approvers() []string
 	Editors() []string
 	State() states.Name
-	Replaces() string
 	DevelopmentThemes() []string
+	Sections() []string // really are section paths
+
+	// should be pointers to other KEPs
+	Replaces() []string
+	SupersededBy() []string
+
 	Created() time.Time
 	LastUpdated() time.Time
 
@@ -36,13 +41,11 @@ type KEP interface {
 	SIGWide() bool
 	ContentDir() string
 
+	// Mutators
 	SetState(states.Name)
 	AddSections([]string)
 	AddApprovers([]string)
 	AddReviewers([]string)
-
-	Sections() []string
-
 	Persist() error
 }
 
@@ -138,25 +141,26 @@ func (s *kepSection) Name() string     { return s.NameField }
 func (s *kepSection) Filename() string { return s.FilenameField }
 
 type kep struct {
-	AuthorsField           []string    `yaml:"authors"`
-	TitleField             string      `yaml:"title"`
+	AuthorsField           []string    `yaml:"authors,omitempty"`
+	TitleField             string      `yaml:"title,omitempty"`
 	ShortIDField           *int        `yaml:"kep_number",omitempty`
-	ReviewersField         []string    `yaml:"reviewers"`
-	ApproversField         []string    `yaml:"approvers"`
-	EditorsField           []string    `yaml:"editors"`
-	StateField             states.Name `yaml:"state"`
-	ReplacesField          string      `yaml:"replaces"`
-	DevelopmentThemesField []string    `yaml:"development_themes"`
-	LastUpdatedField       time.Time   `yaml:"last_updated"`
-	CreatedField           time.Time   `yaml:"created"`
-	UniqueIDField          string      `yaml:"uuid"`
-	SectionsField          []string    `yaml:"sections"`
+	ReviewersField         []string    `yaml:"reviewers,omitempty"`
+	ApproversField         []string    `yaml:"approvers,omitempty"`
+	EditorsField           []string    `yaml:"editors,omitempty"`
+	StateField             states.Name `yaml:"state,omitempty"`
+	ReplacesField          []string    `yaml:"replaces,omitempty"`
+	SupersededByField      []string    `yaml:"superseded_by"`
+	DevelopmentThemesField []string    `yaml:"development_themes,omitempty"`
+	LastUpdatedField       time.Time   `yaml:"last_updated,omitempty"`
+	CreatedField           time.Time   `yaml:"created,omitempty"`
+	UniqueIDField          string      `yaml:"uuid,omitempty"`
+	SectionsField          []string    `yaml:"sections,omitempty"`
 
-	OwningSIGField           string   `yaml:"owning_sig"`
-	AffectedSubprojectsField []string `yaml:"affected_subprojects"`
-	ParticipatingSIGsField   []string `yaml:"participating_sigs"`
-	KubernetesWideField      bool     `yaml:"kubernetes_wide"`
-	SIGWideField             bool     `yaml:"sig_wide"`
+	OwningSIGField           string   `yaml:"owning_sig,omitempty"`
+	AffectedSubprojectsField []string `yaml:"affected_subprojects,omitempty"`
+	ParticipatingSIGsField   []string `yaml:"participating_sigs,omitempty"`
+	KubernetesWideField      bool     `yaml:"kubernetes_wide,omitempty"`
+	SIGWideField             bool     `yaml:"sig_wide,omitempty"`
 
 	hasSectionPath map[string]bool `yaml:"-"` // do not persist this
 	uniqueSections []string        `yaml:"-"` // do not persist this
@@ -316,11 +320,18 @@ func (k *kep) State() states.Name {
 	return k.StateField
 }
 
-func (k *kep) Replaces() string {
+func (k *kep) Replaces() []string {
 	k.lock.RLock()
 	defer k.lock.RUnlock()
 
 	return k.ReplacesField
+}
+
+func (k *kep) SupersededBy() []string {
+	k.lock.RLock()
+	defer k.lock.RUnlock()
+
+	return k.SupersededByField
 }
 
 func (k *kep) DevelopmentThemes() []string {

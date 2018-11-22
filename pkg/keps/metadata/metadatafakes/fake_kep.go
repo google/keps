@@ -145,15 +145,15 @@ type FakeKEP struct {
 	persistReturnsOnCall map[int]struct {
 		result1 error
 	}
-	ReplacesStub        func() string
+	ReplacesStub        func() []string
 	replacesMutex       sync.RWMutex
 	replacesArgsForCall []struct {
 	}
 	replacesReturns struct {
-		result1 string
+		result1 []string
 	}
 	replacesReturnsOnCall map[int]struct {
-		result1 string
+		result1 []string
 	}
 	ReviewersStub        func() []string
 	reviewersMutex       sync.RWMutex
@@ -209,6 +209,16 @@ type FakeKEP struct {
 	}
 	stateReturnsOnCall map[int]struct {
 		result1 states.Name
+	}
+	SupersededByStub        func() []string
+	supersededByMutex       sync.RWMutex
+	supersededByArgsForCall []struct {
+	}
+	supersededByReturns struct {
+		result1 []string
+	}
+	supersededByReturnsOnCall map[int]struct {
+		result1 []string
 	}
 	TitleStub        func() string
 	titleMutex       sync.RWMutex
@@ -828,7 +838,7 @@ func (fake *FakeKEP) PersistReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeKEP) Replaces() string {
+func (fake *FakeKEP) Replaces() []string {
 	fake.replacesMutex.Lock()
 	ret, specificReturn := fake.replacesReturnsOnCall[len(fake.replacesArgsForCall)]
 	fake.replacesArgsForCall = append(fake.replacesArgsForCall, struct {
@@ -851,22 +861,22 @@ func (fake *FakeKEP) ReplacesCallCount() int {
 	return len(fake.replacesArgsForCall)
 }
 
-func (fake *FakeKEP) ReplacesReturns(result1 string) {
+func (fake *FakeKEP) ReplacesReturns(result1 []string) {
 	fake.ReplacesStub = nil
 	fake.replacesReturns = struct {
-		result1 string
+		result1 []string
 	}{result1}
 }
 
-func (fake *FakeKEP) ReplacesReturnsOnCall(i int, result1 string) {
+func (fake *FakeKEP) ReplacesReturnsOnCall(i int, result1 []string) {
 	fake.ReplacesStub = nil
 	if fake.replacesReturnsOnCall == nil {
 		fake.replacesReturnsOnCall = make(map[int]struct {
-			result1 string
+			result1 []string
 		})
 	}
 	fake.replacesReturnsOnCall[i] = struct {
-		result1 string
+		result1 []string
 	}{result1}
 }
 
@@ -1105,6 +1115,48 @@ func (fake *FakeKEP) StateReturnsOnCall(i int, result1 states.Name) {
 	}{result1}
 }
 
+func (fake *FakeKEP) SupersededBy() []string {
+	fake.supersededByMutex.Lock()
+	ret, specificReturn := fake.supersededByReturnsOnCall[len(fake.supersededByArgsForCall)]
+	fake.supersededByArgsForCall = append(fake.supersededByArgsForCall, struct {
+	}{})
+	fake.recordInvocation("SupersededBy", []interface{}{})
+	fake.supersededByMutex.Unlock()
+	if fake.SupersededByStub != nil {
+		return fake.SupersededByStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.supersededByReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeKEP) SupersededByCallCount() int {
+	fake.supersededByMutex.RLock()
+	defer fake.supersededByMutex.RUnlock()
+	return len(fake.supersededByArgsForCall)
+}
+
+func (fake *FakeKEP) SupersededByReturns(result1 []string) {
+	fake.SupersededByStub = nil
+	fake.supersededByReturns = struct {
+		result1 []string
+	}{result1}
+}
+
+func (fake *FakeKEP) SupersededByReturnsOnCall(i int, result1 []string) {
+	fake.SupersededByStub = nil
+	if fake.supersededByReturnsOnCall == nil {
+		fake.supersededByReturnsOnCall = make(map[int]struct {
+			result1 []string
+		})
+	}
+	fake.supersededByReturnsOnCall[i] = struct {
+		result1 []string
+	}{result1}
+}
+
 func (fake *FakeKEP) Title() string {
 	fake.titleMutex.Lock()
 	ret, specificReturn := fake.titleReturnsOnCall[len(fake.titleArgsForCall)]
@@ -1236,6 +1288,8 @@ func (fake *FakeKEP) Invocations() map[string][][]interface{} {
 	defer fake.shortIDMutex.RUnlock()
 	fake.stateMutex.RLock()
 	defer fake.stateMutex.RUnlock()
+	fake.supersededByMutex.RLock()
+	defer fake.supersededByMutex.RUnlock()
 	fake.titleMutex.RLock()
 	defer fake.titleMutex.RUnlock()
 	fake.uniqueIDMutex.RLock()
