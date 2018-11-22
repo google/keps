@@ -194,8 +194,10 @@ var sectionOrder = map[string]int{
 	"summary.md":                1,
 	"motivation.md":             2,
 	"proposal.md":               3,
+	"guides/developer.md":       3, // everything under guides/ is essentially equal in order
 	"graduation_criteria.md":    4,
 	"implementation_history.md": 5,
+	"CHANGELOG.md":              5, // CHANGELOG is the same as implementation_history
 	"drawbacks.md":              6,
 	"alternatives.md":           7,
 	"infrastructure_needed.md":  8,
