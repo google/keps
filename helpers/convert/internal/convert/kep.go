@@ -12,9 +12,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 
-	"github.com/calebamiles/keps/pkg/keps"
 	"github.com/calebamiles/keps/helpers/convert/internal/extract"
 	"github.com/calebamiles/keps/helpers/convert/internal/metadata"
+	"github.com/calebamiles/keps/pkg/keps"
 )
 
 func ToCurrent(kepLocation string) (string, error) {
@@ -54,7 +54,6 @@ func ToCurrent(kepLocation string) (string, error) {
 
 	newMetadata.EditorsField = append(newMetadata.EditorsField, oldMetadata.Editor)
 	newMetadata.EditorsField = clearAllEmpty(newMetadata.EditorsField) // hack as a slice with an empty string is itself nonempty
-
 
 	newMetadata.UniqueIDField = uuid.New().String() // will panic on error
 	newMetadata.SIGWideField = true                 // only KEPs {0000, 0001, 0001a} exist today as Kubernetes wide

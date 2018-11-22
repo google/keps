@@ -12,7 +12,6 @@ const (
 	levelTwoMarkdownHeading = `\s## [\w\s]+\n|\s## [\w\s]+ \[optional\]\n`
 )
 
-
 // TODO add Title(input []byte) ([]byte, error)
 
 func Sections(input []byte) (map[string][]byte, error) {
@@ -51,14 +50,13 @@ func Sections(input []byte) (map[string][]byte, error) {
 }
 
 const (
-	TableOfContentsHeading = "## Table of Contents"
-	SummaryHeading = "## Summary"
-	MotivationHeading = "## Motivation"
-	ProposalHeading = "## Proposal"
-	GraduationCriteriaHeading = "## Graduation Criteria"
+	TableOfContentsHeading       = "## Table of Contents"
+	SummaryHeading               = "## Summary"
+	MotivationHeading            = "## Motivation"
+	ProposalHeading              = "## Proposal"
+	GraduationCriteriaHeading    = "## Graduation Criteria"
 	ImplementationHistoryHeading = "## Implementation History"
-	DrawbacksHeading = "## Drawbacks"
-	AlternativesHeading = "## Alternatives"
-	InfrastructureNeededHeading = "## Infrastructure Needed"
+	DrawbacksHeading             = "## Drawbacks"
+	AlternativesHeading          = "## Alternatives"
+	InfrastructureNeededHeading  = "## Infrastructure Needed"
 )
-
