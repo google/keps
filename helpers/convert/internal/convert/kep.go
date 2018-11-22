@@ -14,7 +14,9 @@ import (
 
 	"github.com/calebamiles/keps/helpers/convert/internal/extract"
 	"github.com/calebamiles/keps/helpers/convert/internal/metadata"
+	"github.com/calebamiles/keps/helpers/convert/internal/render"
 	"github.com/calebamiles/keps/pkg/keps"
+	"github.com/calebamiles/keps/pkg/keps/skeleton"
 )
 
 func ToCurrent(kepLocation string) (string, error) {
@@ -65,27 +67,61 @@ func ToCurrent(kepLocation string) (string, error) {
 		return "", err
 	}
 
-	convertedLocation, err := ioutil.TempDir("", filename("kep-conversion-helper-"+newMetadata.TitleField))
+	convertedLocation, err := ioutil.TempDir("", "kep-conversion-helper-"+strings.Replace(newMetadata.TitleField, " ", "-", -1))
 	if err != nil {
 		// TODO (re)add log warning here
 		return "", err
 	}
 
+	err = skeleton.Init(dirProvider(convertedLocation))
+	if err != nil {
+		return "", err
+	}
+
+	sectionLocations := map[string]string{}
+
 	var errs *multierror.Error
 	for sectionName, sectionContent := range kepSections {
-		if sectionName == extract.TableOfContentsHeading {
-			continue
+		switch sectionName {
+		case extract.TableOfContentsHeading:
+			continue // we want to auto generate this in a KEPs README.md
+		case extract.ProposalHeading:
+			loc := filepath.Join(convertedLocation, developerGuideFilename)
+			sectionLocations[developerGuideName] = developerGuideFilename
+
+			newMetadata.SectionsField = append(newMetadata.SectionsField, developerGuideFilename)
+			developerGuide, renderErr := render.DeveloperGuide(kepSections)
+			if renderErr != nil {
+				errs = multierror.Append(errs, renderErr)
+				continue // try writing the rest of the sections
+			}
+
+			errs = multierror.Append(errs, ioutil.WriteFile(loc, developerGuide, os.ModePerm))
+		case extract.DrawbacksHeading:
+			// covered by template rendering in ProposalHeading case
+		case extract.AlternativesHeading:
+			// covered by template rendering in ProposalHeading case
+		case extract.ImplementationHistoryHeading:
+			loc := filepath.Join(convertedLocation, changelogFilename)
+			sectionLocations[changelogName] = changelogFilename
+
+			newMetadata.SectionsField = append(newMetadata.SectionsField, changelogFilename)
+			errs = multierror.Append(errs, ioutil.WriteFile(loc, sectionContent, os.ModePerm))
+		default:
+			loc := filepath.Join(convertedLocation, markdownFilename(sectionName))
+			sectionLocations[sectionName] = markdownFilename(sectionName)
+
+			newMetadata.SectionsField = append(newMetadata.SectionsField, markdownFilename(sectionName))
+			errs = multierror.Append(errs, ioutil.WriteFile(loc, sectionContent, os.ModePerm))
 		}
 
-		newMetadata.SectionsField = append(newMetadata.SectionsField, filename(sectionName)+".md")
-		multierror.Append(errs, ioutil.WriteFile(filepath.Join(convertedLocation, filename(sectionName)+".md"), sectionContent, os.ModePerm))
 	}
 
 	sort.Sort(BySectionOrder(newMetadata.SectionsField)) // we want earlier sections to appear at the top of the metadata
 
 	if errs.ErrorOrNil() != nil {
 		// TODO (re)add log warning here
-		return "", err
+		return "", errs
 	}
 
 	newMetadataBytes, err := yaml.Marshal(newMetadata)
@@ -100,9 +136,26 @@ func ToCurrent(kepLocation string) (string, error) {
 		return "", err
 	}
 
+	readme, err := render.NewReadme(newMetadata, sectionLocations)
+	if err != nil {
+		// TODO (re)add log warning here
+		return "", err
+	}
+
+	err = ioutil.WriteFile(filepath.Join(convertedLocation, "README.md"), readme, os.ModePerm)
+	if err != nil {
+		// TODO (re)add log warning here
+		return "", err
+	}
+
 	k, err := keps.Open(convertedLocation)
+	if err != nil {
+		return "", err
+	}
+
 	err = k.Check()
 	if err != nil {
+		// TODO log location for debugging rather than remove
 		os.RemoveAll(convertedLocation)
 		return "", err
 	}
@@ -110,8 +163,8 @@ func ToCurrent(kepLocation string) (string, error) {
 	return convertedLocation, nil
 }
 
-func filename(s string) string {
-	return strings.ToLower(strings.Replace(strings.TrimPrefix(s, "## "), " ", "_", -1))
+func markdownFilename(s string) string {
+	return strings.ToLower(strings.Replace(strings.TrimPrefix(s, "## "), " ", "_", -1)) + ".md"
 }
 
 func clearEmpty(s string) string {
@@ -130,6 +183,13 @@ func clearAllEmpty(ss []string) []string {
 	return allCleaned
 }
 
+const (
+	developerGuideName     = "Developer Guide"
+	changelogName          = "CHANGELOG"
+	developerGuideFilename = "guides/developer.md"
+	changelogFilename      = "CHANGELOG.md"
+)
+
 var sectionOrder = map[string]int{
 	"summary.md":                1,
 	"motivation.md":             2,
@@ -146,3 +206,7 @@ type BySectionOrder []string
 func (o BySectionOrder) Len() int           { return len(o) }
 func (o BySectionOrder) Swap(i, j int)      { o[i], o[j] = o[j], o[i] }
 func (o BySectionOrder) Less(i, j int) bool { return sectionOrder[o[i]] < sectionOrder[o[j]] }
+
+type dirProvider string
+
+func (c dirProvider) ContentDir() string { return string(c) }

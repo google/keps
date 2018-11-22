@@ -26,3 +26,10 @@ type New struct {
 	KubernetesWideField      bool     `yaml:"kubernetes_wide,omitempty"`
 	SIGWideField             bool     `yaml:"sig_wide,omitempty"`
 }
+
+func (n *New) Authors() []string { return n.AuthorsField }
+func (n *New) Title() string { return n.TitleField }
+func (n *New) State() string { return n.StateField }
+func (n *New) LastUpdated() time.Time { return n.LastUpdatedField }
+func (n *New) Created() time.Time { return n.CreatedField }
+func (n *New) OwningSIG() string { return n.OwningSIGField }
