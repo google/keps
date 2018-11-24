@@ -42,10 +42,8 @@ var _ = Describe("Init", func() {
 			runtimeSettings.TargetDirReturns(targetDir)
 			runtimeSettings.ContentRootReturns(tmpDir)
 
-			err = workflow.Init(runtimeSettings)
+			expectedKEPContentDir, err := workflow.Init(runtimeSettings)
 			Expect(err).ToNot(HaveOccurred())
-
-			expectedKEPContentDir := filepath.Join(tmpDir, kubernetesWideDir, kepDirName)
 
 			Expect(expectedKEPContentDir).To(BeADirectory())
 			Expect(filepath.Join(expectedKEPContentDir, experienceReportDir)).To(BeADirectory())
@@ -73,10 +71,8 @@ var _ = Describe("Init", func() {
 			runtimeSettings.TargetDirReturns(targetDir)
 			runtimeSettings.ContentRootReturns(tmpDir)
 
-			err = workflow.Init(runtimeSettings)
+			expectedKEPContentDir, err := workflow.Init(runtimeSettings)
 			Expect(err).ToNot(HaveOccurred())
-
-			expectedKEPContentDir := filepath.Join(tmpDir, sigDir, sigWideDir, kepDirName)
 
 			Expect(expectedKEPContentDir).To(BeADirectory())
 			Expect(filepath.Join(expectedKEPContentDir, experienceReportDir)).To(BeADirectory())
@@ -105,10 +101,8 @@ var _ = Describe("Init", func() {
 			runtimeSettings.TargetDirReturns(targetDir)
 			runtimeSettings.ContentRootReturns(tmpDir)
 
-			err = workflow.Init(runtimeSettings)
+			expectedKEPContentDir, err := workflow.Init(runtimeSettings)
 			Expect(err).ToNot(HaveOccurred())
-
-			expectedKEPContentDir := filepath.Join(tmpDir, sigDir, subprojectDir, kepDirName)
 
 			Expect(expectedKEPContentDir).To(BeADirectory())
 			Expect(filepath.Join(expectedKEPContentDir, experienceReportDir)).To(BeADirectory())

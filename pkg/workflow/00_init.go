@@ -18,10 +18,12 @@ import (
 //    - placing KEPs created at the top level of KEP content in a `kubernetes-wide` directory
 //    - places KEPs created at the top level of a SIG directory in a `sig-wide` directory
 //  * creates initial metadata with required sections
-func Init(runtime settings.Runtime) error {
+// Unlike other functions in workflow/ we need to return the path explicitly as it may have
+// changed from Runtime.TargetDir() for SIG or Kubernetes wide KEPs
+func Init(runtime settings.Runtime) (string, error) {
 	routingInfo, err := sigs.BuildRoutingFromPath(runtime.ContentRoot(), runtime.TargetDir())
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	authors := []string{runtime.Principal()}
@@ -29,33 +31,33 @@ func Init(runtime settings.Runtime) error {
 
 	kepMetadata, err := metadata.New(authors, title, routingInfo)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// kepMetadata satisfies the requirements for rendering sections
 	sectionContent, err := sections.ForProvisionalState(kepMetadata)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = skeleton.Init(kepMetadata)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	kep, err := keps.New(kepMetadata, sectionContent)
 	if err != nil {
 		//TODO erase skeleton if an error occurred
-		return err
+		return "", err
 	}
 
 	err = kep.Persist()
 	if err != nil {
 		//TODO erase skeleton if an error occurred
-		return err
+		return "", err
 	}
 
-	return nil
+	return routingInfo.ContentDir(), nil
 }
 
 func buildTitleFromPath(p string) string {

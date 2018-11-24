@@ -37,11 +37,10 @@ var _ = Describe("Approve()", func() {
 		runtimeSettings.TargetDirReturns(targetDir)
 		runtimeSettings.ContentRootReturns(tmpDir)
 
-		err = workflow.Init(runtimeSettings)
+		targetDir, err = workflow.Init(runtimeSettings)
 		Expect(err).ToNot(HaveOccurred())
 
 		// simulate targeting the newly created KEP
-		targetDir = filepath.Join(tmpDir, kubernetesWideDir, kepDirName)
 		runtimeSettings.TargetDirReturns(targetDir)
 
 		kepMetaBytes, err := ioutil.ReadFile(filepath.Join(targetDir, metadataFilename))
