@@ -54,7 +54,7 @@ var _ = Describe("finding KEP content", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
-		It("looks for the content root from the intersection of $PWD and $HOME", func() {
+		It("looks for the content root under $HOME", func() {
 			u, err := user.Current()
 			Expect(err).ToNot(HaveOccurred())
 
@@ -119,6 +119,7 @@ var _ = Describe("finding KEP content", func() {
 			// set user cache dir to someplace unused
 			err = os.Setenv(cacheEnv, tempDir)
 			Expect(err).ToNot(HaveOccurred())
+			defer os.Unsetenv(cacheEnv)
 
 			err = createSIGDirsAt(tempDir)
 			Expect(err).ToNot(HaveOccurred())
