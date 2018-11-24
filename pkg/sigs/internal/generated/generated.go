@@ -276,6 +276,46 @@ var InfoForPath = map[string]*PathInfo{
 		Subproject: "steering",
 	},
 
+	"sig-auth/audit-logging": &PathInfo{
+		OwningSIG:  "sig-auth",
+		Subproject: "audit-logging",
+	},
+
+	"sig-auth/authenticators": &PathInfo{
+		OwningSIG:  "sig-auth",
+		Subproject: "authenticators",
+	},
+
+	"sig-auth/authorizers": &PathInfo{
+		OwningSIG:  "sig-auth",
+		Subproject: "authorizers",
+	},
+
+	"sig-auth/certificates": &PathInfo{
+		OwningSIG:  "sig-auth",
+		Subproject: "certificates",
+	},
+
+	"sig-auth/encryption-at-rest": &PathInfo{
+		OwningSIG:  "sig-auth",
+		Subproject: "encryption-at-rest",
+	},
+
+	"sig-auth/node-identity-and-isolation": &PathInfo{
+		OwningSIG:  "sig-auth",
+		Subproject: "node-identity-and-isolation",
+	},
+
+	"sig-auth/policy-management": &PathInfo{
+		OwningSIG:  "sig-auth",
+		Subproject: "policy-management",
+	},
+
+	"sig-auth/service-accounts": &PathInfo{
+		OwningSIG:  "sig-auth",
+		Subproject: "service-accounts",
+	},
+
 	"sig-autoscaling/scale-client": &PathInfo{
 		OwningSIG:  "sig-autoscaling",
 		Subproject: "scale-client",
@@ -849,6 +889,22 @@ var FlattenedSubprojectSet = map[string]bool{
 
 	"steering": true,
 
+	"audit-logging": true,
+
+	"authenticators": true,
+
+	"authorizers": true,
+
+	"certificates": true,
+
+	"encryption-at-rest": true,
+
+	"node-identity-and-isolation": true,
+
+	"policy-management": true,
+
+	"service-accounts": true,
+
 	"scale-client": true,
 
 	"cluster-autoscaler": true,
@@ -1085,7 +1141,24 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 		"steering": true,
 	},
 
-	"sig-auth": map[string]bool{},
+	"sig-auth": map[string]bool{
+
+		"audit-logging": true,
+
+		"authenticators": true,
+
+		"authorizers": true,
+
+		"certificates": true,
+
+		"encryption-at-rest": true,
+
+		"node-identity-and-isolation": true,
+
+		"policy-management": true,
+
+		"service-accounts": true,
+	},
 
 	"sig-autoscaling": map[string]bool{
 
