@@ -9,12 +9,12 @@ To run this tool:
 go run to_current.go <workspace>/community/keps
 ```
 
-where `<workspace>` is the location where you have previously cloned the Kubernetes Community Repo. The tool
+where `<workspace>` is the location where you have previously cloned the [Kubernetes Community Repo][]. The tool
 will create a temporary directory containing converted KEP content. A KEP process maintainer attempting to
 convert the existing KEP content should
 
 1. Referring to the documentation on [git filter-branch][], select only commits against the `keps` directory
-   in clone of the [Kubernetes Community Repo][]: 
+   in clone of the Kubernetes Community Repo: 
 
    ```
    git filter-branch --prune-empty --subdirectory-filter keps
