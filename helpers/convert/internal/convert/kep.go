@@ -19,7 +19,7 @@ import (
 	"github.com/calebamiles/keps/pkg/keps/skeleton"
 )
 
-func ToCurrent(kepLocation string) (string, error) {
+func ToCurrent(outputDir string, kepLocation string) (string, error) {
 	kepBytes, err := ioutil.ReadFile(kepLocation)
 	if err != nil {
 		log.Fatalf("could not open KEP location: %s", kepLocation)
@@ -67,7 +67,13 @@ func ToCurrent(kepLocation string) (string, error) {
 		return "", err
 	}
 
-	convertedLocation, err := ioutil.TempDir("", "kep-conversion-helper-"+strings.Replace(newMetadata.TitleField, " ", "-", -1))
+	err = os.MkdirAll(filepath.Join(outputDir, strings.Replace(newMetadata.OwningSIGField, " ", "-", -1)), os.ModePerm)
+	if err != nil {
+		// TODO (re)add log warning here
+		return "", err
+	}
+
+	convertedLocation, err := ioutil.TempDir(filepath.Join(outputDir, strings.Replace(newMetadata.OwningSIGField, " ", "-", -1)), strings.Replace(newMetadata.TitleField, " ", "-", -1))
 	if err != nil {
 		// TODO (re)add log warning here
 		return "", err
