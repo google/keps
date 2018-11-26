@@ -18,8 +18,8 @@ convert the existing KEP content should
 
    ```
    git filter-branch --prune-empty --subdirectory-filter keps
-
    ```
+
 1. Create a directory named `content` to contain the existing KEPs
 
    ```
