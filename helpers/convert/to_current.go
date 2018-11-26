@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync/atomic"
 
 	log "github.com/sirupsen/logrus"
@@ -26,11 +27,14 @@ func main() {
 	}
 
 	var filesToSkip = map[string]bool{
+		"0000-kep-template.md":            true,
 		"0004-cloud-provider-template.md": true,
 	}
 
 	var possibleKEPs uint32 = 0
 	var convertedKEPs uint32 = 0
+
+	var failedPaths []string
 
 	err = filepath.Walk(startLocation, func(path string, info os.FileInfo, err error) error {
 		ext := filepath.Ext(path)
@@ -59,6 +63,7 @@ func main() {
 		convertedKEPLocation, err := convert.ToCurrent(outputDir, path)
 		if err != nil {
 			log.Errorf("failed to convert possible KEP at: %s with error: %s", path, err)
+			failedPaths = append(failedPaths, path)
 			return nil // keep going and try to convert the next KEP
 		}
 
@@ -68,7 +73,10 @@ func main() {
 		return nil
 	})
 
+	fmt.Println("")
 	fmt.Println("converted KEP content located at: " + outputDir)
 	fmt.Printf("converted %d out of %d KEPs: %f percent success rate\n", atomic.LoadUint32(&convertedKEPs), atomic.LoadUint32(&possibleKEPs), 100.0*float32(atomic.LoadUint32(&convertedKEPs))/float32(atomic.LoadUint32(&possibleKEPs)))
+	fmt.Printf("failed conversions: \n\n%s", strings.Join(failedPaths, " \n"))
+	fmt.Println("")
 	os.Exit(0)
 }
