@@ -8,7 +8,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/calebamiles/keps/pkg/index"
 	"github.com/calebamiles/keps/pkg/settings/settingsfakes"
 	"github.com/calebamiles/keps/pkg/keps/metadata"
 	"github.com/calebamiles/keps/pkg/keps/states"
@@ -49,9 +48,6 @@ var _ = Describe("Approve()", func() {
 		kepMeta, err := metadata.FromBytes(kepMetaBytes)
 		Expect(err).ToNot(HaveOccurred())
 
-		// read the created unique ID
-		createdKEPId := kepMeta.UniqueID()
-
 		err = workflow.Propose(runtimeSettings)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -72,12 +68,5 @@ var _ = Describe("Approve()", func() {
 
 		By("marking the KEP as implementable")
 		Expect(kepMeta.State()).To(Equal(states.Implementable))
-
-		By("rebuilding and persisting the KEP index")
-		kepIndex, err := index.Open(tmpDir)
-		Expect(err).ToNot(HaveOccurred())
-
-		_, err = kepIndex.Fetch(createdKEPId)
-		Expect(err).ToNot(HaveOccurred())
 	})
 })
