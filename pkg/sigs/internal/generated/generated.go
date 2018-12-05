@@ -546,6 +546,11 @@ var InfoForPath = map[string]*PathInfo{
 		Subproject: "website",
 	},
 
+	"sig-docs/website-metadata": &PathInfo{
+		OwningSIG:  "sig-docs",
+		Subproject: "website-metadata",
+	},
+
 	"sig-gcp/gcp-compute-persistent-disk-csi-driver": &PathInfo{
 		OwningSIG:  "sig-gcp",
 		Subproject: "gcp-compute-persistent-disk-csi-driver",
@@ -997,6 +1002,8 @@ var FlattenedSubprojectSet = map[string]bool{
 
 	"website": true,
 
+	"website-metadata": true,
+
 	"gcp-compute-persistent-disk-csi-driver": true,
 
 	"gcp-filestore-csi-driver": true,
@@ -1278,6 +1285,8 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 		"reference-docs": true,
 
 		"website": true,
+
+		"website-metadata": true,
 	},
 
 	"sig-gcp": map[string]bool{
