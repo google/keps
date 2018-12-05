@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/calebamiles/keps/helpers/render_sig_list/internal/sigs"
+	"github.com/calebamiles/keps/helpers/renderSigList/internal/sigs"
 )
 
 func main() {
