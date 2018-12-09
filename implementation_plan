@@ -19,7 +19,13 @@
   - [x] moved as keps/ subpackage
   - [x] metadata.New
   - [x] metadata getters (protect all fields and eventually add lifecycle hooks e.g. `accept`, `reject`)
-- [ ] templates
+  - [x] add sections
+  - [ ] automatically set LastUpdated when persisting
+  - [x] state handling
+    - [x] SetState()
+  - [x] checks for each state
+  - [ ] event_log (created, accepted/rejected/posponed, implementable)
+- [x] templates
   - [x] summary.md
   - [x] motivation.md
   - [x] README.md
@@ -27,19 +33,19 @@
   - [x] guides/operators.md
   - [x] guides/teachers.md 
   - [x] graduation_criteria.md
-- [ ] section rendering
+- [x] section rendering
   - [x] for templated sections
   - [x] support writable sections for newly rendered content
-  - [x] support read only sections for content already on disk (in progress)
+  - [x] support read only sections for content already on disk
 - [ ] keps
-  - [ ] keps/skeleton
-    - [ ] New
-    - [ ] AddSections
-  - [ ] keps/collection
-    - [ ] Collection.Add
-    - [ ] Collection.Filter
-    - [ ] Collection.Save
-    - [ ] Collection.Render
+  - [x] keps/skeleton
+    - [x] New
+    - [x] AddSections
+- [ ] index 
+  - [x] update from directory walk
+  - [x] Add
+  - [ ] Filter
+  - [x] Persist
 - [ ] demos
   - [ ] demo/init
   - [ ] demo/propose
@@ -59,9 +65,6 @@
 - [ ] kep plan
   - [ ] checks guides existence
   - [ ] checks graduation criteria existence
-- [ ] index
-  - [ ] update from directory walk
-  - [ ] build cache from index
 - [ ] kep approve
   - [ ] assigns number
   - [ ] adds to index
