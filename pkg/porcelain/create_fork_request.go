@@ -61,6 +61,14 @@ func newCreateForkFunc(c *http.Client, token tokenProvider, apiUrl string) (crea
 			return "", "", err
 		}
 
+		if forkResponse.ApiUrlField == "" {
+			return "", "", fmt.Errorf("recieved empty API url from response: \n %s", string(bodyBytes))
+		}
+
+		if forkResponse.HtmlUrlField == "" {
+			return "", "", fmt.Errorf("recieved empty Git url from response: \n %s", string(bodyBytes))
+		}
+
 		return forkResponse.ApiUrlField, forkResponse.HtmlUrlField, nil
 	}
 
