@@ -2,19 +2,19 @@ package porcelain
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
-	"github.com/hashicorp/go-multierror"
 	log "github.com/sirupsen/logrus"
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
-// TODO add branch/upstreamURL override helpers
 type Repo interface {
-	AddPaths(commitMsg string, paths []string) error
+	Add(fromLocation string, toLocationAfterRoot string) error
 	CreatePR(description string, body string) (string, error) // push local changes, hit PR API
 	DeleteLocal() error
 	DeleteRemote() error
@@ -26,9 +26,9 @@ const (
 	OriginRemoteName   = "origin"
 )
 
-type repo struct {
+type repository struct {
 	gitRepo           *git.Repository
-	upstreamApiUrl    string
+	branchName        string
 	deleteGithubRepo  deleteUserRepoFunc
 	createPullRequest createPullRequestFunc
 	pushLocalChanges  pushRepoChangesFunc
@@ -39,26 +39,67 @@ type repo struct {
 	localDeleted      bool
 }
 
-func (r *repo) AddPaths(commitMsg string, paths []string) error {
+func (r *repository) Add(fromLocation string, toLocation string) error {
 	r.locker.Lock()
 	defer r.locker.Unlock()
 
-	w, err := r.gitRepo.Worktree()
+	from, err := os.Open(fromLocation)
 	if err != nil {
 		return err
 	}
 
-	var errs *multierror.Error
-	for _, p := range paths {
-		_, addErr := w.Add(p)
-		errs = multierror.Append(errs, addErr)
+	worktree, err := r.gitRepo.Worktree()
+	if err != nil {
+		return err
 	}
 
-	if errs.ErrorOrNil() != nil {
-		return errs
+	dst := filepath.Join(r.localPath, toLocation)
+
+	to, err := os.Create(dst)
+	if err != nil {
+		return err
 	}
 
-	_, err = w.Commit(commitMsg, &git.CommitOptions{
+	_, err = io.Copy(from, to)
+	if err != nil {
+		return err
+	}
+
+	err = to.Close()
+	if err != nil {
+		return err
+	}
+
+	err = from.Close()
+	if err != nil {
+		return err
+	}
+
+	_, err = worktree.Add(toLocation)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *repository) CreatePR(prTitle string, prDescription string) (string, error) {
+	r.locker.Lock()
+	defer r.locker.Unlock()
+
+	if r.localDeleted || r.remoteDeleted {
+		log.Errorf("requested PR creation after deleting local or remote repository. Local repository deleted: %t. Remote repository deleted: %t", r.localDeleted, r.remoteDeleted)
+		return "", fmt.Errorf("cannot create pull request if either local or remote Git repository has been deleted. Local deleted: %t. Remote deleted: %t", r.localDeleted, r.remoteDeleted)
+	}
+
+	// make sure we're on the right branch
+	worktree, err := r.gitRepo.Worktree()
+	if err != nil {
+		return "", err
+	}
+
+	commitMsg := fmt.Sprintf("%s\n\n%s", prTitle, prDescription)
+	_, err = worktree.Commit(commitMsg, &git.CommitOptions{
 		// TODO read principal user info and set KEP tool as committer
 		Author: &object.Signature{
 			Name:  arbitraryBasicAuthUsername,
@@ -68,28 +109,12 @@ func (r *repo) AddPaths(commitMsg string, paths []string) error {
 	})
 
 	if err != nil {
-		return err
-	}
-
-	// TODO create cute repo return to chain
-	// package.Fork("enhancements-tracking").AddPaths(<my-local-kep-content>).CreatePR("KEP: <KEP_TITLE>", <KEP_SUMMARY>)
-
-	return nil
-}
-
-func (r *repo) CreatePR(prTitle string, prDescription string) (string, error) {
-	r.locker.Lock()
-	defer r.locker.Unlock()
-
-	panic("not implemented")
-
-	if r.localDeleted || r.remoteDeleted {
-		log.Errorf("requested PR creation after deleting local or remote repository. Local repository deleted: %t. Remote repository deleted: %t", r.localDeleted, r.remoteDeleted)
-		return "", fmt.Errorf("cannot create pull request if either local or remote Git repository has been deleted. Local deleted: %t. Remote deleted: %t", r.localDeleted, r.remoteDeleted)
+		log.Errorf("committing files before pushing: %s", err)
+		return "", err
 	}
 
 	// push local changes
-	err := r.pushLocalChanges()
+	err = r.pushLocalChanges()
 	if err != nil {
 		log.Errorf("pushing local changes: %s", err)
 		return "", err
@@ -105,7 +130,7 @@ func (r *repo) CreatePR(prTitle string, prDescription string) (string, error) {
 	return prUrl, nil
 }
 
-func (r *repo) DeleteLocal() error {
+func (r *repository) DeleteLocal() error {
 	r.locker.Lock()
 	defer r.locker.Unlock()
 
@@ -125,7 +150,7 @@ func (r *repo) DeleteLocal() error {
 	return nil
 }
 
-func (r *repo) DeleteRemote() error {
+func (r *repository) DeleteRemote() error {
 	r.locker.Lock()
 	defer r.locker.Unlock()
 

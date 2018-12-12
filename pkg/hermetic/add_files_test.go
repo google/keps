@@ -15,7 +15,8 @@ import (
 
 var _ = Describe("working with a Git repository", func() {
 	Describe("#AddFiles()", func() {
-		FIt("adds the files to the repository and commits", func() {
+		It("adds the files to the repository and commits", func() {
+			By("performing a bunch of set up")
 			githubToken := os.Getenv("KEP_TEST_GITHUB_TOKEN")
 			Expect(githubToken).ToNot(BeEmpty(), "KEP_TEST_GITHUB_TOKEN unset and required for test")
 
@@ -24,7 +25,7 @@ var _ = Describe("working with a Git repository", func() {
 
 			tokenProvider := newMockTokenProvider()
 
-			// call #1: repo clone
+			// call #1: repo fork
 			tokenProvider.ValueOutput.Ret0 <- githubToken
 			tokenProvider.ValueOutput.Ret1 <- nil
 
@@ -43,41 +44,41 @@ var _ = Describe("working with a Git repository", func() {
 			toLocation := filepath.Join(tmpDir, "forked-repo")
 			withBranchName := "keps-porcelain-fork-test"
 
-			repoGitUrl := "https://github.com/Charkha/Hello-World"
-			repoApiUrl := "https://api.github.com/repos/Charkha/Hello-World/forks"
+			owner := "Charkha"
+			repo := "Hello-World"
 
-			forkedRepo, err := porcelain.Fork(githubHandle, tokenProvider, repoApiUrl, repoGitUrl, toLocation, withBranchName)
+			forkedRepo, err := porcelain.Fork(githubHandle, tokenProvider, owner, repo, toLocation, withBranchName)
 			Expect(err).ToNot(HaveOccurred(), "forking GitHub repository in test")
 
 			defer forkedRepo.DeleteRemote()
 			defer forkedRepo.DeleteLocal()
 
-			exampleDir, err := ioutil.TempDir(toLocation, "example-add-dir")
-			Expect(err).ToNot(HaveOccurred(), "creating sub directory in Git repo")
+			exampleDir, err := ioutil.TempDir("", "example-add-dir")
+			Expect(err).ToNot(HaveOccurred(), "creating example directory")
+			defer os.RemoveAll(exampleDir)
 
 			exampleFilename := "example.md"
-			err = ioutil.WriteFile(filepath.Join(exampleDir, exampleFilename), []byte("example content"), os.ModePerm)
+			exampleLocation := filepath.Join(exampleDir, exampleFilename)
+
+			err = ioutil.WriteFile(exampleLocation, []byte("example content"), os.ModePerm)
 			Expect(err).ToNot(HaveOccurred(), "writing a temp file for a test git commit")
 
-			pathToDir, err := filepath.Rel(toLocation, exampleDir)
-			Expect(err).ToNot(HaveOccurred(), "determining relative path to created subdirectory from test repository root")
+			By("adding the files to the Git repository and making a commit")
 
-			commitMsg := "example commit message"
-			err = forkedRepo.AddPaths(commitMsg, []string{pathToDir})
+			err = forkedRepo.Add(exampleLocation, exampleFilename)
 			Expect(err).ToNot(HaveOccurred(), "adding a test file to a Git repository")
 
 			gitRepo, err := git.PlainOpen(toLocation)
 			Expect(err).ToNot(HaveOccurred(), "expected to find Git repository")
 
-			By("adding the files to the Git repository and making a commit")
-			head, err := gitRepo.Head()
-			Expect(err).ToNot(HaveOccurred(), "fetching HEAD of git repo")
+			worktree, err := gitRepo.Worktree()
+			Expect(err).ToNot(HaveOccurred(), "opening Git worktree")
 
-			lastCommit, err := gitRepo.CommitObject(head.Hash())
-			Expect(err).ToNot(HaveOccurred(), "reading commit at HEAD")
+			statusOf, err := worktree.Status()
+			Expect(err).ToNot(HaveOccurred(), "getting worktree status")
 
-			_, err = lastCommit.File(filepath.Join(pathToDir, exampleFilename))
-			Expect(err).ToNot(HaveOccurred(), "reading expected committed file info from test commit")
+			fileStatus := statusOf.File(exampleFilename)
+			Expect(fileStatus.Staging).To(Equal(git.Added))
 		})
 	})
 })

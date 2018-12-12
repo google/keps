@@ -9,19 +9,19 @@ import (
 	"time"
 )
 
-type createForkRequestFunc func() (string, string, error)
+type createForkRequestFunc func() error
 
 func newCreateForkFunc(c *http.Client, token tokenProvider, apiUrl string) (createForkRequestFunc, error) {
 
-	var forkRepoFunc = func() (string, string, error) {
+	var forkRepoFunc = func() error {
 		authToken, err := token.Value()
 		if err != nil {
-			return "", "", err
+			return err
 		}
 
 		req, err := http.NewRequest(http.MethodPost, apiUrl, nil)
 		if err != nil {
-			return "", "", err
+			return err
 		}
 
 		// add auth header
@@ -35,13 +35,13 @@ func newCreateForkFunc(c *http.Client, token tokenProvider, apiUrl string) (crea
 		// Do request
 		resp, err := c.Do(forkRepo)
 		if err != nil {
-			return "", "", nil
+			return nil
 		}
 
 		defer resp.Body.Close()
 
 		if resp.StatusCode != http.StatusAccepted {
-			return "", "", fmt.Errorf("expected status code 202 Accepted, got: %s", resp.Status)
+			return fmt.Errorf("expected status code 202 Accepted, got: %s", resp.Status)
 		}
 
 		// extract API url
@@ -53,23 +53,23 @@ func newCreateForkFunc(c *http.Client, token tokenProvider, apiUrl string) (crea
 
 		bodyBytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return "", "", err
+			return err
 		}
 
 		err = json.Unmarshal(bodyBytes, &forkResponse)
 		if err != nil {
-			return "", "", err
+			return err
 		}
 
 		if forkResponse.ApiUrlField == "" {
-			return "", "", fmt.Errorf("recieved empty API url from response: \n %s", string(bodyBytes))
+			return fmt.Errorf("recieved empty API url from response: \n %s", string(bodyBytes))
 		}
 
 		if forkResponse.HtmlUrlField == "" {
-			return "", "", fmt.Errorf("recieved empty Git url from response: \n %s", string(bodyBytes))
+			return fmt.Errorf("recieved empty Git url from response: \n %s", string(bodyBytes))
 		}
 
-		return forkResponse.ApiUrlField, forkResponse.HtmlUrlField, nil
+		return nil
 	}
 
 	return forkRepoFunc, nil

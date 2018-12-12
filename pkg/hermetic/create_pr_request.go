@@ -42,6 +42,7 @@ func newCreatePRFunc(c *http.Client, token tokenProvider, apiUrl string, sourceL
 		createPrPayload.DescriptionField = prDescription
 		createPrPayload.TargetBranchField = upstreamPRBaseName
 		createPrPayload.SourceBranchField = sourceLocation
+		createPrPayload.MaintainerCanModify = true
 
 		payloadBytes, err := json.Marshal(createPrPayload)
 		if err != nil {
@@ -60,7 +61,7 @@ func newCreatePRFunc(c *http.Client, token tokenProvider, apiUrl string, sourceL
 		req.Header.Add(githubAuthorizationHeaderName, fmt.Sprintf("token %s", authToken))
 
 		// set context
-		ctx, cancel := context.WithTimeout(context.Background(), 5000*time.Millisecond)
+		ctx, cancel := context.WithTimeout(context.Background(), 7000*time.Millisecond)
 		createPullRequest := req.WithContext(ctx)
 		defer cancel()
 
@@ -73,7 +74,7 @@ func newCreatePRFunc(c *http.Client, token tokenProvider, apiUrl string, sourceL
 		defer resp.Body.Close()
 
 		if resp.StatusCode != http.StatusCreated {
-			return "", fmt.Errorf("expected status code 201 Created, got: %s", resp.Status)
+			return "", fmt.Errorf("expected status code 201 Created, got: %s.\nURL: %s.\nBody: %s", resp.Status, apiUrl, string(payloadBytes))
 		}
 
 		// extract PR URL

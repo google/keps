@@ -1,6 +1,7 @@
 package porcelain_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -45,10 +46,10 @@ var _ = Describe("working with a Git repository hosted on GitHub", func() {
 
 			By("forking a remote Git repository locally")
 
-			repoGitUrl := "https://github.com/Charkha/Hello-World"
-			repoApiUrl := "https://api.github.com/repos/Charkha/Hello-World/forks"
+			owner := "Charkha"
+			repo := "Hello-World"
 
-			forkedRepo, err := porcelain.Fork(githubHandle, tokenProvider, repoApiUrl, repoGitUrl, toLocation, withBranchName)
+			forkedRepo, err := porcelain.Fork(githubHandle, tokenProvider, owner, repo, toLocation, withBranchName)
 			Expect(err).ToNot(HaveOccurred(), "forking GitHub repository in test")
 
 			defer forkedRepo.DeleteRemote()
@@ -70,16 +71,30 @@ var _ = Describe("working with a Git repository hosted on GitHub", func() {
 			Expect(remoteNames).To(ContainElement(porcelain.UpstreamRemoteName), "expected configured remotes to contain name `upstream`")
 			Expect(remoteNames).To(ContainElement(porcelain.OriginRemoteName), "expected second configured remotes to contain name `origin`")
 
+			By("checking out a new branch that tracks upstream")
+
+			head, err := gitRepo.Head()
+			Expect(err).ToNot(HaveOccurred(), "reading HEAD of Git repository")
+
+			Expect(head.String()).ToNot(Equal(fmt.Sprintf("refs/heads/%s", withBranchName)))
 		})
 
 		Context("when the location to clone the repo exists", func() {
-			XIt("returns an error", func() {
-				//toLocation, err := ioutil.TempDir("", "keps-clone-test")
-				//toLocatExpect(err).ToNot(HaveOccurred(), "creating temp dir before clone test")
-				//toLocatdefer os.RemoveAll(toLocation)
+			It("returns an error", func() {
+				tmpDir, err := ioutil.TempDir("", "keps-fork-test")
+				Expect(err).ToNot(HaveOccurred())
+				defer os.RemoveAll(tmpDir)
 
-				//toLocat_, err = porcelain.Clone(tokenProvider, repoUrl, porcelain.DefaultBranch, toLocation)
-				//toLocatExpect(err).ToNot(HaveOccurred(), "cloning GitHub repository for test")
+				tokenProvider := newMockTokenProvider()
+				githubHandle := "doesnt-matter"
+				withBranchName := "keps-porcelain-fork-test"
+
+				owner := "Charkha"
+				repo := "Hello-World"
+
+				_, err = porcelain.Fork(githubHandle, tokenProvider, owner, repo, tmpDir, withBranchName)
+				Expect(err.Error()).To(ContainSubstring("may exist already, refusing to overwrite"), "expected error to contain refusal to clone over existing location")
+
 			})
 		})
 	})

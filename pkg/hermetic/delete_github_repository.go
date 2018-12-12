@@ -39,7 +39,7 @@ func newDeleteGithubUserRepoFunc(c *http.Client, token tokenProvider, apiUrl str
 		}
 
 		if delResp.StatusCode != http.StatusNoContent {
-			return fmt.Errorf("expected Status: 204 No Content when deleting repository; got: %s", delResp.Status)
+			return fmt.Errorf("expected Status: 204 No Content when deleting repository; got: %s. URL: %s", delResp.Status, apiUrl)
 		}
 
 		return nil
