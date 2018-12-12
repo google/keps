@@ -1,4 +1,4 @@
-package porcelain_test
+package hermetic_test
 
 import (
 	"testing"

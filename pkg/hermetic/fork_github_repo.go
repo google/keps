@@ -1,4 +1,4 @@
-package porcelain
+package hermetic
 
 import (
 	"fmt"
@@ -90,7 +90,7 @@ func Fork(githubHandle string, token tokenProvider, owner string, repo string, t
 
 	err = worktree.Checkout(&git.CheckoutOptions{Branch: refName})
 	if err != nil {
-		log.Errorf("checking out porcelain branch: %s", err)
+		log.Errorf("checking out hermetic branch: %s", err)
 		return nil, err
 	}
 

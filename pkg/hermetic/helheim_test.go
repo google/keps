@@ -3,7 +3,7 @@
 // doing.  Expect any changes made manually to be overwritten
 // the next time hel regenerates this file.
 
-package porcelain_test
+package hermetic_test
 
 type mockTokenProvider struct {
 	ValueCalled chan bool

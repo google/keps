@@ -1,4 +1,4 @@
-package porcelain_test
+package hermetic_test
 
 import (
 	"bytes"
@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/calebamiles/keps/pkg/porcelain"
+	"github.com/calebamiles/keps/pkg/hermetic"
 )
 
 var _ = Describe("submitting changes to an upstream GitHub repository", func() {
@@ -56,12 +56,12 @@ var _ = Describe("submitting changes to an upstream GitHub repository", func() {
 			//defer os.RemoveAll(tmpDir)
 
 			toLocation := filepath.Join(tmpDir, "forked-repo")
-			withBranchName := "keps-porcelain-fork-test"
+			withBranchName := "keps-hermetic-fork-test"
 
 			owner := "Charkha"
 			repo := "Hello-World"
 
-			forkedRepo, err := porcelain.Fork(githubHandle, tokenProvider, owner, repo, toLocation, withBranchName)
+			forkedRepo, err := hermetic.Fork(githubHandle, tokenProvider, owner, repo, toLocation, withBranchName)
 			Expect(err).ToNot(HaveOccurred(), "forking GitHub repository in test")
 
 			defer forkedRepo.DeleteRemote()
