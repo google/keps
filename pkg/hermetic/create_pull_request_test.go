@@ -96,8 +96,8 @@ var _ = Describe("submitting changes to an upstream GitHub repository", func() {
 
 			Expect(resp.StatusCode).To(Equal(http.StatusOK), "expected status code when GET-ting pull request URL to be 200 OK")
 
-			prApiUrl := strings.Replace(prUrl, "https://github", "https://api.github", 1)
-			prApiUrl = strings.Replace(prUrl, "github.com", "github.com/repos", 1)
+			prApiUrl := strings.Replace(prUrl, "github.com", "api.github.com/repos", 1)
+			prApiUrl = strings.Replace(prApiUrl, "pull", "pulls", 1)
 
 			var payloadBody struct {
 				State string `json:"state"`
@@ -126,6 +126,10 @@ var _ = Describe("submitting changes to an upstream GitHub repository", func() {
 
 			resp, err = c.Do(createPullRequest)
 			Expect(err).ToNot(HaveOccurred(), "closing pull request")
+
+			println(prApiUrl)
+
+			Expect(resp.StatusCode).To(Equal(http.StatusOK), fmt.Sprintf("expected 200 Status OK, got: %s", resp.Status))
 
 			defer resp.Body.Close()
 		})
