@@ -25,6 +25,7 @@ var _ = Describe("working with an index of KEPs", func() {
 		It("builds an index of KEP entries", func() {
 			tmpDir, err := ioutil.TempDir("", "kep-index")
 			Expect(err).ToNot(HaveOccurred())
+			defer os.RemoveAll(tmpDir)
 
 			kepDirOne := filepath.Join(tmpDir, "sig-architecture", "kep1")
 			kepDirTwo := filepath.Join(tmpDir, "sig-architecture", "kep2")
@@ -54,6 +55,7 @@ var _ = Describe("working with an index of KEPs", func() {
 			It("finishes looking for KEPs before returning an error", func() {
 				tmpDir, err := ioutil.TempDir("", "kep-index")
 				Expect(err).ToNot(HaveOccurred())
+				defer os.RemoveAll(tmpDir)
 
 				kepDirOne := filepath.Join(tmpDir, "sig-architecture", "kep1")
 				kepDirTwo := filepath.Join(tmpDir, "sig-architecture", "kep2")
