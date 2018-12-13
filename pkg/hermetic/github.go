@@ -7,7 +7,7 @@ import (
 
 const (
 	// a default email to use when committing on behalf of the user // TODO pass through principal user email
-	kepToolEmail = "kubernetes-sig-contribex@googlegroups.com"
+	kepToolEmail = "kubernetes-sig-architecture@googlegroups.com"
 
 	// githubAuthorizationHeader is the header name for authorizing GitHub API requests
 	githubAuthorizationHeaderName = "Authorization"
