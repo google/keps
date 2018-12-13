@@ -4,10 +4,7 @@ hosted on GitHub. The proposed changes, ultimatedly delivered as a GitHub Pull
 Request, are "hermetic" in the sense that the upstream repository will be
 cloned to a unique location and changes pushed to a user GitHub repository
 will overwrite any changes through force pushing.
-*/
-package hermetic
 
-/*
 This package was designed to make it easy to connect the KEP process to the
 enhancements tracking process
 
@@ -53,3 +50,5 @@ enhancements tracking process
 	
 	fmt.Printf("proposed tracking KEP in PR: %s\n", prUrl)	
 */
+
+package hermetic
