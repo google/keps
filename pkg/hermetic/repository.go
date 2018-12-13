@@ -16,7 +16,7 @@ import (
 // A Repo abstracts the basic Git and GitHub operations required to submit a GitHub pull request against
 // an upstream repository
 //
-// Besides two obvious cleanup operations (delete forked GitHub repository, delete local Git repository), A
+// Besides two cleanup operations (delete forked GitHub repository, delete local Git repository), A
 // Repo implementation should expose just  enough functionality to add files to the repository and create
 // a GitHub Pull Request containing only those files
 type Repo interface {
