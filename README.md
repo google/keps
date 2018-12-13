@@ -5,8 +5,10 @@ content. At a high level the library is organized as follows
 
 ```
 .
-├── go.mod
-├── go.sum
+├── cli                     (an example CLI)
+│   ├── cmd                 (the subcommands, e.g. init, propose...)
+│   ├── main.go
+│   └── README.md           (a now redundant README)
 ├── helpers
 │   ├── convert             (attempt to convert a flat file KEP to the new directory structure)
 │   ├── initSigDirs         (create a playground for experimenting with this library)
