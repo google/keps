@@ -2,6 +2,7 @@ package hermetic
 
 import (
 	"fmt"
+	"io/ioutil"
 )
 
 const (
@@ -12,6 +13,32 @@ const (
 	githubAuthorizationHeaderName = "Authorization"
 )
 
+type TokenFromPath struct {
+	value tokenValueFunc
+}
+
+func (t *TokenFromPath) Value() (string, error) {
+	return t.value()
+}
+
+func NewProvideTokenFromPath(p string) (*TokenFromPath, error) {
+	var value = func() (string, error) {
+		tokenBytes, err := ioutil.ReadFile(p)
+		if err != nil {
+			return "", err
+		}
+
+		return string(tokenBytes), nil
+	}
+
+	t := &TokenFromPath{
+		value: value,
+	}
+
+	return t, nil
+}
+
+type tokenValueFunc func() (string, error)
 // githubGitUrl returns the URL to use for Git operations against a repo hosted on GitHub (e.g. clone, push)
 func githubGitUrl(owner string, repo string) string {
 	return fmt.Sprintf("https://github.com/%s/%s.git", owner, repo)
@@ -31,3 +58,4 @@ func githubPrUrl(owner string, repo string) string {
 func githubRepoApiUrl(owner string, repo string) string {
 	return fmt.Sprintf("https://api.github.com/repos/%s/%s", owner, repo)
 }
+
