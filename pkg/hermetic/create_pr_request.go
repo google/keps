@@ -14,8 +14,11 @@ const (
 	upstreamPRBaseName = "master" // TODO move into higher level function
 )
 
+// createPullRequestFunc returns a human consumable GitHub Pull Request URL
 type createPullRequestFunc func(string, string) (string, error)
 
+// newCreatePRFunc returns a callback which abstracts away the details of creating a GitHub Pull Request containing the current
+// repository state
 func newCreatePRFunc(c *http.Client, token tokenProvider, apiUrl string, sourceLocation string) (createPullRequestFunc, error) {
 
 	// we're not going to know when the pull request should actually be created

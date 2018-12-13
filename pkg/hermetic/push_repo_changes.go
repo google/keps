@@ -10,6 +10,8 @@ import (
 
 type pushRepoChangesFunc func() error
 
+// newPushRepoChanges creates a callback to abstract away the details of pushing local changes to a remote Git repository
+// named "origin"
 func newPushRepoChangesFunc(gitRepo *git.Repository, token tokenProvider, withBranchName string) (pushRepoChangesFunc, error) {
 
 	var pushRepoChangesFunc = func() error {
@@ -48,7 +50,7 @@ func newPushRepoChangesFunc(gitRepo *git.Repository, token tokenProvider, withBr
 		case nil:
 			return nil
 		case git.NoErrAlreadyUpToDate:
-			return err // eventually swallow this once we know how to properly make git commits
+			return nil
 		default:
 			return err
 		}

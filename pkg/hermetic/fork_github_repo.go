@@ -16,11 +16,19 @@ const (
 	arbitraryBasicAuthUsername = "ossKEPtool" // Username can be anything except empty
 )
 
-const (
-	// TODO extract this to a higher level caller
-	UpstreamEnhancementsTrackingRepoApiUrl = "https://api.github.com/repos/Charkha/enhancements-tracking/forks"
-)
-
+// Fork is responsible for "forking" an upstream Git repository that is hosted on GitHub into the account of the authenticated GitHub user
+// with the goal of proposing an isolated change to upstream. Initial upstream targets are imagined to be an "enhancements tracking"
+// repository, used for managing release over release changes to Kubernetes, as well as an "API review tracking" repository used by SIG
+// Architecture to manage API changes with a Kubernetes wide scope
+//
+// Fork:
+//   - Issues a fork request to the GitHub API
+//   - Clones the default branch from upstream
+//   - Creates a new branch to add changes
+//   - Sets the Git remote name "origin" to the forked repository
+//   - Sets the Git remote name "upstream" to the upstream repository (for advanced uesrs who may desire to work with the Git repo directly)
+//   - Creates callbacks to push changes to the forked repository; create a PR against the upstream repository; and to delete the forked
+//     repository
 func Fork(githubHandle string, token tokenProvider, owner string, repo string, toLocation string, withBranchName string) (Repo, error) {
 	if _, err := os.Stat(toLocation); !os.IsNotExist(err) {
 		log.Errorf("location: %s may exist already, refusing to overwrite", toLocation)

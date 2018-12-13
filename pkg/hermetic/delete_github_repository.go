@@ -9,6 +9,9 @@ import (
 
 type deleteUserRepoFunc func() error
 
+// newDeleteGithubUserRepoFunc creates a callback which abstracts away the details of deleting GitHub repository
+// from a user account. This function is intended to be used in the context of forking an existing GitHub repository
+// to allow deletion of the repository created in account of the authenticated GitHub user
 func newDeleteGithubUserRepoFunc(c *http.Client, token tokenProvider, apiUrl string) (deleteUserRepoFunc, error) {
 	var deleteRepo = func() error {
 		authToken, err := token.Value()

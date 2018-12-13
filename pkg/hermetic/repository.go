@@ -13,6 +13,12 @@ import (
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 )
 
+// A Repo abstracts the basic Git and GitHub operations required to submit a GitHub pull request against
+// an upstream repository
+//
+// Besides two obvious cleanup operations (delete forked GitHub repository, delete local Git repository), A
+// Repo implementation should expose just  enough functionality to add files to the repository and create
+// a GitHub Pull Request containing only those files
 type Repo interface {
 	Add(fromLocation string, toLocationAfterRoot string) error
 	CreatePR(description string, body string) (string, error) // push local changes, hit PR API

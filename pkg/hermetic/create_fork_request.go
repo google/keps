@@ -11,6 +11,9 @@ import (
 
 type createForkRequestFunc func() error
 
+// newCreateForkFunc creates a callback that is able to handle the details of issuing a GitHub API request
+// to fork a repository into the authenticated user's GitHub account (forking into an organization is not
+// supported at this time
 func newCreateForkFunc(c *http.Client, token tokenProvider, apiUrl string) (createForkRequestFunc, error) {
 
 	var forkRepoFunc = func() error {
@@ -24,15 +27,12 @@ func newCreateForkFunc(c *http.Client, token tokenProvider, apiUrl string) (crea
 			return err
 		}
 
-		// add auth header
 		req.Header.Add(githubAuthorizationHeaderName, fmt.Sprintf("token %s", authToken))
 
-		// set context
 		ctx, cancel := context.WithTimeout(context.Background(), 5000*time.Millisecond)
 		forkRepo := req.WithContext(ctx)
 		defer cancel()
 
-		// Do request
 		resp, err := c.Do(forkRepo)
 		if err != nil {
 			return nil
@@ -44,7 +44,6 @@ func newCreateForkFunc(c *http.Client, token tokenProvider, apiUrl string) (crea
 			return fmt.Errorf("expected status code 202 Accepted, got: %s", resp.Status)
 		}
 
-		// extract API url
 		var forkResponse struct {
 			NodeIdField  string `json:"node_id"`
 			HtmlUrlField string `json:"html_url"`
