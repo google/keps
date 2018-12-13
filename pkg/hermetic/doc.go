@@ -25,7 +25,15 @@ enhancements tracking process
 	kubernetes := "kubernetes"
 	enhancementsTracking := "enhancements-tracking"
 
-	repo, err := hermetic.Fork(githubHandle, token, kubernetes, enhancementsTracking, toLocation, withBranchName)
+	repo, err := hermetic.Fork(
+				githubHandle,
+				token,
+				kubernetes,
+				enhancementsTracking,
+				toLocation,
+				withBranchName
+	)
+
 	if err != nil {
 		// graceful handling
 	}
