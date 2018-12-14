@@ -143,13 +143,13 @@ func (s *kepSection) Filename() string { return s.FilenameField }
 type kep struct {
 	AuthorsField           []string    `yaml:"authors,omitempty"`
 	TitleField             string      `yaml:"title,omitempty"`
-	ShortIDField           *int        `yaml:"kep_number",omitempty`
+	ShortIDField           *int        `yaml:"kep_number,omitempty"`
 	ReviewersField         []string    `yaml:"reviewers,omitempty"`
 	ApproversField         []string    `yaml:"approvers,omitempty"`
 	EditorsField           []string    `yaml:"editors,omitempty"`
 	StateField             states.Name `yaml:"state,omitempty"`
 	ReplacesField          []string    `yaml:"replaces,omitempty"`
-	SupersededByField      []string    `yaml:"superseded_by"`
+	SupersededByField      []string    `yaml:"superseded_by,omitempty"`
 	DevelopmentThemesField []string    `yaml:"development_themes,omitempty"`
 	LastUpdatedField       time.Time   `yaml:"last_updated,omitempty"`
 	CreatedField           time.Time   `yaml:"created,omitempty"`
