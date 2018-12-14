@@ -32,11 +32,6 @@ func Plan(runtime settings.Runtime) error {
 		return err
 	}
 
-	err = kep.Persist()
-	if err != nil {
-		return err
-	}
-
 	// TODO add mechanics for creating PR
 
 	return nil
