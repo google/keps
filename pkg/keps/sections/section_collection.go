@@ -24,6 +24,10 @@ func OpenCollection(locations locationProvider) (Collection, error) {
 	contentDir := locations.ContentDir()
 	secs := []section{}
 	for _, sectionFilename := range locations.Sections() {
+		if sectionFilename == Readme {
+			continue
+		}
+
 		contentBytes, readErr := ioutil.ReadFile(filepath.Join(contentDir, sectionFilename))
 		if readErr != nil {
 			errs = multierror.Append(errs, readErr)

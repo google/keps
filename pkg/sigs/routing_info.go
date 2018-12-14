@@ -20,9 +20,8 @@ type RoutingInfo interface {
 
 func BuildRoutingFromPath(contentRoot string, targetPath string) (RoutingInfo, error) {
 	// we assume that targetPath will be of the form
-	// keps/content/sig-node/kubelet/device-plugins
+	// sig-node/kubelet/device-plugins
 	// where
-	// - content/ is the contentRoot
 	// - sig-node/ is the owning SIG
 	// - kubelet/ is the subproject
 	// - device-plugins/ is the KEP directory
@@ -30,12 +29,7 @@ func BuildRoutingFromPath(contentRoot string, targetPath string) (RoutingInfo, e
 	routingPath := filepath.Dir(targetPath)
 	kepDirName := filepath.Base(targetPath)
 
-	pathAfterContentRoot, err := filepath.Rel(contentRoot, routingPath)
-	if err != nil {
-		return nil, err
-	}
-
-	pathInfo := generated.InfoForPath[pathAfterContentRoot]
+	pathInfo := generated.InfoForPath[routingPath]
 	if pathInfo == nil {
 		return nil, fmt.Errorf("unable to determine SIG information for given path: %s", targetPath)
 	}
