@@ -7,6 +7,7 @@ require (
 	github.com/google/uuid v1.0.0
 	github.com/hashicorp/go-multierror v1.0.0
 	github.com/hpcloud/tail v1.0.0 // indirect
+	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/onsi/ginkgo v1.7.0
 	github.com/onsi/gomega v1.4.1
 	github.com/sirupsen/logrus v1.1.0
