@@ -14,7 +14,12 @@ import (
 //  - sets the KEP state to `provisional`
 //  - persists the KEP to disk
 func Accept(runtime settings.Runtime) error {
-	kep, err := keps.Open(runtime.TargetDir())
+	p, err := keps.Path(runtime.ContentRoot(), runtime.TargetDir())
+	if err != nil {
+		return err
+	}
+
+	kep, err := keps.Open(p)
 	if err != nil {
 		return err
 	}

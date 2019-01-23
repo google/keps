@@ -8,9 +8,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/calebamiles/keps/pkg/settings/settingsfakes"
-	"github.com/calebamiles/keps/pkg/keps/metadata"
+	"github.com/calebamiles/keps/pkg/keps"
 	"github.com/calebamiles/keps/pkg/keps/states"
+	"github.com/calebamiles/keps/pkg/settings/settingsfakes"
 
 	"github.com/calebamiles/keps/pkg/workflow"
 )
@@ -42,12 +42,6 @@ var _ = Describe("Approve()", func() {
 		// simulate targeting the newly created KEP
 		runtimeSettings.TargetDirReturns(targetDir)
 
-		kepMetaBytes, err := ioutil.ReadFile(filepath.Join(targetDir, metadataFilename))
-		Expect(err).ToNot(HaveOccurred())
-
-		kepMeta, err := metadata.FromBytes(kepMetaBytes)
-		Expect(err).ToNot(HaveOccurred())
-
 		err = workflow.Propose(runtimeSettings)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -57,16 +51,14 @@ var _ = Describe("Approve()", func() {
 		err = workflow.Plan(runtimeSettings)
 		Expect(err).ToNot(HaveOccurred())
 
+		By("updating the KEP state and persisting the KEP")
 		err = workflow.Approve(runtimeSettings)
 		Expect(err).ToNot(HaveOccurred())
 
-		kepMetaBytes, err = ioutil.ReadFile(filepath.Join(targetDir, metadataFilename))
-		Expect(err).ToNot(HaveOccurred())
-
-		kepMeta, err = metadata.FromBytes(kepMetaBytes)
-		Expect(err).ToNot(HaveOccurred())
-
 		By("marking the KEP as implementable")
-		Expect(kepMeta.State()).To(Equal(states.Implementable))
+		kep, err := keps.Open(targetDir)
+		Expect(err).ToNot(HaveOccurred(), "opening KEP after approve")
+
+		Expect(kep.State()).To(Equal(states.Implementable))
 	})
 })

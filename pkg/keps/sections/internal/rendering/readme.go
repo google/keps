@@ -13,7 +13,7 @@ const (
 	ReadmeFilename = "README.md"
 )
 
-func NewReadme(info InfoAndSectionProvider) ([]byte, error) {
+func NewReadme(info InfoProvider) ([]byte, error) {
 	sectionContent := &bytes.Buffer{}
 
 	t, err := template.New(ReadmeName).Funcs(funcMap).Parse(unrendered.Readme)
@@ -33,12 +33,28 @@ func joinComma(ss []string) string {
 	return strings.Join(ss, ", ")
 }
 
+func removeReadme(ss []string) []string {
+	secs := []string{}
+
+	for i := range ss {
+		if ss[i] == ReadmeFilename {
+			continue
+		}
+
+		secs = append(secs, ss[i])
+	}
+
+	return secs
+}
+
 // TODO() remove this once generating SIG info from path stores display name there
 func sigDisplayName(s string) string {
 	return strings.Title(strings.TrimSpace(strings.Replace(strings.Replace(s, "-", " ", -1), "sig", "", 1)))
 }
 
 var funcMap = template.FuncMap{
-	"joinComma":   joinComma,
-	"displayName": sigDisplayName,
+	"joinComma":    joinComma,
+	"displayName":  sigDisplayName,
+	"sectionName":  NameForFilename,
+	"removeReadme": removeReadme,
 }

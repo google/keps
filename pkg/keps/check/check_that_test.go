@@ -33,7 +33,7 @@ var _ = Describe("Checking Metadata", func() {
 			err = ioutil.WriteFile(filepath.Join(tmpDir, testSectionFilename), testSectionContent, os.ModePerm)
 			Expect(err).ToNot(HaveOccurred())
 
-			meta.SectionsReturns([]string{testSectionFilename})
+			meta.SectionLocationsReturns([]string{testSectionFilename})
 
 			err = check.ThatAllSectionsExistWithContent(meta)
 			Expect(err).ToNot(HaveOccurred())
@@ -45,7 +45,7 @@ var _ = Describe("Checking Metadata", func() {
 			err = f.Close()
 			Expect(err).ToNot(HaveOccurred())
 
-			meta.SectionsReturns([]string{testSectionFilename, testSectionWithNoContentFilename})
+			meta.SectionLocationsReturns([]string{testSectionFilename, testSectionWithNoContentFilename})
 
 			err = check.ThatAllSectionsExistWithContent(meta)
 			merr, ok := err.(*multierror.Error)
@@ -56,13 +56,23 @@ var _ = Describe("Checking Metadata", func() {
 
 			By("returning an error if there is no section on disk")
 			testMissingSectionFilename := "no_section.md"
-			meta.SectionsReturns([]string{testSectionFilename, testSectionWithNoContentFilename, testMissingSectionFilename})
+			meta.SectionLocationsReturns([]string{testSectionFilename, testMissingSectionFilename})
 
 			err = check.ThatAllSectionsExistWithContent(meta)
 			merr, ok = err.(*multierror.Error)
 			Expect(ok).To(BeTrue())
-			Expect(merr.Errors).To(HaveLen(2))
-			Expect(merr.Errors[1].Error()).To(ContainSubstring("Section does not exist on disk"))
+			Expect(merr.Errors).To(HaveLen(1))
+			Expect(merr.Errors[0].Error()).To(ContainSubstring("Section does not exist on disk"))
+
+			By("returning an error if there are duplicate sections")
+			testDuplicateSectionFilename := "dupe.md"
+			meta.SectionLocationsReturns([]string{testDuplicateSectionFilename, testDuplicateSectionFilename})
+
+			err = check.ThatAllSectionsAreUnique(meta)
+			merr, ok = err.(*multierror.Error)
+			Expect(ok).To(BeTrue())
+			Expect(merr.Errors).To(HaveLen(1))
+			Expect(merr.Errors[0].Error()).To(ContainSubstring("found duplicate section"))
 		})
 	})
 

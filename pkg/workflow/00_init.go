@@ -21,13 +21,13 @@ import (
 // Unlike other functions in workflow/ we need to return the path explicitly as it may have
 // changed from Runtime.TargetDir() for SIG or Kubernetes wide KEPs
 func Init(runtime settings.Runtime) (string, error) {
+	authors := []string{runtime.Principal()}
+	title := buildTitleFromPath(filepath.Base(runtime.TargetDir()))
+
 	routingInfo, err := sigs.BuildRoutingFromPath(runtime.ContentRoot(), runtime.TargetDir())
 	if err != nil {
 		return "", err
 	}
-
-	authors := []string{runtime.Principal()}
-	title := buildTitleFromPath(filepath.Base(runtime.TargetDir()))
 
 	kepMetadata, err := metadata.New(authors, title, routingInfo)
 	if err != nil {

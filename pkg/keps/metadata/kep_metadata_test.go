@@ -57,8 +57,8 @@ var _ = Describe("KEP Metdata", func() {
 			m, err := metadata.New([]string{author}, title, info)
 			Expect(err).ToNot(HaveOccurred())
 
-			m.AddSections([]string{"test_section.md", "test_section.md"})
-			Expect(m.Sections()).To(HaveLen(1))
+			m.AddSectionLocations([]string{"test_section.md", "test_section.md"})
+			Expect(m.SectionLocations()).To(HaveLen(1))
 		})
 	})
 
@@ -154,7 +154,7 @@ var _ = Describe("KEP Metdata", func() {
 			m, err := metadata.New([]string{author}, title, info)
 			Expect(err).ToNot(HaveOccurred())
 
-			m.AddSections([]string{"test_section.md"})
+			m.AddSectionLocations([]string{"test_section.md"})
 
 			err = m.Persist()
 			Expect(err).ToNot(HaveOccurred())
@@ -169,7 +169,7 @@ var _ = Describe("KEP Metdata", func() {
 			Expect(readMetadata.Title()).To(Equal(title))
 			Expect(readMetadata.OwningSIG()).To(Equal(owningSIG))
 			Expect(readMetadata.AffectedSubprojects()).To(ContainElement(subprojects[0]))
-			Expect(readMetadata.Sections()).To(HaveLen(1))
+			Expect(readMetadata.SectionLocations()).To(HaveLen(1))
 
 			lastUpdated := readMetadata.LastUpdated()
 			lastUpdatedMinute := lastUpdated.Round(time.Minute)

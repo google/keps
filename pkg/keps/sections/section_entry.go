@@ -1,5 +1,12 @@
 package sections
 
+type Entry interface {
+	Filename() string
+	Name() string
+	Content() []byte
+	Persist() error
+}
+
 type commonSectionInfo struct {
 	filename   string
 	name       string

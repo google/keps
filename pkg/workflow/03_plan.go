@@ -2,7 +2,7 @@ package workflow
 
 import (
 	"github.com/calebamiles/keps/pkg/keps"
-	"github.com/calebamiles/keps/pkg/keps/sections"
+	"github.com/calebamiles/keps/pkg/keps/states"
 	"github.com/calebamiles/keps/pkg/settings"
 )
 
@@ -16,18 +16,17 @@ import (
 // Guide templates are rendered and their locations added to the KEP metadata. Plan also adds a template
 // for iterating on success criteria as the enhancement works towards general availability
 func Plan(runtime settings.Runtime) error {
-	kep, err := keps.Open(runtime.TargetDir())
+	p, err := keps.Path(runtime.ContentRoot(), runtime.TargetDir())
 	if err != nil {
 		return err
 	}
 
-	sectionContent, err := sections.ForImplementableState(kep)
+	kep, err := keps.Open(p)
 	if err != nil {
 		return err
 	}
 
-	kep.AddSections(sectionContent)
-	err = kep.Persist()
+	err = kep.SetState(states.Implementable)
 	if err != nil {
 		return err
 	}

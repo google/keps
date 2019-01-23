@@ -15,11 +15,17 @@ import (
 // Errors returned by Propose are likely due to file i/o
 // Eventually, Propose may also handle git and GitHub operations
 func Propose(runtime settings.Runtime) error {
-	kep, err := keps.Open(runtime.TargetDir())
+	p, err := keps.Path(runtime.ContentRoot(), runtime.TargetDir())
 	if err != nil {
 		return err
 	}
 
+	kep, err := keps.Open(p)
+	if err != nil {
+		return err
+	}
+
+	// set state I suppose can know about how to get the sections we need
 	err = kep.SetState(states.Draft)
 	if err != nil {
 		return err

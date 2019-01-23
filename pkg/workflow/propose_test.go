@@ -2,13 +2,13 @@ package workflow_test
 
 import (
 	"io/ioutil"
-	"os"
+	_ "os"
 	"path/filepath"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/calebamiles/keps/pkg/keps/metadata"
+	"github.com/calebamiles/keps/pkg/keps"
 	"github.com/calebamiles/keps/pkg/keps/states"
 	"github.com/calebamiles/keps/pkg/settings/settingsfakes"
 
@@ -23,35 +23,43 @@ var _ = Describe("Propose", func() {
 		metadataFilename  = "metadata.yaml"
 	)
 
-	It("prepares the KEP for acceptance|deferment|rejection", func() {
+	FIt("prepares the KEP for acceptance|deferment|rejection", func() {
 		tmpDir, err := ioutil.TempDir("", "kep-propose")
 		Expect(err).ToNot(HaveOccurred())
-		defer os.RemoveAll(tmpDir)
+		//defer os.RemoveAll(tmpDir)
+		println(tmpDir)
 
-		kepDirName := "a-good-but-complicated-idea"
-		targetDir := filepath.Join(tmpDir, kepDirName)
+		contentRoot := filepath.Join(tmpDir, "content")
+
+		err = createSIGDirsAt(contentRoot)
+		Expect(err).ToNot(HaveOccurred(), "creating SIG directories")
+
+		kepDirName := "value-delivered-over-multiple-releases"
+		targetDir := kepDirName
 
 		runtimeSettings := &settingsfakes.FakeRuntime{}
 		runtimeSettings.PrincipalReturns(authorOne)
 		runtimeSettings.TargetDirReturns(targetDir)
-		runtimeSettings.ContentRootReturns(tmpDir)
+		runtimeSettings.ContentRootReturns(contentRoot)
 
 		targetDir, err = workflow.Init(runtimeSettings)
-		Expect(err).ToNot(HaveOccurred())
+		Expect(err).ToNot(HaveOccurred(), "simulating `kep init`")
 
 		// simulate targeting the newly created KEP
 		runtimeSettings.TargetDirReturns(targetDir)
 
+		By("updating the KEP state and persisting the KEP")
 		err = workflow.Propose(runtimeSettings)
 		Expect(err).ToNot(HaveOccurred())
 
-		By("updating the KEP state and persisting the KEP")
-		kepMetaBytes, err := ioutil.ReadFile(filepath.Join(targetDir, metadataFilename))
-		Expect(err).ToNot(HaveOccurred())
+		By("marking the KEP as draft")
+		kep, err := keps.Open(targetDir)
+		Expect(err).ToNot(HaveOccurred(), "opening KEP after propose")
 
-		kepMeta, err := metadata.FromBytes(kepMetaBytes)
-		Expect(err).ToNot(HaveOccurred())
+		Expect(kep.State()).To(Equal(states.Draft))
+		Fail("this test should fail because README.md is duplicated in metadata.yaml")
 
-		Expect(kepMeta.State()).To(Equal(states.Draft))
+		// check that has matching state and last updated
+		Fail("no checking of README.md")
 	})
 })

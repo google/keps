@@ -1,14 +1,16 @@
 package rendering_test
 
 import (
+	"fmt"
+	"time"
+
+	"github.com/calebamiles/keps/pkg/keps/metadata/metadatafakes"
+	"github.com/calebamiles/keps/pkg/keps/states"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"time"
-
-	"github.com/calebamiles/keps/pkg/keps/sections"
 	"github.com/calebamiles/keps/pkg/keps/sections/internal/rendering"
-	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
 var _ = Describe("The README section", func() {
@@ -16,50 +18,32 @@ var _ = Describe("The README section", func() {
 		It("renders a new README from the provided sections", func() {
 			title := "Kubernetes Enhancement Proposal Process"
 			authors := []string{"jbeda", "calebamiles"}
+			sectionLocations := []string{rendering.SummaryFilename, rendering.MotivationFilename, rendering.ReadmeFilename}
 			owningSIG := "sig-architecture"
 			contentDir := ""
 
 			now := time.Now().UTC()
 
-			info := newMockInfoProvider()
+			info := &metadatafakes.FakeKEP{}
+			info.TitleReturns(title)
+			info.AuthorsReturns(authors)
+			info.OwningSIGReturns(owningSIG)
+			info.ContentDirReturns(contentDir)
+			info.StateReturns(states.Provisional)
+			info.LastUpdatedReturns(now)
+			info.SectionLocationsReturns(sectionLocations)
 
-			for i := 0; i < 3; i++ {
-				info.TitleOutput.Ret0 <- title
-				info.AuthorsOutput.Ret0 <- authors
-				info.OwningSIGOutput.Ret0 <- owningSIG
-				info.ContentDirOutput.Ret0 <- contentDir
-				info.StateOutput.Ret0 <- states.Provisional
-				info.LastUpdatedOutput.Ret0 <- now
-			}
-
-			summary, err := sections.New(rendering.SummaryName, info)
+			readmeBytes, err := rendering.NewReadme(info)
 			Expect(err).ToNot(HaveOccurred())
 
-			motivation, err := sections.New(rendering.MotivationName, info)
-			Expect(err).ToNot(HaveOccurred())
-
-			secs := []rendering.SectionProvider{summary, motivation}
-			enhancedInfo := &infoWithSections{
-				ss:           secs,
-				InfoProvider: info,
-			}
-
-			readmeBytes, err := rendering.NewReadme(enhancedInfo)
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(readmeBytes).To(ContainSubstring("**Authors: jbeda, calebamiles**"))
-			Expect(readmeBytes).To(ContainSubstring("**Sponsoring SIG: [Architecture](https://github.com/kubernetes/community/tree/master/sig-architecture/README.md)**"))
-			Expect(readmeBytes).To(ContainSubstring("**Status: provisional**"))
-			Expect(readmeBytes).To(ContainSubstring("## Table of Contents"))
-			Expect(readmeBytes).To(ContainSubstring("[Summary](summary.md)"))
-			Expect(readmeBytes).To(ContainSubstring("[Motivation](motivation.md)"))
+			Expect(string(readmeBytes)).To(ContainSubstring("**Authors: jbeda, calebamiles**"), "expected jbeda and calebamiles to be listed as authors")
+			Expect(string(readmeBytes)).To(ContainSubstring("**Sponsoring SIG: [Architecture](https://github.com/kubernetes/community/tree/master/sig-architecture/README.md)**"), "expected SIG Architecture to be listed as owning SIG")
+			Expect(string(readmeBytes)).To(ContainSubstring("**Status: provisional**"), "expected KEP to have `provisional` state")
+			Expect(string(readmeBytes)).To(ContainSubstring("## Table of Contents"), "expected to find `Table of Contents` heading")
+			Expect(string(readmeBytes)).To(ContainSubstring("[Summary](summary.md)"), "expected to find `Summary` listed in table of contents")
+			Expect(string(readmeBytes)).To(ContainSubstring("[Motivation](motivation.md)"), "expected to find `Motivation` listed in table of contents")
+			Expect(string(readmeBytes)).To(ContainSubstring(fmt.Sprintf("Last Updated: %s", now.UTC().String())), "expected last updated time to appear in README")
+			Expect(string(readmeBytes)).ToNot(ContainSubstring("[README](README.md)"), "expected to remove README.md reference within README.md")
 		})
 	})
 })
-
-type infoWithSections struct {
-	ss []rendering.SectionProvider
-	rendering.InfoProvider
-}
-
-func (i *infoWithSections) Sections() []rendering.SectionProvider { return i.ss }

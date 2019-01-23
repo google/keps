@@ -73,7 +73,7 @@ func thatHasIntroduction(meta metadata.KEP) error {
 	var errs *multierror.Error
 
 	hasSection := map[string]bool{}
-	for _, path := range meta.Sections() {
+	for _, path := range meta.SectionLocations() {
 		hasSection[path] = true
 	}
 
@@ -93,7 +93,7 @@ func thatHasGuides(meta metadata.KEP) error {
 	var errs *multierror.Error
 
 	hasSection := map[string]bool{}
-	for _, path := range meta.Sections() {
+	for _, path := range meta.SectionLocations() {
 		hasSection[path] = true
 	}
 
@@ -116,7 +116,7 @@ func thatHasAcceptanceCriteria(meta metadata.KEP) error {
 	var errs *multierror.Error
 
 	hasSection := map[string]bool{}
-	for _, path := range meta.Sections() {
+	for _, path := range meta.SectionLocations() {
 		hasSection[path] = true
 	}
 

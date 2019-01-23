@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"gopkg.in/yaml.v2"
 
+	"github.com/calebamiles/keps/pkg/keps/sections"
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
@@ -24,9 +26,9 @@ type KEP interface {
 	Editors() []string
 	State() states.Name
 	DevelopmentThemes() []string
-	Sections() []string // really are section paths
+	SectionLocations() []string // really are section paths
 
-	// should be pointers to other KEPs
+	// should be (string) references to other KEPs
 	Replaces() []string
 	SupersededBy() []string
 
@@ -41,12 +43,18 @@ type KEP interface {
 	SIGWide() bool
 	ContentDir() string
 
-	// Mutators
+	// Mutators (locking)
 	SetState(states.Name)
-	AddSections([]string)
+	AddSectionLocations([]string)
 	AddApprovers([]string)
 	AddReviewers([]string)
 	Persist() error
+
+	// External locking support
+	sync.Locker
+
+	// "unsafe" (non locking) mutators
+	UnsafeAddSectionLocations([]string)
 }
 
 type routingInfoProvider interface {
@@ -72,9 +80,10 @@ func New(authors []string, title string, routingInfo routingInfoProvider) (KEP, 
 		UniqueIDField:            uuid.New().String(), // note: will panic on error
 		StateField:               states.Draft,
 		contentDir:               routingInfo.ContentDir(),
-		hasSectionPath:           make(map[string]bool),
 		inApproversSet:           make(map[string]bool),
 		inReviewersSet:           make(map[string]bool),
+		inSectionLocationsSet:    make(map[string]bool),
+		RWMutex:                  new(sync.RWMutex),
 	}
 
 	return k, nil
@@ -100,38 +109,6 @@ func FromBytes(b []byte) (KEP, error) {
 	return fromBytes(b)
 }
 
-func fromBytes(b []byte) (*kep, error) {
-	k := &kep{
-		hasSectionPath: make(map[string]bool),
-		inApproversSet: make(map[string]bool),
-		inReviewersSet: make(map[string]bool),
-	}
-
-	err := yaml.Unmarshal(b, k)
-	if err != nil {
-		return nil, err
-	}
-
-	k.hasSectionPath = make(map[string]bool)
-
-	for _, s := range k.SectionsField {
-		if !k.hasSectionPath[sectionKey(s)] {
-			k.hasSectionPath[sectionKey(s)] = true
-			k.uniqueSections = append(k.uniqueSections, s)
-		}
-	}
-
-	for _, a := range k.ApproversField {
-		k.inApproversSet[a] = true
-	}
-
-	for _, r := range k.ReviewersField {
-		k.inReviewersSet[r] = true
-	}
-
-	return k, nil
-}
-
 type kepSection struct {
 	FilenameField string `yaml:"filename"`
 	NameField     string `yaml:"name"`
@@ -154,7 +131,7 @@ type kep struct {
 	LastUpdatedField       time.Time   `yaml:"last_updated,omitempty"`
 	CreatedField           time.Time   `yaml:"created,omitempty"`
 	UniqueIDField          string      `yaml:"uuid,omitempty"`
-	SectionsField          []string    `yaml:"sections,omitempty"`
+	SectionLocationsField  []string    `yaml:"sections,omitempty"`
 
 	OwningSIGField           string   `yaml:"owning_sig,omitempty"`
 	AffectedSubprojectsField []string `yaml:"affected_subprojects,omitempty"`
@@ -162,30 +139,46 @@ type kep struct {
 	KubernetesWideField      bool     `yaml:"kubernetes_wide,omitempty"`
 	SIGWideField             bool     `yaml:"sig_wide,omitempty"`
 
-	hasSectionPath map[string]bool `yaml:"-"` // do not persist this
-	uniqueSections []string        `yaml:"-"` // do not persist this
-	inApproversSet map[string]bool `yaml:"-"` // do not persist this
-	inReviewersSet map[string]bool `yaml:"-"` // do not persist this
-	contentDir     string          `yaml:"-"` // do not persist this
-	lock           sync.RWMutex    `yaml:"-"` // do not persist this
+	inApproversSet        map[string]bool `yaml:"-"` // do not persist this
+	inReviewersSet        map[string]bool `yaml:"-"` // do not persist this
+	inSectionLocationsSet map[string]bool `yaml:"-"` // do not persist this
+	contentDir            string          `yaml:"-"` // do not persist this
+
+	*sync.RWMutex `yaml:"-"` // do not persist this
 }
 
 func (k *kep) Persist() error {
-	k.lock.Lock()
-	defer k.lock.Unlock()
+	k.Lock()
+	defer k.Unlock()
+
+	// TODO make this a no op if no KEP content has changed
 
 	k.LastUpdatedField = time.Now().UTC()
-	k.SectionsField = k.uniqueSections
+
+	k.SectionLocationsField = []string{}
+	for p := range k.inSectionLocationsSet {
+		k.SectionLocationsField = append(k.SectionLocationsField, p)
+
+	}
 
 	k.ApproversField = []string{}
 	for approver := range k.inApproversSet {
 		k.ApproversField = append(k.ApproversField, approver)
+
 	}
 
 	k.ReviewersField = []string{}
 	for reviewer := range k.inReviewersSet {
 		k.ReviewersField = append(k.ReviewersField, reviewer)
+
 	}
+
+	// TODO write tests for this
+	sort.Sort(sections.ByOrder(k.SectionLocationsField))
+	sort.Strings(k.ApproversField)
+	sort.Strings(k.ReviewersField)
+
+	// TODO ensure all section locations exist
 
 	loc := k.contentDir
 	filename := filepath.Join(loc, metadataFilename)
@@ -203,88 +196,79 @@ func (k *kep) Persist() error {
 	return nil
 }
 
-func (k *kep) AddSections(paths []string) {
-	k.lock.Lock()
-	defer k.lock.Unlock()
+// sections
 
-	for _, s := range paths {
-		if !k.hasSectionPath[s] {
-			k.hasSectionPath[sectionKey(s)] = true
-			// we maintain a separate slice in order to maintain section order
-			k.uniqueSections = append(k.uniqueSections, s)
-		}
+func (k *kep) UnsafeAddSectionLocations(locs []string) {
+	for _, loc := range locs {
+		k.inSectionLocationsSet[loc] = true
 	}
 }
 
-func (k *kep) AddApprovers(approvers []string) {
-	k.lock.Lock()
-	defer k.lock.Unlock()
+func (k *kep) AddSectionLocations(locs []string) {
+	k.Lock()
+	defer k.Unlock()
 
-	// we don't currently care about the order of approvers when persisting this back to YAML
+	k.UnsafeAddSectionLocations(locs)
+}
+
+func (k *kep) SectionLocations() []string {
+	k.RLock()
+	defer k.RUnlock()
+
+	locs := []string{}
+	for loc := range k.inSectionLocationsSet {
+		locs = append(locs, loc)
+	}
+
+	return locs
+}
+
+// state
+
+func (k *kep) SetState(state states.Name) {
+	k.Lock()
+	defer k.Unlock()
+
+	k.StateField = state
+}
+
+func (k *kep) State() states.Name {
+	k.RLock()
+	defer k.RUnlock()
+
+	return k.StateField
+}
+
+// owners
+
+func (k *kep) AddApprovers(approvers []string) {
+	k.Lock()
+	defer k.Unlock()
+
 	for _, approver := range approvers {
 		k.inApproversSet[approver] = true
 	}
 }
 
 func (k *kep) AddReviewers(reviewers []string) {
-	k.lock.Lock()
-	defer k.lock.Unlock()
+	k.Lock()
+	defer k.Unlock()
 
-	// we don't currently care about the order of reviewers when persisting this back to YAML
 	for _, reviewer := range reviewers {
 		k.inReviewersSet[reviewer] = true
 	}
 }
 
-func (k *kep) SetState(state states.Name) {
-	k.lock.Lock()
-	defer k.lock.Unlock()
-
-	k.StateField = state
-}
-
-func (k *kep) Sections() []string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
-
-	return k.uniqueSections
-}
-
 func (k *kep) Authors() []string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+	k.RLock()
+	defer k.RUnlock()
 
 	return k.AuthorsField
 }
 
-func (k *kep) Title() string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
-
-	return k.TitleField
-}
-
-func (k *kep) ShortID() int {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
-
-	if k.ShortIDField != nil {
-		return *k.ShortIDField
-	}
-
-	return UnsetShortID
-}
-
-func (k *kep) UniqueID() string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
-
-	return k.UniqueIDField
-}
-
 func (k *kep) Reviewers() []string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+	k.RLock()
+	defer k.RUnlock()
 
 	reviewers := []string{}
 	for reviewer := range k.inReviewersSet {
@@ -295,8 +279,8 @@ func (k *kep) Reviewers() []string {
 }
 
 func (k *kep) Approvers() []string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+	k.RLock()
+	defer k.RUnlock()
 
 	approvers := []string{}
 	for approver := range k.inApproversSet {
@@ -307,94 +291,120 @@ func (k *kep) Approvers() []string {
 }
 
 func (k *kep) Editors() []string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+	k.RLock()
+	defer k.RUnlock()
 
 	return k.EditorsField
 }
 
-func (k *kep) State() states.Name {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+// basic metadata
 
-	return k.StateField
+func (k *kep) Title() string {
+	k.RLock()
+	defer k.RUnlock()
+
+	return k.TitleField
 }
 
-func (k *kep) Replaces() []string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+func (k *kep) ShortID() int {
+	k.RLock()
+	defer k.RUnlock()
 
-	return k.ReplacesField
+	if k.ShortIDField != nil {
+		return *k.ShortIDField
+	}
+
+	return UnsetShortID
 }
 
-func (k *kep) SupersededBy() []string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+func (k *kep) UniqueID() string {
+	k.RLock()
+	defer k.RUnlock()
 
-	return k.SupersededByField
+	return k.UniqueIDField
 }
 
-func (k *kep) DevelopmentThemes() []string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+func (k *kep) ContentDir() string {
+	k.RLock()
+	defer k.RUnlock()
 
-	return k.DevelopmentThemesField
+	return k.contentDir
 }
 
 func (k *kep) LastUpdated() time.Time {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+	k.RLock()
+	defer k.RUnlock()
 
 	return k.LastUpdatedField
 }
 
 func (k *kep) Created() time.Time {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+	k.RLock()
+	defer k.RUnlock()
 
 	return k.CreatedField
 }
 
+// other KEP references
+
+func (k *kep) Replaces() []string {
+	k.RLock()
+	defer k.RUnlock()
+
+	return k.ReplacesField
+}
+
+func (k *kep) SupersededBy() []string {
+	k.RLock()
+	defer k.RUnlock()
+
+	return k.SupersededByField
+}
+
+// development themes (SIG PM)
+
+func (k *kep) DevelopmentThemes() []string {
+	k.RLock()
+	defer k.RUnlock()
+
+	return k.DevelopmentThemesField
+}
+
+// SIG info
+
 func (k *kep) OwningSIG() string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+	k.RLock()
+	defer k.RUnlock()
 
 	return k.OwningSIGField
 }
 
 func (k *kep) AffectedSubprojects() []string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+	k.RLock()
+	defer k.RUnlock()
 
 	return k.AffectedSubprojectsField
 }
 
 func (k *kep) ParticipatingSIGs() []string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+	k.RLock()
+	defer k.RUnlock()
 
 	return k.ParticipatingSIGsField
 }
 
 func (k *kep) KubernetesWide() bool {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+	k.RLock()
+	defer k.RUnlock()
 
 	return k.KubernetesWideField
 }
 
 func (k *kep) SIGWide() bool {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
+	k.RLock()
+	defer k.RUnlock()
 
 	return k.SIGWideField
-}
-
-func (k *kep) ContentDir() string {
-	k.lock.RLock()
-	defer k.lock.RUnlock()
-
-	return k.contentDir
 }
 
 const (
@@ -404,4 +414,32 @@ const (
 
 func sectionKey(s string) string {
 	return strings.ToLower(strings.TrimSpace(s))
+}
+
+func fromBytes(b []byte) (*kep, error) {
+	k := &kep{
+		inSectionLocationsSet: make(map[string]bool),
+		inApproversSet:        make(map[string]bool),
+		inReviewersSet:        make(map[string]bool),
+		RWMutex:               new(sync.RWMutex),
+	}
+
+	err := yaml.Unmarshal(b, k)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, p := range k.SectionLocationsField {
+		k.inSectionLocationsSet[p] = true
+	}
+
+	for _, a := range k.ApproversField {
+		k.inApproversSet[a] = true
+	}
+
+	for _, r := range k.ReviewersField {
+		k.inReviewersSet[r] = true
+	}
+
+	return k, nil
 }

@@ -26,6 +26,9 @@ func ThatAllBasicInvariantsAreSatisfied(meta metadata.KEP) error {
 	err = ThatAllSectionsExistWithContent(meta)
 	errs = multierror.Append(errs, err)
 
+	err = ThatAllSectionsAreUnique(meta)
+	errs = multierror.Append(errs, err)
+
 	err = ThatAllSIGsExist(meta)
 	errs = multierror.Append(errs, err)
 
@@ -50,7 +53,7 @@ func ThatAllBasicInvariantsAreSatisfied(meta metadata.KEP) error {
 func ThatAllSectionsExistWithContent(meta metadata.KEP) error {
 	var errs *multierror.Error
 
-	for _, sectionFilename := range meta.Sections() {
+	for _, sectionFilename := range meta.SectionLocations() {
 		sectionBytes, err := ioutil.ReadFile(filepath.Join(meta.ContentDir(), sectionFilename))
 		switch {
 		case os.IsNotExist(err):
@@ -136,6 +139,8 @@ func ThatStateIsSet(meta metadata.KEP) error {
 	var errs *multierror.Error
 
 	switch meta.State() {
+	case states.Draft:
+		// valid state
 	case states.Provisional:
 		// valid state
 	case states.Implementable:
@@ -154,6 +159,23 @@ func ThatStateIsSet(meta metadata.KEP) error {
 		errs = multierror.Append(errs, errors.New("empty state set"))
 	default:
 		errs = multierror.Append(errs, fmt.Errorf("invalid state: %s, set", meta.State()))
+	}
+
+	return errs.ErrorOrNil()
+}
+
+func ThatAllSectionsAreUnique(meta metadata.KEP) error {
+	var errs *multierror.Error
+
+	sectionExistsFor := map[string]bool{}
+
+	givenSections := meta.SectionLocations()
+	for _, sectionPath := range givenSections {
+		if sectionExistsFor[sectionPath] {
+			errs = multierror.Append(errs, fmt.Errorf("found duplicate section: %s", sectionPath))
+		}
+
+		sectionExistsFor[sectionPath] = true
 	}
 
 	return errs.ErrorOrNil()

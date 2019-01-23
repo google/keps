@@ -9,9 +9,9 @@ const Readme = `
 - **Last Updated: {{.LastUpdated}}**
 
 ## Table of Contents
-{{- with .Sections}}
+{{- with removeReadme .SectionLocations}}
 {{range .}}
-1. [{{.Name}}]({{.Filename -}})
+1. [{{sectionName .}}]({{. -}})
 {{end -}}
 {{end -}}
 `

@@ -6,6 +6,7 @@ import (
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
+// TODO delete this interface if unused
 type SectionProvider interface {
 	Name() string
 	Filename() string
@@ -19,9 +20,5 @@ type InfoProvider interface {
 	State() states.Name
 	ContentDir() string
 	LastUpdated() time.Time
-}
-
-type InfoAndSectionProvider interface {
-	InfoProvider
-	Sections() []SectionProvider
+	SectionLocations() []string
 }
