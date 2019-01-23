@@ -15,7 +15,7 @@ var _ = Describe("The Operator Guide", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(content).To(ContainSubstring(basicInfoTitle))
-			Expect(content).To(ContainSubstring("## Operator Guide"))
+			Expect(content).To(ContainSubstring("## Operator Guide"), "expected `Operator Guide` section heading to exist")
 		})
 	})
 })

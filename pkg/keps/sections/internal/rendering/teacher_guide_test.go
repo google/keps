@@ -15,7 +15,7 @@ var _ = Describe("The Teacher Guide", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(content).To(ContainSubstring(basicInfoTitle))
-			Expect(content).To(ContainSubstring("## Teacher Guide"))
+			Expect(content).To(ContainSubstring("## Teacher Guide"), "expected `Teacher Guide` section heading to exist")
 		})
 	})
 })
