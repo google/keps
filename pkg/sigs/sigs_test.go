@@ -42,7 +42,7 @@ var _ = Describe("the SIGs helper package", func() {
 
 			for _, s := range upstreamList.SIGs {
 				for _, sp := range s.Subprojects {
-					Expect(sigs.SubprojectExists(sp.Name)).To(BeTrue(), "expected " + sp.Name + " to exist as subproject")
+					Expect(sigs.SubprojectExists(sp.Name)).To(BeTrue(), "expected "+sp.Name+" to exist as subproject")
 				}
 			}
 		})
