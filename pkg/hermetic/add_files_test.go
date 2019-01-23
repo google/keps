@@ -17,11 +17,16 @@ var _ = Describe("working with a Git repository", func() {
 	Describe("#AddFiles()", func() {
 		It("adds the files to the repository and commits", func() {
 			By("performing a bunch of set up")
+
 			githubToken := os.Getenv("KEP_TEST_GITHUB_TOKEN")
-			Expect(githubToken).ToNot(BeEmpty(), "KEP_TEST_GITHUB_TOKEN unset and required for test")
+			if githubToken == "" {
+				Skip("KEP_TEST_GITHUB_TOKEN unset and required for test")
+			}
 
 			githubHandle := os.Getenv("KEP_TEST_GITHUB_HANDLE")
-			Expect(githubHandle).ToNot(BeEmpty(), "KEP_TEST_GITHUB_HANDLE unset and required for test")
+			if githubHandle == "" {
+				Skip("KEP_TEST_GITHUB_HANDLE unset and required for test")
+			}
 
 			tokenProvider := newMockTokenProvider()
 

@@ -1,6 +1,7 @@
 package keps
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -165,6 +166,18 @@ func (k *kep) SetState(state states.Name) error {
 	}
 
 	switch state {
+	case states.Draft:
+		newEntries, err := sections.RenderMissingForProvisionalState(k.meta)
+		if err != nil {
+			return err
+		}
+
+		k.addSections(newEntries)
+
+		k.meta.SetState(states.Draft)
+
+		return nil
+
 	case states.Provisional:
 		newEntries, err := sections.RenderMissingForProvisionalState(k.meta)
 		if err != nil {
@@ -175,6 +188,7 @@ func (k *kep) SetState(state states.Name) error {
 		k.addSections(newEntries)
 
 		k.meta.SetState(states.Provisional)
+		return nil
 
 	case states.Implementable:
 		newEntries, err := sections.RenderMissingForImplementableState(k.meta)
@@ -186,9 +200,11 @@ func (k *kep) SetState(state states.Name) error {
 		k.addSections(newEntries)
 
 		k.meta.SetState(states.Implementable)
-	}
+		return nil
 
-	return nil
+	default:
+		return fmt.Errorf("no transition rules exist for state: %s", state)
+	}
 }
 
 func (k *kep) addSections(entries []sections.Entry) {

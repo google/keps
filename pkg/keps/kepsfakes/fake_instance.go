@@ -7,7 +7,6 @@ import (
 
 	keps "github.com/calebamiles/keps/pkg/keps"
 	check "github.com/calebamiles/keps/pkg/keps/check"
-	sections "github.com/calebamiles/keps/pkg/keps/sections"
 	states "github.com/calebamiles/keps/pkg/keps/states"
 )
 
@@ -26,11 +25,6 @@ type FakeInstance struct {
 	addReviewersMutex       sync.RWMutex
 	addReviewersArgsForCall []struct {
 		arg1 []string
-	}
-	AddSectionsStub        func(sections.Collection)
-	addSectionsMutex       sync.RWMutex
-	addSectionsArgsForCall []struct {
-		arg1 sections.Collection
 	}
 	AuthorsStub        func() []string
 	authorsMutex       sync.RWMutex
@@ -101,6 +95,16 @@ type FakeInstance struct {
 	}
 	persistReturnsOnCall map[int]struct {
 		result1 error
+	}
+	SectionsStub        func() []string
+	sectionsMutex       sync.RWMutex
+	sectionsArgsForCall []struct {
+	}
+	sectionsReturns struct {
+		result1 []string
+	}
+	sectionsReturnsOnCall map[int]struct {
+		result1 []string
 	}
 	SetStateStub        func(states.Name) error
 	setStateMutex       sync.RWMutex
@@ -175,6 +179,12 @@ func (fake *FakeInstance) AddApproversCallCount() int {
 	return len(fake.addApproversArgsForCall)
 }
 
+func (fake *FakeInstance) AddApproversCalls(stub func(...string)) {
+	fake.addApproversMutex.Lock()
+	defer fake.addApproversMutex.Unlock()
+	fake.AddApproversStub = stub
+}
+
 func (fake *FakeInstance) AddApproversArgsForCall(i int) []string {
 	fake.addApproversMutex.RLock()
 	defer fake.addApproversMutex.RUnlock()
@@ -198,6 +208,12 @@ func (fake *FakeInstance) AddChecksCallCount() int {
 	fake.addChecksMutex.RLock()
 	defer fake.addChecksMutex.RUnlock()
 	return len(fake.addChecksArgsForCall)
+}
+
+func (fake *FakeInstance) AddChecksCalls(stub func(...check.That)) {
+	fake.addChecksMutex.Lock()
+	defer fake.addChecksMutex.Unlock()
+	fake.AddChecksStub = stub
 }
 
 func (fake *FakeInstance) AddChecksArgsForCall(i int) []check.That {
@@ -225,35 +241,16 @@ func (fake *FakeInstance) AddReviewersCallCount() int {
 	return len(fake.addReviewersArgsForCall)
 }
 
+func (fake *FakeInstance) AddReviewersCalls(stub func(...string)) {
+	fake.addReviewersMutex.Lock()
+	defer fake.addReviewersMutex.Unlock()
+	fake.AddReviewersStub = stub
+}
+
 func (fake *FakeInstance) AddReviewersArgsForCall(i int) []string {
 	fake.addReviewersMutex.RLock()
 	defer fake.addReviewersMutex.RUnlock()
 	argsForCall := fake.addReviewersArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeInstance) AddSections(arg1 sections.Collection) {
-	fake.addSectionsMutex.Lock()
-	fake.addSectionsArgsForCall = append(fake.addSectionsArgsForCall, struct {
-		arg1 sections.Collection
-	}{arg1})
-	fake.recordInvocation("AddSections", []interface{}{arg1})
-	fake.addSectionsMutex.Unlock()
-	if fake.AddSectionsStub != nil {
-		fake.AddSectionsStub(arg1)
-	}
-}
-
-func (fake *FakeInstance) AddSectionsCallCount() int {
-	fake.addSectionsMutex.RLock()
-	defer fake.addSectionsMutex.RUnlock()
-	return len(fake.addSectionsArgsForCall)
-}
-
-func (fake *FakeInstance) AddSectionsArgsForCall(i int) sections.Collection {
-	fake.addSectionsMutex.RLock()
-	defer fake.addSectionsMutex.RUnlock()
-	argsForCall := fake.addSectionsArgsForCall[i]
 	return argsForCall.arg1
 }
 
@@ -280,7 +277,15 @@ func (fake *FakeInstance) AuthorsCallCount() int {
 	return len(fake.authorsArgsForCall)
 }
 
+func (fake *FakeInstance) AuthorsCalls(stub func() []string) {
+	fake.authorsMutex.Lock()
+	defer fake.authorsMutex.Unlock()
+	fake.AuthorsStub = stub
+}
+
 func (fake *FakeInstance) AuthorsReturns(result1 []string) {
+	fake.authorsMutex.Lock()
+	defer fake.authorsMutex.Unlock()
 	fake.AuthorsStub = nil
 	fake.authorsReturns = struct {
 		result1 []string
@@ -288,6 +293,8 @@ func (fake *FakeInstance) AuthorsReturns(result1 []string) {
 }
 
 func (fake *FakeInstance) AuthorsReturnsOnCall(i int, result1 []string) {
+	fake.authorsMutex.Lock()
+	defer fake.authorsMutex.Unlock()
 	fake.AuthorsStub = nil
 	if fake.authorsReturnsOnCall == nil {
 		fake.authorsReturnsOnCall = make(map[int]struct {
@@ -322,7 +329,15 @@ func (fake *FakeInstance) CheckCallCount() int {
 	return len(fake.checkArgsForCall)
 }
 
+func (fake *FakeInstance) CheckCalls(stub func() error) {
+	fake.checkMutex.Lock()
+	defer fake.checkMutex.Unlock()
+	fake.CheckStub = stub
+}
+
 func (fake *FakeInstance) CheckReturns(result1 error) {
+	fake.checkMutex.Lock()
+	defer fake.checkMutex.Unlock()
 	fake.CheckStub = nil
 	fake.checkReturns = struct {
 		result1 error
@@ -330,6 +345,8 @@ func (fake *FakeInstance) CheckReturns(result1 error) {
 }
 
 func (fake *FakeInstance) CheckReturnsOnCall(i int, result1 error) {
+	fake.checkMutex.Lock()
+	defer fake.checkMutex.Unlock()
 	fake.CheckStub = nil
 	if fake.checkReturnsOnCall == nil {
 		fake.checkReturnsOnCall = make(map[int]struct {
@@ -364,7 +381,15 @@ func (fake *FakeInstance) ContentDirCallCount() int {
 	return len(fake.contentDirArgsForCall)
 }
 
+func (fake *FakeInstance) ContentDirCalls(stub func() string) {
+	fake.contentDirMutex.Lock()
+	defer fake.contentDirMutex.Unlock()
+	fake.ContentDirStub = stub
+}
+
 func (fake *FakeInstance) ContentDirReturns(result1 string) {
+	fake.contentDirMutex.Lock()
+	defer fake.contentDirMutex.Unlock()
 	fake.ContentDirStub = nil
 	fake.contentDirReturns = struct {
 		result1 string
@@ -372,6 +397,8 @@ func (fake *FakeInstance) ContentDirReturns(result1 string) {
 }
 
 func (fake *FakeInstance) ContentDirReturnsOnCall(i int, result1 string) {
+	fake.contentDirMutex.Lock()
+	defer fake.contentDirMutex.Unlock()
 	fake.ContentDirStub = nil
 	if fake.contentDirReturnsOnCall == nil {
 		fake.contentDirReturnsOnCall = make(map[int]struct {
@@ -406,7 +433,15 @@ func (fake *FakeInstance) CreatedCallCount() int {
 	return len(fake.createdArgsForCall)
 }
 
+func (fake *FakeInstance) CreatedCalls(stub func() time.Time) {
+	fake.createdMutex.Lock()
+	defer fake.createdMutex.Unlock()
+	fake.CreatedStub = stub
+}
+
 func (fake *FakeInstance) CreatedReturns(result1 time.Time) {
+	fake.createdMutex.Lock()
+	defer fake.createdMutex.Unlock()
 	fake.CreatedStub = nil
 	fake.createdReturns = struct {
 		result1 time.Time
@@ -414,6 +449,8 @@ func (fake *FakeInstance) CreatedReturns(result1 time.Time) {
 }
 
 func (fake *FakeInstance) CreatedReturnsOnCall(i int, result1 time.Time) {
+	fake.createdMutex.Lock()
+	defer fake.createdMutex.Unlock()
 	fake.CreatedStub = nil
 	if fake.createdReturnsOnCall == nil {
 		fake.createdReturnsOnCall = make(map[int]struct {
@@ -448,7 +485,15 @@ func (fake *FakeInstance) LastUpdatedCallCount() int {
 	return len(fake.lastUpdatedArgsForCall)
 }
 
+func (fake *FakeInstance) LastUpdatedCalls(stub func() time.Time) {
+	fake.lastUpdatedMutex.Lock()
+	defer fake.lastUpdatedMutex.Unlock()
+	fake.LastUpdatedStub = stub
+}
+
 func (fake *FakeInstance) LastUpdatedReturns(result1 time.Time) {
+	fake.lastUpdatedMutex.Lock()
+	defer fake.lastUpdatedMutex.Unlock()
 	fake.LastUpdatedStub = nil
 	fake.lastUpdatedReturns = struct {
 		result1 time.Time
@@ -456,6 +501,8 @@ func (fake *FakeInstance) LastUpdatedReturns(result1 time.Time) {
 }
 
 func (fake *FakeInstance) LastUpdatedReturnsOnCall(i int, result1 time.Time) {
+	fake.lastUpdatedMutex.Lock()
+	defer fake.lastUpdatedMutex.Unlock()
 	fake.LastUpdatedStub = nil
 	if fake.lastUpdatedReturnsOnCall == nil {
 		fake.lastUpdatedReturnsOnCall = make(map[int]struct {
@@ -490,7 +537,15 @@ func (fake *FakeInstance) OwningSIGCallCount() int {
 	return len(fake.owningSIGArgsForCall)
 }
 
+func (fake *FakeInstance) OwningSIGCalls(stub func() string) {
+	fake.owningSIGMutex.Lock()
+	defer fake.owningSIGMutex.Unlock()
+	fake.OwningSIGStub = stub
+}
+
 func (fake *FakeInstance) OwningSIGReturns(result1 string) {
+	fake.owningSIGMutex.Lock()
+	defer fake.owningSIGMutex.Unlock()
 	fake.OwningSIGStub = nil
 	fake.owningSIGReturns = struct {
 		result1 string
@@ -498,6 +553,8 @@ func (fake *FakeInstance) OwningSIGReturns(result1 string) {
 }
 
 func (fake *FakeInstance) OwningSIGReturnsOnCall(i int, result1 string) {
+	fake.owningSIGMutex.Lock()
+	defer fake.owningSIGMutex.Unlock()
 	fake.OwningSIGStub = nil
 	if fake.owningSIGReturnsOnCall == nil {
 		fake.owningSIGReturnsOnCall = make(map[int]struct {
@@ -532,7 +589,15 @@ func (fake *FakeInstance) PersistCallCount() int {
 	return len(fake.persistArgsForCall)
 }
 
+func (fake *FakeInstance) PersistCalls(stub func() error) {
+	fake.persistMutex.Lock()
+	defer fake.persistMutex.Unlock()
+	fake.PersistStub = stub
+}
+
 func (fake *FakeInstance) PersistReturns(result1 error) {
+	fake.persistMutex.Lock()
+	defer fake.persistMutex.Unlock()
 	fake.PersistStub = nil
 	fake.persistReturns = struct {
 		result1 error
@@ -540,6 +605,8 @@ func (fake *FakeInstance) PersistReturns(result1 error) {
 }
 
 func (fake *FakeInstance) PersistReturnsOnCall(i int, result1 error) {
+	fake.persistMutex.Lock()
+	defer fake.persistMutex.Unlock()
 	fake.PersistStub = nil
 	if fake.persistReturnsOnCall == nil {
 		fake.persistReturnsOnCall = make(map[int]struct {
@@ -548,6 +615,58 @@ func (fake *FakeInstance) PersistReturnsOnCall(i int, result1 error) {
 	}
 	fake.persistReturnsOnCall[i] = struct {
 		result1 error
+	}{result1}
+}
+
+func (fake *FakeInstance) Sections() []string {
+	fake.sectionsMutex.Lock()
+	ret, specificReturn := fake.sectionsReturnsOnCall[len(fake.sectionsArgsForCall)]
+	fake.sectionsArgsForCall = append(fake.sectionsArgsForCall, struct {
+	}{})
+	fake.recordInvocation("Sections", []interface{}{})
+	fake.sectionsMutex.Unlock()
+	if fake.SectionsStub != nil {
+		return fake.SectionsStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.sectionsReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeInstance) SectionsCallCount() int {
+	fake.sectionsMutex.RLock()
+	defer fake.sectionsMutex.RUnlock()
+	return len(fake.sectionsArgsForCall)
+}
+
+func (fake *FakeInstance) SectionsCalls(stub func() []string) {
+	fake.sectionsMutex.Lock()
+	defer fake.sectionsMutex.Unlock()
+	fake.SectionsStub = stub
+}
+
+func (fake *FakeInstance) SectionsReturns(result1 []string) {
+	fake.sectionsMutex.Lock()
+	defer fake.sectionsMutex.Unlock()
+	fake.SectionsStub = nil
+	fake.sectionsReturns = struct {
+		result1 []string
+	}{result1}
+}
+
+func (fake *FakeInstance) SectionsReturnsOnCall(i int, result1 []string) {
+	fake.sectionsMutex.Lock()
+	defer fake.sectionsMutex.Unlock()
+	fake.SectionsStub = nil
+	if fake.sectionsReturnsOnCall == nil {
+		fake.sectionsReturnsOnCall = make(map[int]struct {
+			result1 []string
+		})
+	}
+	fake.sectionsReturnsOnCall[i] = struct {
+		result1 []string
 	}{result1}
 }
 
@@ -575,6 +694,12 @@ func (fake *FakeInstance) SetStateCallCount() int {
 	return len(fake.setStateArgsForCall)
 }
 
+func (fake *FakeInstance) SetStateCalls(stub func(states.Name) error) {
+	fake.setStateMutex.Lock()
+	defer fake.setStateMutex.Unlock()
+	fake.SetStateStub = stub
+}
+
 func (fake *FakeInstance) SetStateArgsForCall(i int) states.Name {
 	fake.setStateMutex.RLock()
 	defer fake.setStateMutex.RUnlock()
@@ -583,6 +708,8 @@ func (fake *FakeInstance) SetStateArgsForCall(i int) states.Name {
 }
 
 func (fake *FakeInstance) SetStateReturns(result1 error) {
+	fake.setStateMutex.Lock()
+	defer fake.setStateMutex.Unlock()
 	fake.SetStateStub = nil
 	fake.setStateReturns = struct {
 		result1 error
@@ -590,6 +717,8 @@ func (fake *FakeInstance) SetStateReturns(result1 error) {
 }
 
 func (fake *FakeInstance) SetStateReturnsOnCall(i int, result1 error) {
+	fake.setStateMutex.Lock()
+	defer fake.setStateMutex.Unlock()
 	fake.SetStateStub = nil
 	if fake.setStateReturnsOnCall == nil {
 		fake.setStateReturnsOnCall = make(map[int]struct {
@@ -624,7 +753,15 @@ func (fake *FakeInstance) ShortIDCallCount() int {
 	return len(fake.shortIDArgsForCall)
 }
 
+func (fake *FakeInstance) ShortIDCalls(stub func() int) {
+	fake.shortIDMutex.Lock()
+	defer fake.shortIDMutex.Unlock()
+	fake.ShortIDStub = stub
+}
+
 func (fake *FakeInstance) ShortIDReturns(result1 int) {
+	fake.shortIDMutex.Lock()
+	defer fake.shortIDMutex.Unlock()
 	fake.ShortIDStub = nil
 	fake.shortIDReturns = struct {
 		result1 int
@@ -632,6 +769,8 @@ func (fake *FakeInstance) ShortIDReturns(result1 int) {
 }
 
 func (fake *FakeInstance) ShortIDReturnsOnCall(i int, result1 int) {
+	fake.shortIDMutex.Lock()
+	defer fake.shortIDMutex.Unlock()
 	fake.ShortIDStub = nil
 	if fake.shortIDReturnsOnCall == nil {
 		fake.shortIDReturnsOnCall = make(map[int]struct {
@@ -666,7 +805,15 @@ func (fake *FakeInstance) StateCallCount() int {
 	return len(fake.stateArgsForCall)
 }
 
+func (fake *FakeInstance) StateCalls(stub func() states.Name) {
+	fake.stateMutex.Lock()
+	defer fake.stateMutex.Unlock()
+	fake.StateStub = stub
+}
+
 func (fake *FakeInstance) StateReturns(result1 states.Name) {
+	fake.stateMutex.Lock()
+	defer fake.stateMutex.Unlock()
 	fake.StateStub = nil
 	fake.stateReturns = struct {
 		result1 states.Name
@@ -674,6 +821,8 @@ func (fake *FakeInstance) StateReturns(result1 states.Name) {
 }
 
 func (fake *FakeInstance) StateReturnsOnCall(i int, result1 states.Name) {
+	fake.stateMutex.Lock()
+	defer fake.stateMutex.Unlock()
 	fake.StateStub = nil
 	if fake.stateReturnsOnCall == nil {
 		fake.stateReturnsOnCall = make(map[int]struct {
@@ -708,7 +857,15 @@ func (fake *FakeInstance) TitleCallCount() int {
 	return len(fake.titleArgsForCall)
 }
 
+func (fake *FakeInstance) TitleCalls(stub func() string) {
+	fake.titleMutex.Lock()
+	defer fake.titleMutex.Unlock()
+	fake.TitleStub = stub
+}
+
 func (fake *FakeInstance) TitleReturns(result1 string) {
+	fake.titleMutex.Lock()
+	defer fake.titleMutex.Unlock()
 	fake.TitleStub = nil
 	fake.titleReturns = struct {
 		result1 string
@@ -716,6 +873,8 @@ func (fake *FakeInstance) TitleReturns(result1 string) {
 }
 
 func (fake *FakeInstance) TitleReturnsOnCall(i int, result1 string) {
+	fake.titleMutex.Lock()
+	defer fake.titleMutex.Unlock()
 	fake.TitleStub = nil
 	if fake.titleReturnsOnCall == nil {
 		fake.titleReturnsOnCall = make(map[int]struct {
@@ -750,7 +909,15 @@ func (fake *FakeInstance) UniqueIDCallCount() int {
 	return len(fake.uniqueIDArgsForCall)
 }
 
+func (fake *FakeInstance) UniqueIDCalls(stub func() string) {
+	fake.uniqueIDMutex.Lock()
+	defer fake.uniqueIDMutex.Unlock()
+	fake.UniqueIDStub = stub
+}
+
 func (fake *FakeInstance) UniqueIDReturns(result1 string) {
+	fake.uniqueIDMutex.Lock()
+	defer fake.uniqueIDMutex.Unlock()
 	fake.UniqueIDStub = nil
 	fake.uniqueIDReturns = struct {
 		result1 string
@@ -758,6 +925,8 @@ func (fake *FakeInstance) UniqueIDReturns(result1 string) {
 }
 
 func (fake *FakeInstance) UniqueIDReturnsOnCall(i int, result1 string) {
+	fake.uniqueIDMutex.Lock()
+	defer fake.uniqueIDMutex.Unlock()
 	fake.UniqueIDStub = nil
 	if fake.uniqueIDReturnsOnCall == nil {
 		fake.uniqueIDReturnsOnCall = make(map[int]struct {
@@ -778,8 +947,6 @@ func (fake *FakeInstance) Invocations() map[string][][]interface{} {
 	defer fake.addChecksMutex.RUnlock()
 	fake.addReviewersMutex.RLock()
 	defer fake.addReviewersMutex.RUnlock()
-	fake.addSectionsMutex.RLock()
-	defer fake.addSectionsMutex.RUnlock()
 	fake.authorsMutex.RLock()
 	defer fake.authorsMutex.RUnlock()
 	fake.checkMutex.RLock()
@@ -794,6 +961,8 @@ func (fake *FakeInstance) Invocations() map[string][][]interface{} {
 	defer fake.owningSIGMutex.RUnlock()
 	fake.persistMutex.RLock()
 	defer fake.persistMutex.RUnlock()
+	fake.sectionsMutex.RLock()
+	defer fake.sectionsMutex.RUnlock()
 	fake.setStateMutex.RLock()
 	defer fake.setStateMutex.RUnlock()
 	fake.shortIDMutex.RLock()

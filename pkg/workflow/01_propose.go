@@ -25,8 +25,7 @@ func Propose(runtime settings.Runtime) error {
 		return err
 	}
 
-	// set state I suppose can know about how to get the sections we need
-	err = kep.SetState(states.Draft)
+	err = kep.SetState(states.Provisional)
 	if err != nil {
 		return err
 	}

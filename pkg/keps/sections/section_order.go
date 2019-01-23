@@ -1,8 +1,8 @@
 package sections
 
 var sectionOrdering = map[string]int{
+	Summary: -1,
 	// any user defined sections fit here
-	Summary:            1,
 	Motivation:         2,
 	DeveloperGuide:     3,
 	OperatorGuide:      4,

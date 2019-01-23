@@ -29,14 +29,13 @@ var _ = Describe("Accept", func() {
 		defer os.RemoveAll(tmpDir)
 
 		kepDirName := "a-good-but-complicated-idea"
-		targetDir := filepath.Join(tmpDir, kepDirName)
 
 		runtimeSettings := &settingsfakes.FakeRuntime{}
 		runtimeSettings.PrincipalReturns(approverOne)
-		runtimeSettings.TargetDirReturns(targetDir)
+		runtimeSettings.TargetDirReturns(kepDirName)
 		runtimeSettings.ContentRootReturns(tmpDir)
 
-		targetDir, err = workflow.Init(runtimeSettings)
+		targetDir, err := workflow.Init(runtimeSettings)
 		Expect(err).ToNot(HaveOccurred())
 
 		// simulate targeting the newly created KEP

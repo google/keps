@@ -35,11 +35,10 @@ var _ = Describe("Init", func() {
 			defer os.RemoveAll(tmpDir)
 
 			kepDirName := "a-good-but-complicated-idea"
-			targetDir := filepath.Join(tmpDir, kepDirName)
 
 			runtimeSettings := &settingsfakes.FakeRuntime{}
 			runtimeSettings.PrincipalReturns(authorOne)
-			runtimeSettings.TargetDirReturns(targetDir)
+			runtimeSettings.TargetDirReturns(kepDirName)
 			runtimeSettings.ContentRootReturns(tmpDir)
 
 			expectedKEPContentDir, err := workflow.Init(runtimeSettings)
@@ -64,7 +63,7 @@ var _ = Describe("Init", func() {
 			kepDirName := "kubelet-v2-api"
 			sigDir := "sig-node"
 
-			targetDir := filepath.Join(tmpDir, sigDir, kepDirName)
+			targetDir := filepath.Join(sigDir, kepDirName)
 
 			runtimeSettings := &settingsfakes.FakeRuntime{}
 			runtimeSettings.PrincipalReturns(authorOne)
@@ -94,7 +93,7 @@ var _ = Describe("Init", func() {
 			subprojectDir := "kubelet"
 			kepDirName := "dynamic-kubelet-configuration"
 
-			targetDir := filepath.Join(tmpDir, sigDir, subprojectDir, kepDirName)
+			targetDir := filepath.Join(sigDir, subprojectDir, kepDirName)
 
 			runtimeSettings := &settingsfakes.FakeRuntime{}
 			runtimeSettings.PrincipalReturns(authorOne)

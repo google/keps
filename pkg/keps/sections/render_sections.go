@@ -10,6 +10,38 @@ import (
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
+func RenderMissingForDraftlState(provider renderingInfoProvider) ([]Entry, error) {
+	requiredSections := []string{
+		Summary,
+		Motivation,
+	}
+
+	sectionsInclude := map[string]bool{}
+	for _, sectionFilename := range provider.SectionLocations() {
+		sectionsInclude[NameForFilename(sectionFilename)] = true
+	}
+
+	missingEntries := []Entry{}
+
+	// TODO this isn't really thread safe, better think about how this should work more
+	// let's try granting a file lock on the metadata when we open a KEP
+	// https://github.com/gofrs/flock
+	var errs *multierror.Error
+	for _, requiredSection := range requiredSections {
+		if !sectionsInclude[requiredSection] {
+			newEntry, err := Render(provider, requiredSection)
+			errs = multierror.Append(errs, err)
+			missingEntries = append(missingEntries, newEntry)
+		}
+	}
+
+	if errs.ErrorOrNil() != nil {
+		return nil, errs
+	}
+
+	return missingEntries, nil
+}
+
 func RenderMissingForProvisionalState(provider renderingInfoProvider) ([]Entry, error) {
 	requiredSections := []string{
 		Summary,

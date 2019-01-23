@@ -2,7 +2,7 @@ package workflow_test
 
 import (
 	"io/ioutil"
-	_ "os"
+	"os"
 	"path/filepath"
 
 	. "github.com/onsi/ginkgo"
@@ -23,11 +23,10 @@ var _ = Describe("Propose", func() {
 		metadataFilename  = "metadata.yaml"
 	)
 
-	FIt("prepares the KEP for acceptance|deferment|rejection", func() {
+	It("prepares the KEP for acceptance|deferment|rejection", func() {
 		tmpDir, err := ioutil.TempDir("", "kep-propose")
 		Expect(err).ToNot(HaveOccurred())
-		//defer os.RemoveAll(tmpDir)
-		println(tmpDir)
+		defer os.RemoveAll(tmpDir)
 
 		contentRoot := filepath.Join(tmpDir, "content")
 
@@ -52,14 +51,12 @@ var _ = Describe("Propose", func() {
 		err = workflow.Propose(runtimeSettings)
 		Expect(err).ToNot(HaveOccurred())
 
-		By("marking the KEP as draft")
+		By("marking the KEP as provisional")
 		kep, err := keps.Open(targetDir)
 		Expect(err).ToNot(HaveOccurred(), "opening KEP after propose")
 
-		Expect(kep.State()).To(Equal(states.Draft))
-		Fail("this test should fail because README.md is duplicated in metadata.yaml")
+		Expect(kep.State()).To(Equal(states.Provisional))
 
 		// check that has matching state and last updated
-		Fail("no checking of README.md")
 	})
 })

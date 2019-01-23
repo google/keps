@@ -24,10 +24,14 @@ var _ = Describe("submitting changes to an upstream GitHub repository", func() {
 			By("performing a lot of setup")
 
 			githubToken := os.Getenv("KEP_TEST_GITHUB_TOKEN")
-			Expect(githubToken).ToNot(BeEmpty(), "KEP_TEST_GITHUB_TOKEN unset and required for test")
+			if githubToken == "" {
+				Skip("KEP_TEST_GITHUB_TOKEN unset and required for test")
+			}
 
 			githubHandle := os.Getenv("KEP_TEST_GITHUB_HANDLE")
-			Expect(githubHandle).ToNot(BeEmpty(), "KEP_TEST_GITHUB_HANDLE unset and required for test")
+			if githubHandle == "" {
+				Skip("KEP_TEST_GITHUB_HANDLE unset and required for test")
+			}
 
 			tokenProvider := newMockTokenProvider()
 

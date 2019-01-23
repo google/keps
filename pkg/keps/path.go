@@ -50,7 +50,7 @@ func Path(contentRoot string, p string) (string, error) {
 
 		return p, nil
 	default:
-		// address examples: {1, 3, 5}
+		// addresses examples: {1, 3, 5}
 
 		routingInfo, err := sigs.BuildRoutingFromPath(contentRoot, p)
 		if err != nil {

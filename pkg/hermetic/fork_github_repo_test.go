@@ -18,10 +18,14 @@ var _ = Describe("working with a Git repository hosted on GitHub", func() {
 	Describe("Fork()", func() {
 		It("creates a copy of an upstream GitHub repository in a user account", func() {
 			githubToken := os.Getenv("KEP_TEST_GITHUB_TOKEN")
-			Expect(githubToken).ToNot(BeEmpty(), "KEP_TEST_GITHUB_TOKEN unset and required for test")
+			if githubToken == "" {
+				Skip("KEP_TEST_GITHUB_TOKEN unset and required for test")
+			}
 
 			githubHandle := os.Getenv("KEP_TEST_GITHUB_HANDLE")
-			Expect(githubHandle).ToNot(BeEmpty(), "KEP_TEST_GITHUB_HANDLE unset and required for test")
+			if githubHandle == "" {
+				Skip("KEP_TEST_GITHUB_HANDLE unset and required for test")
+			}
 
 			tokenProvider := newMockTokenProvider()
 

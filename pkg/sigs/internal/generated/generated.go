@@ -231,6 +231,16 @@ var InfoForPath = map[string]*PathInfo{
 		Subproject: "kubernetes-clients",
 	},
 
+	"sig-api-machinery/yaml": &PathInfo{
+		OwningSIG:  "sig-api-machinery",
+		Subproject: "yaml",
+	},
+
+	"sig-api-machinery/component-base": &PathInfo{
+		OwningSIG:  "sig-api-machinery",
+		Subproject: "component-base",
+	},
+
 	"sig-apps/examples": &PathInfo{
 		OwningSIG:  "sig-apps",
 		Subproject: "examples",
@@ -269,6 +279,11 @@ var InfoForPath = map[string]*PathInfo{
 	"sig-architecture/code-organization": &PathInfo{
 		OwningSIG:  "sig-architecture",
 		Subproject: "code-organization",
+	},
+
+	"sig-architecture/klog": &PathInfo{
+		OwningSIG:  "sig-architecture",
+		Subproject: "klog",
 	},
 
 	"sig-architecture/steering": &PathInfo{
@@ -381,6 +396,11 @@ var InfoForPath = map[string]*PathInfo{
 		Subproject: "cloud-provider-azure",
 	},
 
+	"sig-azure/cluster-api-provider-azure": &PathInfo{
+		OwningSIG:  "sig-azure",
+		Subproject: "cluster-api-provider-azure",
+	},
+
 	"sig-cli/kubectl": &PathInfo{
 		OwningSIG:  "sig-cli",
 		Subproject: "kubectl",
@@ -399,6 +419,11 @@ var InfoForPath = map[string]*PathInfo{
 	"sig-cloud-provider/kubernetes-cloud-provider": &PathInfo{
 		OwningSIG:  "sig-cloud-provider",
 		Subproject: "kubernetes-cloud-provider",
+	},
+
+	"sig-cloud-provider/cloud-provider-alibaba-cloud": &PathInfo{
+		OwningSIG:  "sig-cloud-provider",
+		Subproject: "cloud-provider-alibaba-cloud",
 	},
 
 	"sig-cloud-provider/cloud-provider-gcp": &PathInfo{
@@ -586,6 +611,11 @@ var InfoForPath = map[string]*PathInfo{
 		Subproject: "metrics",
 	},
 
+	"sig-instrumentation/mutating-trace-admission-controller": &PathInfo{
+		OwningSIG:  "sig-instrumentation",
+		Subproject: "mutating-trace-admission-controller",
+	},
+
 	"sig-multicluster/federation-v1": &PathInfo{
 		OwningSIG:  "sig-multicluster",
 		Subproject: "federation-v1",
@@ -656,6 +686,11 @@ var InfoForPath = map[string]*PathInfo{
 		Subproject: "kubelet",
 	},
 
+	"sig-node/node-api": &PathInfo{
+		OwningSIG:  "sig-node",
+		Subproject: "node-api",
+	},
+
 	"sig-node/node-feature-discovery": &PathInfo{
 		OwningSIG:  "sig-node",
 		Subproject: "node-feature-discovery",
@@ -671,9 +706,9 @@ var InfoForPath = map[string]*PathInfo{
 		Subproject: "rktlet",
 	},
 
-	"sig-pm/features": &PathInfo{
+	"sig-pm/enhancements": &PathInfo{
 		OwningSIG:  "sig-pm",
-		Subproject: "features",
+		Subproject: "enhancements",
 	},
 
 	"sig-release/hyperkube": &PathInfo{
@@ -681,9 +716,14 @@ var InfoForPath = map[string]*PathInfo{
 		Subproject: "hyperkube",
 	},
 
-	"sig-release/release": &PathInfo{
+	"sig-release/release-team": &PathInfo{
 		OwningSIG:  "sig-release",
-		Subproject: "release",
+		Subproject: "release-team",
+	},
+
+	"sig-release/publishing-bot": &PathInfo{
+		OwningSIG:  "sig-release",
+		Subproject: "publishing-bot",
 	},
 
 	"sig-release/sig-release": &PathInfo{
@@ -691,14 +731,29 @@ var InfoForPath = map[string]*PathInfo{
 		Subproject: "sig-release",
 	},
 
-	"sig-scalability/kubemark": &PathInfo{
+	"sig-scalability/kubernetes-scalability-definition": &PathInfo{
 		OwningSIG:  "sig-scalability",
-		Subproject: "kubemark",
+		Subproject: "kubernetes-scalability-definition",
 	},
 
-	"sig-scalability/perf-tests": &PathInfo{
+	"sig-scalability/kubernetes-scalability-governance": &PathInfo{
 		OwningSIG:  "sig-scalability",
-		Subproject: "perf-tests",
+		Subproject: "kubernetes-scalability-governance",
+	},
+
+	"sig-scalability/kubernetes-scalability-test-frameworks": &PathInfo{
+		OwningSIG:  "sig-scalability",
+		Subproject: "kubernetes-scalability-test-frameworks",
+	},
+
+	"sig-scalability/kubernetes-scalability-and-performance-tests-and-validation": &PathInfo{
+		OwningSIG:  "sig-scalability",
+		Subproject: "kubernetes-scalability-and-performance-tests-and-validation",
+	},
+
+	"sig-scalability/kubernetes-scalability-bottlenecks-detection": &PathInfo{
+		OwningSIG:  "sig-scalability",
+		Subproject: "kubernetes-scalability-bottlenecks-detection",
 	},
 
 	"sig-scheduling/cluster-capacity": &PathInfo{
@@ -756,14 +811,29 @@ var InfoForPath = map[string]*PathInfo{
 		Subproject: "volumes",
 	},
 
+	"sig-testing/boskos": &PathInfo{
+		OwningSIG:  "sig-testing",
+		Subproject: "boskos",
+	},
+
+	"sig-testing/gopherage": &PathInfo{
+		OwningSIG:  "sig-testing",
+		Subproject: "gopherage",
+	},
+
+	"sig-testing/gubernator": &PathInfo{
+		OwningSIG:  "sig-testing",
+		Subproject: "gubernator",
+	},
+
 	"sig-testing/kind": &PathInfo{
 		OwningSIG:  "sig-testing",
 		Subproject: "kind",
 	},
 
-	"sig-testing/repo-publishing": &PathInfo{
+	"sig-testing/prow": &PathInfo{
 		OwningSIG:  "sig-testing",
-		Subproject: "repo-publishing",
+		Subproject: "prow",
 	},
 
 	"sig-testing/testing-commons": &PathInfo{
@@ -784,6 +854,11 @@ var InfoForPath = map[string]*PathInfo{
 	"sig-vmware/cluster-api-provider-vsphere": &PathInfo{
 		OwningSIG:  "sig-vmware",
 		Subproject: "cluster-api-provider-vsphere",
+	},
+
+	"sig-windows/windows-testing": &PathInfo{
+		OwningSIG:  "sig-windows",
+		Subproject: "windows-testing",
 	},
 }
 
@@ -876,6 +951,10 @@ var FlattenedSubprojectSet = map[string]bool{
 
 	"kubernetes-clients": true,
 
+	"yaml": true,
+
+	"component-base": true,
+
 	"examples": true,
 
 	"kompose": true,
@@ -891,6 +970,8 @@ var FlattenedSubprojectSet = map[string]bool{
 	"kep-adoption-and-reviews": true,
 
 	"code-organization": true,
+
+	"klog": true,
 
 	"steering": true,
 
@@ -936,6 +1017,8 @@ var FlattenedSubprojectSet = map[string]bool{
 
 	"cloud-provider-azure": true,
 
+	"cluster-api-provider-azure": true,
+
 	"kubectl": true,
 
 	"kustomize": true,
@@ -943,6 +1026,8 @@ var FlattenedSubprojectSet = map[string]bool{
 	"cli-sdk": true,
 
 	"kubernetes-cloud-provider": true,
+
+	"cloud-provider-alibaba-cloud": true,
 
 	"cloud-provider-gcp": true,
 
@@ -1018,6 +1103,8 @@ var FlattenedSubprojectSet = map[string]bool{
 
 	"metrics": true,
 
+	"mutating-trace-admission-controller": true,
+
 	"federation-v1": true,
 
 	"federation-v2": true,
@@ -1046,23 +1133,33 @@ var FlattenedSubprojectSet = map[string]bool{
 
 	"kubelet": true,
 
+	"node-api": true,
+
 	"node-feature-discovery": true,
 
 	"node-problem-detector": true,
 
 	"rktlet": true,
 
-	"features": true,
+	"enhancements": true,
 
 	"hyperkube": true,
 
-	"release": true,
+	"release-team": true,
+
+	"publishing-bot": true,
 
 	"sig-release": true,
 
-	"kubemark": true,
+	"kubernetes-scalability-definition": true,
 
-	"perf-tests": true,
+	"kubernetes-scalability-governance": true,
+
+	"kubernetes-scalability-test-frameworks": true,
+
+	"kubernetes-scalability-and-performance-tests-and-validation": true,
+
+	"kubernetes-scalability-bottlenecks-detection": true,
 
 	"cluster-capacity": true,
 
@@ -1086,9 +1183,15 @@ var FlattenedSubprojectSet = map[string]bool{
 
 	"volumes": true,
 
+	"boskos": true,
+
+	"gopherage": true,
+
+	"gubernator": true,
+
 	"kind": true,
 
-	"repo-publishing": true,
+	"prow": true,
 
 	"testing-commons": true,
 
@@ -1097,6 +1200,8 @@ var FlattenedSubprojectSet = map[string]bool{
 	"dashboard": true,
 
 	"cluster-api-provider-vsphere": true,
+
+	"windows-testing": true,
 }
 
 // SIGSubprojectMapping groups subprojects by their owning SIG
@@ -1122,6 +1227,10 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 		"idl-schema-client-pipeline": true,
 
 		"kubernetes-clients": true,
+
+		"yaml": true,
+
+		"component-base": true,
 	},
 
 	"sig-apps": map[string]bool{
@@ -1144,6 +1253,8 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 		"kep-adoption-and-reviews": true,
 
 		"code-organization": true,
+
+		"klog": true,
 
 		"steering": true,
 	},
@@ -1200,6 +1311,8 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 	"sig-azure": map[string]bool{
 
 		"cloud-provider-azure": true,
+
+		"cluster-api-provider-azure": true,
 	},
 
 	"sig-big-data": map[string]bool{},
@@ -1216,6 +1329,8 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 	"sig-cloud-provider": map[string]bool{
 
 		"kubernetes-cloud-provider": true,
+
+		"cloud-provider-alibaba-cloud": true,
 
 		"cloud-provider-gcp": true,
 
@@ -1309,6 +1424,8 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 		"metrics-server": true,
 
 		"metrics": true,
+
+		"mutating-trace-admission-controller": true,
 	},
 
 	"sig-multicluster": map[string]bool{
@@ -1347,6 +1464,8 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 
 		"kubelet": true,
 
+		"node-api": true,
+
 		"node-feature-discovery": true,
 
 		"node-problem-detector": true,
@@ -1358,23 +1477,31 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 
 	"sig-pm": map[string]bool{
 
-		"features": true,
+		"enhancements": true,
 	},
 
 	"sig-release": map[string]bool{
 
 		"hyperkube": true,
 
-		"release": true,
+		"release-team": true,
+
+		"publishing-bot": true,
 
 		"sig-release": true,
 	},
 
 	"sig-scalability": map[string]bool{
 
-		"kubemark": true,
+		"kubernetes-scalability-definition": true,
 
-		"perf-tests": true,
+		"kubernetes-scalability-governance": true,
+
+		"kubernetes-scalability-test-frameworks": true,
+
+		"kubernetes-scalability-and-performance-tests-and-validation": true,
+
+		"kubernetes-scalability-bottlenecks-detection": true,
 	},
 
 	"sig-scheduling": map[string]bool{
@@ -1410,9 +1537,15 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 
 	"sig-testing": map[string]bool{
 
+		"boskos": true,
+
+		"gopherage": true,
+
+		"gubernator": true,
+
 		"kind": true,
 
-		"repo-publishing": true,
+		"prow": true,
 
 		"testing-commons": true,
 
@@ -1429,7 +1562,10 @@ var SIGSubprojectMapping = map[string]map[string]bool{
 		"cluster-api-provider-vsphere": true,
 	},
 
-	"sig-windows": map[string]bool{},
+	"sig-windows": map[string]bool{
+
+		"windows-testing": true,
+	},
 }
 
 var SIGList = []string{

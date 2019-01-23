@@ -8,6 +8,7 @@ import (
 	"github.com/calebamiles/keps/pkg/keps/metadata"
 	"github.com/calebamiles/keps/pkg/keps/sections"
 	"github.com/calebamiles/keps/pkg/keps/skeleton"
+	"github.com/calebamiles/keps/pkg/keps/states"
 	"github.com/calebamiles/keps/pkg/settings"
 	"github.com/calebamiles/keps/pkg/sigs"
 )
@@ -34,18 +35,19 @@ func Init(runtime settings.Runtime) (string, error) {
 		return "", err
 	}
 
-	// kepMetadata satisfies the requirements for rendering sections
-	sectionContent, err := sections.ForProvisionalState(kepMetadata)
-	if err != nil {
-		return "", err
-	}
-
 	err = skeleton.Init(kepMetadata)
 	if err != nil {
 		return "", err
 	}
 
-	kep, err := keps.New(kepMetadata, sectionContent)
+	// we could pass nil here but now you now the type
+	kep, err := keps.New(kepMetadata, []sections.Entry{})
+	if err != nil {
+		//TODO erase skeleton if an error occurred
+		return "", err
+	}
+
+	err = kep.SetState(states.Draft)
 	if err != nil {
 		//TODO erase skeleton if an error occurred
 		return "", err

@@ -18,10 +18,10 @@ var _ = Describe("the SIGs helper package", func() {
 			upstreamList := fetchUpstreamSIGNames()
 			compiledList := sigs.All()
 
-			Expect(len(upstreamList)).To(Equal(len(compiledList)), "compiled list of SIGs has different length than upstream")
+			Expect(len(upstreamList)).To(Equal(len(compiledList)), "compiled list of SIGs should have the length as upstream")
 
 			for _, s := range upstreamList {
-				Expect(compiledList).To(ContainElement(s))
+				Expect(compiledList).To(ContainElement(s), "expected compiled SIG list to include: "+s)
 			}
 		})
 	})
@@ -31,7 +31,7 @@ var _ = Describe("the SIGs helper package", func() {
 			upstreamList := fetchUpstreamSIGNames()
 
 			for _, s := range upstreamList {
-				Expect(sigs.Exists(s)).To(BeTrue())
+				Expect(sigs.Exists(s)).To(BeTrue(), "expected "+s+" to exist as listed SIG")
 			}
 		})
 	})
@@ -52,27 +52,27 @@ var _ = Describe("the SIGs helper package", func() {
 		Context("when the path is at a SIG root", func() {
 			It("returns SIG wide information", func() {
 				contentRoot := "/home/user/workspace/keps/content/"
-				givenPath := "/home/user/workspace/keps/content/sig-node/device-plugins"
+				givenPath := "sig-node/device-plugins"
 
 				info, err := sigs.BuildRoutingFromPath(contentRoot, givenPath)
-				Expect(err).ToNot(HaveOccurred())
+				Expect(err).ToNot(HaveOccurred(), "building routing info from a path relative to the content root should not return an error")
 
-				Expect(info.OwningSIG()).To(Equal("sig-node"))
-				Expect(info.SIGWide()).To(BeTrue())
+				Expect(info.OwningSIG()).To(Equal("sig-node"), "SIG node should be owner of KEPs in the `sig-node` directory")
+				Expect(info.SIGWide()).To(BeTrue(), "a KEP at the root of a SIG dir should have `sig-wide` scope")
 			})
 		})
 
 		Context("when the path includes a SIG and subproject", func() {
 			It("returns SIG and subproject information", func() {
 				contentRoot := "/home/user/workspace/keps/content/"
-				givenPath := "/home/user/workspace/keps/content/sig-node/kubelet/dynamic-kubelet-configuration"
+				givenPath := "sig-node/kubelet/dynamic-kubelet-configuration"
 
 				info, err := sigs.BuildRoutingFromPath(contentRoot, givenPath)
-				Expect(err).ToNot(HaveOccurred())
+				Expect(err).ToNot(HaveOccurred(), "building routing info from a path relative to the content root and including a subproject should not return an error")
 
-				Expect(info.OwningSIG()).To(Equal("sig-node"))
-				Expect(info.SIGWide()).To(BeFalse())
-				Expect(info.AffectedSubprojects()).To(ContainElement("kubelet"))
+				Expect(info.OwningSIG()).To(Equal("sig-node"), "SIG node should be owner of KEPs created in its subproject directories")
+				Expect(info.SIGWide()).To(BeFalse(), "KEPs within a subproject directory should not be given `sig-wide` scope")
+				Expect(info.AffectedSubprojects()).To(ContainElement("kubelet"), "the affected subprojects for a KEP created inside a subproject directory should contain the subproject")
 			})
 		})
 	})

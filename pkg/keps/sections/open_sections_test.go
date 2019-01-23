@@ -47,6 +47,7 @@ var _ = Describe("Opening existing section content from disk", func() {
 		It("returns an error after attempting to open all sections", func() {
 			tmpDir, err := ioutil.TempDir("", "sections-open-test")
 			Expect(err).ToNot(HaveOccurred(), "creating temp dir for test section")
+			defer os.RemoveAll(tmpDir)
 
 			sectionOneFilename := "section_one.md"
 			sectionTwoFilename := "does_not_exist.md"
