@@ -17,7 +17,7 @@ enhancements tracking process
 		// graceful handling
 	}
 
-	token, err := NewProvideTokenFromPath(whereGitHubTokenExists)
+	token, err := settings.NewGitHubTokenProvider(whereGitHubTokenExists)
 	if err != nil {
 		// graceful handling
 	}
@@ -41,21 +41,20 @@ enhancements tracking process
 	kepSummaryLocation := "path-to-kep-summary.md"
 	releaseTrackingDir := "release-1.15/proposed"
 
-	kepSummaryBytes, err := ioutil.ReadFile(kepSummaryLocation)
+	err = repo.Add(kepSummaryLocation, releaseTrackingDir, "track enhancement for 1.15 release")
 	if err != nil {
 		// graceful handling
 	}
 
-	err = repo.Add(kepSummaryLocation, releaseTrackingDir)
-	if err != nil {
-		// graceful handling
-	}
-
-	prUrl, err := repo.CreatePR("Track delivery of KEP title", string(kepSummaryBytes))
+	prUrl, err := repo.CreatePR("Target delivery of enhancement KEP title", string(kepSummaryBytes))
 	if err != nil {
 		// graceful handling
 	}
 	
 	fmt.Printf("proposed tracking KEP in PR: %s\n", prUrl)	
+
+For comparison, "forking" (server side clone) of a GitHub repo, cloning the repo, adding a file,
+creating a commit, pushing the changes to the "fork", and making a GitHub Pull Request requires several
+hundred lines of Go.
 */
 package hermetic
