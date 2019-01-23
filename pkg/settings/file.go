@@ -43,6 +43,7 @@ func findSettingsFile() (string, error) {
 func readSettingsFile(loc string, u *User) error {
 	settingsBytes, err := ioutil.ReadFile(loc)
 	if err != nil {
+		log.Errorf("reading settings location %s: %s", loc, err)
 		return err
 	}
 
