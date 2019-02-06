@@ -52,9 +52,6 @@ type KEP interface {
 
 	// External locking support
 	sync.Locker
-
-	// "unsafe" (non locking) mutators
-	UnsafeAddSectionLocations([]string)
 }
 
 type routingInfoProvider interface {
@@ -198,17 +195,13 @@ func (k *kep) Persist() error {
 
 // sections
 
-func (k *kep) UnsafeAddSectionLocations(locs []string) {
-	for _, loc := range locs {
-		k.inSectionLocationsSet[loc] = true
-	}
-}
-
 func (k *kep) AddSectionLocations(locs []string) {
 	k.Lock()
 	defer k.Unlock()
 
-	k.UnsafeAddSectionLocations(locs)
+	for _, loc := range locs {
+		k.inSectionLocationsSet[loc] = true
+	}
 }
 
 func (k *kep) SectionLocations() []string {
