@@ -8,9 +8,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/calebamiles/keps/pkg/changes/auth"
 )
 
-func CreatePullRequest(routingInfo PullRequestRoutingInfo, prTitle PullRequestTitle, prDescription PullRequestDescription) (string, error) {
+type PullRequestCreator func(token auth.TokenProvider, routingInfo PullRequestRoutingInfo, prTitle PullRequestTitle, prDescription PullRequestDescription) (string, error)
+
+func CreatePullRequest(token auth.TokenProvider, routingInfo PullRequestRoutingInfo, prTitle PullRequestTitle, prDescription PullRequestDescription) (string, error) {
 	// serialize request payload
 	var createPrPayload struct {
 		TitleField          PullRequestTitle       `json:"title"`
@@ -43,7 +47,7 @@ func CreatePullRequest(routingInfo PullRequestRoutingInfo, prTitle PullRequestTi
 	}
 
 	// add auth header
-	err = AddAuthorizationHeader(req, routingInfo.Token())
+	err = AddAuthorizationHeader(req, token)
 	if err != nil {
 		return "", err
 	}

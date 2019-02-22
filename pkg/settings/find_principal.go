@@ -20,16 +20,16 @@ func FindPrincipal() (string, error) {
 
 func principal() (string, error) {
 	settingsFileLocation, err := findSettingsFile()
-        if err != nil {
-                return "", err
-        }
+	if err != nil {
+		return "", err
+	}
 
-        s := &User{}
-        err = readSettingsFile(settingsFileLocation, s)
-        if err != nil {
-                log.Warn("reading user settings file")
-                return "", nil
-        }
+	s := &User{}
+	err = readSettingsFile(settingsFileLocation, s)
+	if err != nil {
+		log.Warn("reading user settings file")
+		return "", nil
+	}
 
 	return s.GitHubHandle, nil
 }

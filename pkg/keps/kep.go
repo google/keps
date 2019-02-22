@@ -5,13 +5,17 @@ import (
 	"sync"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/calebamiles/keps/pkg/keps/check"
+	"github.com/calebamiles/keps/pkg/keps/events"
 	"github.com/calebamiles/keps/pkg/keps/metadata"
 	"github.com/calebamiles/keps/pkg/keps/sections"
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
 
 type Instance interface {
+	// getters
 	UniqueID() string
 	ShortID() int
 	Title() string
@@ -22,6 +26,7 @@ type Instance interface {
 	Created() time.Time
 	LastUpdated() time.Time
 	Sections() []string
+	GetLifecyclePR(event events.Lifecycle) string
 
 	// simple pass through mutators
 	AddApprovers(...string)
@@ -29,6 +34,7 @@ type Instance interface {
 
 	// heavy lifting mutators
 	SetState(states.Name) error
+	AddLifecyclePR(event events.Lifecycle, principal string, prUrl string) error
 
 	// consistency
 	AddChecks(...check.That)
@@ -153,6 +159,47 @@ func (k *kep) Persist() error {
 	return k.check() // TODO figure out how to roll back failures "safely"
 }
 
+func (k *kep) AddLifecyclePR(event events.Lifecycle, principal string, prUrl string) error {
+	k.locker.Lock()
+	defer k.locker.Unlock()
+
+	occurred := map[events.Lifecycle]bool{}
+	for _, evnt := range k.meta.Events() {
+		occurred[evnt.Type()] = true
+	}
+
+	if occurred[event] {
+		return fmt.Errorf("event: %s has already occurred, refusing to overwrite previous history", event)
+	}
+
+	switch event {
+	case events.Proposal:
+		k.meta.AddEvent(event, principal, prUrl)
+		k.meta.AssociatePR(prUrl)
+
+		return nil
+
+	default:
+		return fmt.Errorf("no lifecycle rules exist for event: %s", event)
+	}
+}
+
+func (k *kep) GetLifecyclePR(event events.Lifecycle) string {
+	prs := []string{}
+	for _, evnt := range k.meta.Events() {
+		if evnt.Type() == event {
+			prs = append(prs, evnt.Notes())
+		}
+	}
+
+	if len(prs) > 1 {
+		// TODO return error
+		log.Warnf("found %d possible pull requests, for event type: %s, but there should be only one", len(prs), event)
+	}
+
+	return prs[0]
+}
+
 func (k *kep) SetState(state states.Name) error {
 	k.locker.Lock()
 	defer k.locker.Unlock()
@@ -173,7 +220,6 @@ func (k *kep) SetState(state states.Name) error {
 		}
 
 		k.addSections(newEntries)
-
 		k.meta.SetState(states.Draft)
 
 		return nil
@@ -186,8 +232,8 @@ func (k *kep) SetState(state states.Name) error {
 
 		k.checks = append(k.checks, check.ThatIsValidForProvisionalState) // allow anyone to check that the KEP remains valid
 		k.addSections(newEntries)
-
 		k.meta.SetState(states.Provisional)
+
 		return nil
 
 	case states.Implementable:
@@ -198,8 +244,8 @@ func (k *kep) SetState(state states.Name) error {
 
 		k.checks = append(k.checks, check.ThatIsValidForImplementableState) // allow anyone to check that the KEP remains valid
 		k.addSections(newEntries)
-
 		k.meta.SetState(states.Implementable)
+
 		return nil
 
 	default:

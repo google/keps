@@ -1,9 +1,5 @@
 package github
 
-import (
-	"github.com/calebamiles/keps/pkg/changes/auth"
-)
-
 type SourceOwner string
 type SourceRepository string
 type SourceBranch string
@@ -14,7 +10,6 @@ type PullRequestTitle string
 type PullRequestDescription string
 
 type PullRequestRoutingInfo interface {
-	Token() auth.TokenProvider
 	SourceRepositoryOwner() string
 	SourceRepository() string
 	SourceBranch() string
@@ -24,7 +19,6 @@ type PullRequestRoutingInfo interface {
 }
 
 func NewPullRequestRoutingInfo(
-	token auth.TokenProvider,
 	sourceOwner SourceOwner,
 	sourceRepository SourceRepository,
 	sourceBranch SourceBranch,
@@ -34,7 +28,6 @@ func NewPullRequestRoutingInfo(
 ) PullRequestRoutingInfo {
 
 	return &routingInfo{
-		token:                 token,
 		sourceRepositoryOwner: string(sourceOwner),
 		sourceRepository:      string(sourceRepository),
 		sourceBranch:          string(sourceBranch),
@@ -45,7 +38,6 @@ func NewPullRequestRoutingInfo(
 }
 
 type routingInfo struct {
-	token                 auth.TokenProvider
 	sourceRepositoryOwner string
 	sourceRepository      string
 	sourceBranch          string
@@ -54,7 +46,6 @@ type routingInfo struct {
 	targetBranch          string
 }
 
-func (info *routingInfo) Token() auth.TokenProvider     { return info.token }
 func (info *routingInfo) SourceRepositoryOwner() string { return info.sourceRepositoryOwner }
 func (info *routingInfo) SourceRepository() string      { return info.sourceRepository }
 func (info *routingInfo) SourceBranch() string          { return info.sourceBranch }

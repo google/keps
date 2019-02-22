@@ -24,8 +24,9 @@ func Accept(runtime settings.Runtime) error {
 		return err
 	}
 
-	kep.AddApprovers(runtime.Principal())
-	kep.AddReviewers(runtime.Principal())
+	// TODO remove these as acceptance is moving client side in MVP
+	kep.AddApprovers(runtime.PrincipalGithubHandle())
+	kep.AddReviewers(runtime.PrincipalGithubHandle())
 
 	err = kep.SetState(states.Provisional)
 	if err != nil {

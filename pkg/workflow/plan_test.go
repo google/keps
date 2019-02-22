@@ -26,7 +26,7 @@ var _ = Describe("Plan()", func() {
 	It("ensures the KEP is ready for approval", func() {
 		tmpDir, err := ioutil.TempDir("", "kep-plan")
 		Expect(err).ToNot(HaveOccurred())
-		defer os.RemoveAll(tmpDir + "/nope")
+		defer os.RemoveAll(tmpDir)
 
 		kepDirName := "a-good-but-complicated-idea"
 
