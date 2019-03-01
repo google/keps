@@ -24,9 +24,6 @@ func Accept(runtime settings.Runtime) error {
 		return err
 	}
 
-	kep.AddApprovers(runtime.Principal())
-	kep.AddReviewers(runtime.Principal())
-
 	err = kep.SetState(states.Provisional)
 	if err != nil {
 		return err

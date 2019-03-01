@@ -21,7 +21,6 @@ func NewProvideTokenFromPath(p string) (TokenProvider, error) {
 	return t, nil
 }
 
-
 type TokenProvider interface {
 	Value() (string, error)
 }
@@ -35,4 +34,3 @@ type tokenFromPath struct {
 func (t *tokenFromPath) Value() (string, error) {
 	return t.value()
 }
-

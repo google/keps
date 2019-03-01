@@ -16,7 +16,6 @@ import (
 var _ = Describe("determining the KEP principal user", func() {
 	cacheEnv := "XDG_CACHE_HOME"
 
-
 	Describe("FindPrincipal()", func() {
 		It("looks for the principal's GitHub handle from the environment", func() {
 			githubHandle := "@smartcoder"

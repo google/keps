@@ -108,6 +108,24 @@ var _ = Describe("KEP Metdata", func() {
 		})
 	})
 
+	Describe("#AddEvent()", func() {
+		It("adds a KEP lifecycle event to metadata", func() {
+			Fail("test not written")
+		})
+	})
+
+	Describe("#AssociatePR()", func() {
+		It("adds an associated PR to metadata", func() {
+			Fail("test not written")
+		})
+	})
+
+	Describe("#Events()", func() {
+		It("returns KEP lifecycle event names in the order they occurred", func() {
+			Fail("test not written")
+		})
+	})
+
 	Describe("#SetState()", func() {
 		It("sets the state on the metadata", func() {
 			author := "dchen1107"

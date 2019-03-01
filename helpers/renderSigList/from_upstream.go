@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/calebamiles/keps/helpers/renderSigList/internal/sigs"

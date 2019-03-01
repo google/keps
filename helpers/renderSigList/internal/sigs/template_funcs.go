@@ -19,7 +19,7 @@ func joinPath(elem ...string) string {
 }
 
 var upstreamListTemplateFuncs = template.FuncMap{
-		"canonicalName": canonicalName,
-		"canonicalSIGName": canonicalSIGName,
-		"joinPath": joinPath,
+	"canonicalName":    canonicalName,
+	"canonicalSIGName": canonicalSIGName,
+	"joinPath":         joinPath,
 }

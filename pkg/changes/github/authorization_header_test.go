@@ -17,7 +17,7 @@ var _ = Describe("GitHub authorization", func() {
 			githubToken := "this-isnt-a-valid-token"
 
 			token := &authfakes.FakeTokenProvider{}
-                        token.ValueReturns(githubToken, nil)
+			token.ValueReturns(githubToken, nil)
 
 			req, err := http.NewRequest(http.MethodGet, "https://kubernetes.io", nil)
 			Expect(err).ToNot(HaveOccurred(), "expected no error when creating a HTTP GET request with a valid URL")

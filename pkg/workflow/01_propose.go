@@ -2,7 +2,8 @@ package workflow
 
 import (
 	"github.com/calebamiles/keps/pkg/keps"
-	"github.com/calebamiles/keps/pkg/keps/states"
+	"github.com/calebamiles/keps/pkg/orgs"
+	"github.com/calebamiles/keps/pkg/procs/enhancements"
 	"github.com/calebamiles/keps/pkg/settings"
 )
 
@@ -11,31 +12,18 @@ import (
 // inspiration from https://blog.golang.org/toward-go2, Propose prepares
 // the author to explain the importance of their change through a KEP
 // Propose currently:
-//  - sets KEP state to `draft`
-// Errors returned by Propose are likely due to file i/o
-// Eventually, Propose may also handle git and GitHub operations
-func Propose(runtime settings.Runtime) error {
-	p, err := keps.Path(runtime.ContentRoot(), runtime.TargetDir())
+//  - sets KEP state to `provisional`
+//  - creates a pull request against the enhancements repository
+func Propose(runtime settings.Runtime, org orgs.Instance, kep keps.Instance) (string, error) {
+	repo, err := enhancements.OpenRepo(runtime, org, kep)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	kep, err := keps.Open(p)
+	prUrl, err := enhancements.Propose(repo, kep)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	err = kep.SetState(states.Provisional)
-	if err != nil {
-		return err
-	}
-
-	err = kep.Persist()
-	if err != nil {
-		return err
-	}
-
-	// TODO add mechanics for creating PR
-
-	return nil
+	return prUrl, nil
 }

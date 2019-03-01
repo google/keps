@@ -8,6 +8,16 @@ import (
 )
 
 type FakeRuntime struct {
+	CacheDirStub        func() string
+	cacheDirMutex       sync.RWMutex
+	cacheDirArgsForCall []struct {
+	}
+	cacheDirReturns struct {
+		result1 string
+	}
+	cacheDirReturnsOnCall map[int]struct {
+		result1 string
+	}
 	ContentRootStub        func() string
 	contentRootMutex       sync.RWMutex
 	contentRootArgsForCall []struct {
@@ -18,14 +28,44 @@ type FakeRuntime struct {
 	contentRootReturnsOnCall map[int]struct {
 		result1 string
 	}
-	PrincipalStub        func() string
-	principalMutex       sync.RWMutex
-	principalArgsForCall []struct {
+	IsSandboxedStub        func() bool
+	isSandboxedMutex       sync.RWMutex
+	isSandboxedArgsForCall []struct {
 	}
-	principalReturns struct {
+	isSandboxedReturns struct {
+		result1 bool
+	}
+	isSandboxedReturnsOnCall map[int]struct {
+		result1 bool
+	}
+	PrincipalDisplayNameStub        func() string
+	principalDisplayNameMutex       sync.RWMutex
+	principalDisplayNameArgsForCall []struct {
+	}
+	principalDisplayNameReturns struct {
 		result1 string
 	}
-	principalReturnsOnCall map[int]struct {
+	principalDisplayNameReturnsOnCall map[int]struct {
+		result1 string
+	}
+	PrincipalEmailStub        func() string
+	principalEmailMutex       sync.RWMutex
+	principalEmailArgsForCall []struct {
+	}
+	principalEmailReturns struct {
+		result1 string
+	}
+	principalEmailReturnsOnCall map[int]struct {
+		result1 string
+	}
+	PrincipalGithubHandleStub        func() string
+	principalGithubHandleMutex       sync.RWMutex
+	principalGithubHandleArgsForCall []struct {
+	}
+	principalGithubHandleReturns struct {
+		result1 string
+	}
+	principalGithubHandleReturnsOnCall map[int]struct {
 		result1 string
 	}
 	TargetDirStub        func() string
@@ -38,8 +78,70 @@ type FakeRuntime struct {
 	targetDirReturnsOnCall map[int]struct {
 		result1 string
 	}
+	TokenPathStub        func() string
+	tokenPathMutex       sync.RWMutex
+	tokenPathArgsForCall []struct {
+	}
+	tokenPathReturns struct {
+		result1 string
+	}
+	tokenPathReturnsOnCall map[int]struct {
+		result1 string
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeRuntime) CacheDir() string {
+	fake.cacheDirMutex.Lock()
+	ret, specificReturn := fake.cacheDirReturnsOnCall[len(fake.cacheDirArgsForCall)]
+	fake.cacheDirArgsForCall = append(fake.cacheDirArgsForCall, struct {
+	}{})
+	fake.recordInvocation("CacheDir", []interface{}{})
+	fake.cacheDirMutex.Unlock()
+	if fake.CacheDirStub != nil {
+		return fake.CacheDirStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.cacheDirReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeRuntime) CacheDirCallCount() int {
+	fake.cacheDirMutex.RLock()
+	defer fake.cacheDirMutex.RUnlock()
+	return len(fake.cacheDirArgsForCall)
+}
+
+func (fake *FakeRuntime) CacheDirCalls(stub func() string) {
+	fake.cacheDirMutex.Lock()
+	defer fake.cacheDirMutex.Unlock()
+	fake.CacheDirStub = stub
+}
+
+func (fake *FakeRuntime) CacheDirReturns(result1 string) {
+	fake.cacheDirMutex.Lock()
+	defer fake.cacheDirMutex.Unlock()
+	fake.CacheDirStub = nil
+	fake.cacheDirReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRuntime) CacheDirReturnsOnCall(i int, result1 string) {
+	fake.cacheDirMutex.Lock()
+	defer fake.cacheDirMutex.Unlock()
+	fake.CacheDirStub = nil
+	if fake.cacheDirReturnsOnCall == nil {
+		fake.cacheDirReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.cacheDirReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeRuntime) ContentRoot() string {
@@ -65,7 +167,15 @@ func (fake *FakeRuntime) ContentRootCallCount() int {
 	return len(fake.contentRootArgsForCall)
 }
 
+func (fake *FakeRuntime) ContentRootCalls(stub func() string) {
+	fake.contentRootMutex.Lock()
+	defer fake.contentRootMutex.Unlock()
+	fake.ContentRootStub = stub
+}
+
 func (fake *FakeRuntime) ContentRootReturns(result1 string) {
+	fake.contentRootMutex.Lock()
+	defer fake.contentRootMutex.Unlock()
 	fake.ContentRootStub = nil
 	fake.contentRootReturns = struct {
 		result1 string
@@ -73,6 +183,8 @@ func (fake *FakeRuntime) ContentRootReturns(result1 string) {
 }
 
 func (fake *FakeRuntime) ContentRootReturnsOnCall(i int, result1 string) {
+	fake.contentRootMutex.Lock()
+	defer fake.contentRootMutex.Unlock()
 	fake.ContentRootStub = nil
 	if fake.contentRootReturnsOnCall == nil {
 		fake.contentRootReturnsOnCall = make(map[int]struct {
@@ -84,44 +196,210 @@ func (fake *FakeRuntime) ContentRootReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
-func (fake *FakeRuntime) Principal() string {
-	fake.principalMutex.Lock()
-	ret, specificReturn := fake.principalReturnsOnCall[len(fake.principalArgsForCall)]
-	fake.principalArgsForCall = append(fake.principalArgsForCall, struct {
+func (fake *FakeRuntime) IsSandboxed() bool {
+	fake.isSandboxedMutex.Lock()
+	ret, specificReturn := fake.isSandboxedReturnsOnCall[len(fake.isSandboxedArgsForCall)]
+	fake.isSandboxedArgsForCall = append(fake.isSandboxedArgsForCall, struct {
 	}{})
-	fake.recordInvocation("Principal", []interface{}{})
-	fake.principalMutex.Unlock()
-	if fake.PrincipalStub != nil {
-		return fake.PrincipalStub()
+	fake.recordInvocation("IsSandboxed", []interface{}{})
+	fake.isSandboxedMutex.Unlock()
+	if fake.IsSandboxedStub != nil {
+		return fake.IsSandboxedStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.principalReturns
+	fakeReturns := fake.isSandboxedReturns
 	return fakeReturns.result1
 }
 
-func (fake *FakeRuntime) PrincipalCallCount() int {
-	fake.principalMutex.RLock()
-	defer fake.principalMutex.RUnlock()
-	return len(fake.principalArgsForCall)
+func (fake *FakeRuntime) IsSandboxedCallCount() int {
+	fake.isSandboxedMutex.RLock()
+	defer fake.isSandboxedMutex.RUnlock()
+	return len(fake.isSandboxedArgsForCall)
 }
 
-func (fake *FakeRuntime) PrincipalReturns(result1 string) {
-	fake.PrincipalStub = nil
-	fake.principalReturns = struct {
+func (fake *FakeRuntime) IsSandboxedCalls(stub func() bool) {
+	fake.isSandboxedMutex.Lock()
+	defer fake.isSandboxedMutex.Unlock()
+	fake.IsSandboxedStub = stub
+}
+
+func (fake *FakeRuntime) IsSandboxedReturns(result1 bool) {
+	fake.isSandboxedMutex.Lock()
+	defer fake.isSandboxedMutex.Unlock()
+	fake.IsSandboxedStub = nil
+	fake.isSandboxedReturns = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeRuntime) IsSandboxedReturnsOnCall(i int, result1 bool) {
+	fake.isSandboxedMutex.Lock()
+	defer fake.isSandboxedMutex.Unlock()
+	fake.IsSandboxedStub = nil
+	if fake.isSandboxedReturnsOnCall == nil {
+		fake.isSandboxedReturnsOnCall = make(map[int]struct {
+			result1 bool
+		})
+	}
+	fake.isSandboxedReturnsOnCall[i] = struct {
+		result1 bool
+	}{result1}
+}
+
+func (fake *FakeRuntime) PrincipalDisplayName() string {
+	fake.principalDisplayNameMutex.Lock()
+	ret, specificReturn := fake.principalDisplayNameReturnsOnCall[len(fake.principalDisplayNameArgsForCall)]
+	fake.principalDisplayNameArgsForCall = append(fake.principalDisplayNameArgsForCall, struct {
+	}{})
+	fake.recordInvocation("PrincipalDisplayName", []interface{}{})
+	fake.principalDisplayNameMutex.Unlock()
+	if fake.PrincipalDisplayNameStub != nil {
+		return fake.PrincipalDisplayNameStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.principalDisplayNameReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeRuntime) PrincipalDisplayNameCallCount() int {
+	fake.principalDisplayNameMutex.RLock()
+	defer fake.principalDisplayNameMutex.RUnlock()
+	return len(fake.principalDisplayNameArgsForCall)
+}
+
+func (fake *FakeRuntime) PrincipalDisplayNameCalls(stub func() string) {
+	fake.principalDisplayNameMutex.Lock()
+	defer fake.principalDisplayNameMutex.Unlock()
+	fake.PrincipalDisplayNameStub = stub
+}
+
+func (fake *FakeRuntime) PrincipalDisplayNameReturns(result1 string) {
+	fake.principalDisplayNameMutex.Lock()
+	defer fake.principalDisplayNameMutex.Unlock()
+	fake.PrincipalDisplayNameStub = nil
+	fake.principalDisplayNameReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *FakeRuntime) PrincipalReturnsOnCall(i int, result1 string) {
-	fake.PrincipalStub = nil
-	if fake.principalReturnsOnCall == nil {
-		fake.principalReturnsOnCall = make(map[int]struct {
+func (fake *FakeRuntime) PrincipalDisplayNameReturnsOnCall(i int, result1 string) {
+	fake.principalDisplayNameMutex.Lock()
+	defer fake.principalDisplayNameMutex.Unlock()
+	fake.PrincipalDisplayNameStub = nil
+	if fake.principalDisplayNameReturnsOnCall == nil {
+		fake.principalDisplayNameReturnsOnCall = make(map[int]struct {
 			result1 string
 		})
 	}
-	fake.principalReturnsOnCall[i] = struct {
+	fake.principalDisplayNameReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRuntime) PrincipalEmail() string {
+	fake.principalEmailMutex.Lock()
+	ret, specificReturn := fake.principalEmailReturnsOnCall[len(fake.principalEmailArgsForCall)]
+	fake.principalEmailArgsForCall = append(fake.principalEmailArgsForCall, struct {
+	}{})
+	fake.recordInvocation("PrincipalEmail", []interface{}{})
+	fake.principalEmailMutex.Unlock()
+	if fake.PrincipalEmailStub != nil {
+		return fake.PrincipalEmailStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.principalEmailReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeRuntime) PrincipalEmailCallCount() int {
+	fake.principalEmailMutex.RLock()
+	defer fake.principalEmailMutex.RUnlock()
+	return len(fake.principalEmailArgsForCall)
+}
+
+func (fake *FakeRuntime) PrincipalEmailCalls(stub func() string) {
+	fake.principalEmailMutex.Lock()
+	defer fake.principalEmailMutex.Unlock()
+	fake.PrincipalEmailStub = stub
+}
+
+func (fake *FakeRuntime) PrincipalEmailReturns(result1 string) {
+	fake.principalEmailMutex.Lock()
+	defer fake.principalEmailMutex.Unlock()
+	fake.PrincipalEmailStub = nil
+	fake.principalEmailReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRuntime) PrincipalEmailReturnsOnCall(i int, result1 string) {
+	fake.principalEmailMutex.Lock()
+	defer fake.principalEmailMutex.Unlock()
+	fake.PrincipalEmailStub = nil
+	if fake.principalEmailReturnsOnCall == nil {
+		fake.principalEmailReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.principalEmailReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRuntime) PrincipalGithubHandle() string {
+	fake.principalGithubHandleMutex.Lock()
+	ret, specificReturn := fake.principalGithubHandleReturnsOnCall[len(fake.principalGithubHandleArgsForCall)]
+	fake.principalGithubHandleArgsForCall = append(fake.principalGithubHandleArgsForCall, struct {
+	}{})
+	fake.recordInvocation("PrincipalGithubHandle", []interface{}{})
+	fake.principalGithubHandleMutex.Unlock()
+	if fake.PrincipalGithubHandleStub != nil {
+		return fake.PrincipalGithubHandleStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.principalGithubHandleReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeRuntime) PrincipalGithubHandleCallCount() int {
+	fake.principalGithubHandleMutex.RLock()
+	defer fake.principalGithubHandleMutex.RUnlock()
+	return len(fake.principalGithubHandleArgsForCall)
+}
+
+func (fake *FakeRuntime) PrincipalGithubHandleCalls(stub func() string) {
+	fake.principalGithubHandleMutex.Lock()
+	defer fake.principalGithubHandleMutex.Unlock()
+	fake.PrincipalGithubHandleStub = stub
+}
+
+func (fake *FakeRuntime) PrincipalGithubHandleReturns(result1 string) {
+	fake.principalGithubHandleMutex.Lock()
+	defer fake.principalGithubHandleMutex.Unlock()
+	fake.PrincipalGithubHandleStub = nil
+	fake.principalGithubHandleReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRuntime) PrincipalGithubHandleReturnsOnCall(i int, result1 string) {
+	fake.principalGithubHandleMutex.Lock()
+	defer fake.principalGithubHandleMutex.Unlock()
+	fake.PrincipalGithubHandleStub = nil
+	if fake.principalGithubHandleReturnsOnCall == nil {
+		fake.principalGithubHandleReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.principalGithubHandleReturnsOnCall[i] = struct {
 		result1 string
 	}{result1}
 }
@@ -149,7 +427,15 @@ func (fake *FakeRuntime) TargetDirCallCount() int {
 	return len(fake.targetDirArgsForCall)
 }
 
+func (fake *FakeRuntime) TargetDirCalls(stub func() string) {
+	fake.targetDirMutex.Lock()
+	defer fake.targetDirMutex.Unlock()
+	fake.TargetDirStub = stub
+}
+
 func (fake *FakeRuntime) TargetDirReturns(result1 string) {
+	fake.targetDirMutex.Lock()
+	defer fake.targetDirMutex.Unlock()
 	fake.TargetDirStub = nil
 	fake.targetDirReturns = struct {
 		result1 string
@@ -157,6 +443,8 @@ func (fake *FakeRuntime) TargetDirReturns(result1 string) {
 }
 
 func (fake *FakeRuntime) TargetDirReturnsOnCall(i int, result1 string) {
+	fake.targetDirMutex.Lock()
+	defer fake.targetDirMutex.Unlock()
 	fake.TargetDirStub = nil
 	if fake.targetDirReturnsOnCall == nil {
 		fake.targetDirReturnsOnCall = make(map[int]struct {
@@ -168,15 +456,77 @@ func (fake *FakeRuntime) TargetDirReturnsOnCall(i int, result1 string) {
 	}{result1}
 }
 
+func (fake *FakeRuntime) TokenPath() string {
+	fake.tokenPathMutex.Lock()
+	ret, specificReturn := fake.tokenPathReturnsOnCall[len(fake.tokenPathArgsForCall)]
+	fake.tokenPathArgsForCall = append(fake.tokenPathArgsForCall, struct {
+	}{})
+	fake.recordInvocation("TokenPath", []interface{}{})
+	fake.tokenPathMutex.Unlock()
+	if fake.TokenPathStub != nil {
+		return fake.TokenPathStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.tokenPathReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeRuntime) TokenPathCallCount() int {
+	fake.tokenPathMutex.RLock()
+	defer fake.tokenPathMutex.RUnlock()
+	return len(fake.tokenPathArgsForCall)
+}
+
+func (fake *FakeRuntime) TokenPathCalls(stub func() string) {
+	fake.tokenPathMutex.Lock()
+	defer fake.tokenPathMutex.Unlock()
+	fake.TokenPathStub = stub
+}
+
+func (fake *FakeRuntime) TokenPathReturns(result1 string) {
+	fake.tokenPathMutex.Lock()
+	defer fake.tokenPathMutex.Unlock()
+	fake.TokenPathStub = nil
+	fake.tokenPathReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeRuntime) TokenPathReturnsOnCall(i int, result1 string) {
+	fake.tokenPathMutex.Lock()
+	defer fake.tokenPathMutex.Unlock()
+	fake.TokenPathStub = nil
+	if fake.tokenPathReturnsOnCall == nil {
+		fake.tokenPathReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.tokenPathReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
+}
+
 func (fake *FakeRuntime) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.cacheDirMutex.RLock()
+	defer fake.cacheDirMutex.RUnlock()
 	fake.contentRootMutex.RLock()
 	defer fake.contentRootMutex.RUnlock()
-	fake.principalMutex.RLock()
-	defer fake.principalMutex.RUnlock()
+	fake.isSandboxedMutex.RLock()
+	defer fake.isSandboxedMutex.RUnlock()
+	fake.principalDisplayNameMutex.RLock()
+	defer fake.principalDisplayNameMutex.RUnlock()
+	fake.principalEmailMutex.RLock()
+	defer fake.principalEmailMutex.RUnlock()
+	fake.principalGithubHandleMutex.RLock()
+	defer fake.principalGithubHandleMutex.RUnlock()
 	fake.targetDirMutex.RLock()
 	defer fake.targetDirMutex.RUnlock()
+	fake.tokenPathMutex.RLock()
+	defer fake.tokenPathMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

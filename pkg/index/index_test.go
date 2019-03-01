@@ -200,6 +200,7 @@ var _ = Describe("working with an index of KEPs", func() {
 
 		Describe("Open()", func() {
 			It("reads a kep.yaml from disk", func() {
+				Fail("delete this function and only expose Rebuild")
 				tmpDir, err := ioutil.TempDir("", "kep-index")
 				Expect(err).ToNot(HaveOccurred())
 				defer os.RemoveAll(tmpDir)

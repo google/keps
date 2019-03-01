@@ -1,9 +1,9 @@
 package sigs
 
 import (
-	"net/http"
-	"io/ioutil"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/go-yaml/yaml"
 )

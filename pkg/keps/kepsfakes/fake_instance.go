@@ -7,6 +7,7 @@ import (
 
 	keps "github.com/calebamiles/keps/pkg/keps"
 	check "github.com/calebamiles/keps/pkg/keps/check"
+	events "github.com/calebamiles/keps/pkg/keps/events"
 	states "github.com/calebamiles/keps/pkg/keps/states"
 )
 
@@ -20,6 +21,19 @@ type FakeInstance struct {
 	addChecksMutex       sync.RWMutex
 	addChecksArgsForCall []struct {
 		arg1 []check.That
+	}
+	AddLifecyclePRStub        func(events.Lifecycle, string, string) error
+	addLifecyclePRMutex       sync.RWMutex
+	addLifecyclePRArgsForCall []struct {
+		arg1 events.Lifecycle
+		arg2 string
+		arg3 string
+	}
+	addLifecyclePRReturns struct {
+		result1 error
+	}
+	addLifecyclePRReturnsOnCall map[int]struct {
+		result1 error
 	}
 	AddReviewersStub        func(...string)
 	addReviewersMutex       sync.RWMutex
@@ -221,6 +235,68 @@ func (fake *FakeInstance) AddChecksArgsForCall(i int) []check.That {
 	defer fake.addChecksMutex.RUnlock()
 	argsForCall := fake.addChecksArgsForCall[i]
 	return argsForCall.arg1
+}
+
+func (fake *FakeInstance) AddLifecyclePR(arg1 events.Lifecycle, arg2 string, arg3 string) error {
+	fake.addLifecyclePRMutex.Lock()
+	ret, specificReturn := fake.addLifecyclePRReturnsOnCall[len(fake.addLifecyclePRArgsForCall)]
+	fake.addLifecyclePRArgsForCall = append(fake.addLifecyclePRArgsForCall, struct {
+		arg1 events.Lifecycle
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("AddLifecyclePR", []interface{}{arg1, arg2, arg3})
+	fake.addLifecyclePRMutex.Unlock()
+	if fake.AddLifecyclePRStub != nil {
+		return fake.AddLifecyclePRStub(arg1, arg2, arg3)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.addLifecyclePRReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeInstance) AddLifecyclePRCallCount() int {
+	fake.addLifecyclePRMutex.RLock()
+	defer fake.addLifecyclePRMutex.RUnlock()
+	return len(fake.addLifecyclePRArgsForCall)
+}
+
+func (fake *FakeInstance) AddLifecyclePRCalls(stub func(events.Lifecycle, string, string) error) {
+	fake.addLifecyclePRMutex.Lock()
+	defer fake.addLifecyclePRMutex.Unlock()
+	fake.AddLifecyclePRStub = stub
+}
+
+func (fake *FakeInstance) AddLifecyclePRArgsForCall(i int) (events.Lifecycle, string, string) {
+	fake.addLifecyclePRMutex.RLock()
+	defer fake.addLifecyclePRMutex.RUnlock()
+	argsForCall := fake.addLifecyclePRArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
+}
+
+func (fake *FakeInstance) AddLifecyclePRReturns(result1 error) {
+	fake.addLifecyclePRMutex.Lock()
+	defer fake.addLifecyclePRMutex.Unlock()
+	fake.AddLifecyclePRStub = nil
+	fake.addLifecyclePRReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeInstance) AddLifecyclePRReturnsOnCall(i int, result1 error) {
+	fake.addLifecyclePRMutex.Lock()
+	defer fake.addLifecyclePRMutex.Unlock()
+	fake.AddLifecyclePRStub = nil
+	if fake.addLifecyclePRReturnsOnCall == nil {
+		fake.addLifecyclePRReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.addLifecyclePRReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeInstance) AddReviewers(arg1 ...string) {
@@ -945,6 +1021,8 @@ func (fake *FakeInstance) Invocations() map[string][][]interface{} {
 	defer fake.addApproversMutex.RUnlock()
 	fake.addChecksMutex.RLock()
 	defer fake.addChecksMutex.RUnlock()
+	fake.addLifecyclePRMutex.RLock()
+	defer fake.addLifecyclePRMutex.RUnlock()
 	fake.addReviewersMutex.RLock()
 	defer fake.addReviewersMutex.RUnlock()
 	fake.authorsMutex.RLock()

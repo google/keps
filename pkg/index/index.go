@@ -20,16 +20,19 @@ import (
 	"github.com/calebamiles/keps/pkg/settings"
 )
 
+type FilteringCriteria func(metadata.KEP) bool
+
 type Index interface {
-	ClaimNextShortID() int // implementations of Index MUST tolerate HasShortID being called from within Update() to prevent deadlocks
-	HasShortID(int) bool   // implementations of Index MUST tolerate HasShortID being called from within Update() to prevent deadlocks
+	ClaimNextShortID() int   // implementations of Index MUST tolerate ShortIdClaimed being called from within Update() to prevent deadlocks
+	ShortIdClaimed(int) bool // implementations of Index MUST tolerate ShortIdClaimed being called from within Update() to prevent deadlocks
 
 	Fetch(string) (keps.Instance, error)
 
-	// TODO add Filter(metadata.KEP) metadata.KEP
 	// TODO add Remove(keps.Instance)
 	Update(keps.Instance) error
 	Persist() error
+
+	// TODO add Filter(metadata.KEP) metadata.KEP
 }
 
 func New(contentRoot string) (Index, error) {
@@ -125,10 +128,10 @@ func Rebuild(runtime settings.Runtime) (Index, error) {
 
 		switch kep.State() {
 		case states.Draft:
+			// DISCUSS: should we index draft KEPs
 			return filepath.SkipDir
 		case states.Provisional:
 			// DISCUSS: should we index provisional KEPs
-			return filepath.SkipDir
 		}
 
 		err = kepIndex.Update(kep)
@@ -184,7 +187,7 @@ func (i *index) Fetch(id string) (keps.Instance, error) {
 	return k, nil
 }
 
-func (i *index) HasShortID(given int) bool {
+func (i *index) ShortIdClaimed(given int) bool {
 	// no additional locking should be needed here
 	_, found := i.kepShortIDs.Load(given)
 	return found

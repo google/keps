@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"gopkg.in/yaml.v2"
 
+	"github.com/calebamiles/keps/pkg/keps/events"
 	"github.com/calebamiles/keps/pkg/keps/sections"
 	"github.com/calebamiles/keps/pkg/keps/states"
 )
@@ -32,10 +33,14 @@ type KEP interface {
 	Replaces() []string
 	SupersededBy() []string
 
+	// liveness information
 	Created() time.Time
 	LastUpdated() time.Time
 
-	// Flattened routing info
+	// audit information
+	Events() []events.Occurrence
+
+	// flattened routing info
 	OwningSIG() string
 	AffectedSubprojects() []string
 	ParticipatingSIGs() []string
@@ -43,15 +48,14 @@ type KEP interface {
 	SIGWide() bool
 	ContentDir() string
 
-	// Mutators (locking)
+	// mutators (locking)
 	SetState(states.Name)
 	AddSectionLocations([]string)
 	AddApprovers([]string)
 	AddReviewers([]string)
+	AddEvent(events.Lifecycle, string, string)
+	AssociatePR(string)
 	Persist() error
-
-	// External locking support
-	sync.Locker
 }
 
 type routingInfoProvider interface {
@@ -80,6 +84,7 @@ func New(authors []string, title string, routingInfo routingInfoProvider) (KEP, 
 		inApproversSet:           make(map[string]bool),
 		inReviewersSet:           make(map[string]bool),
 		inSectionLocationsSet:    make(map[string]bool),
+		inAssociatedPrsSet:       make(map[string]bool),
 		RWMutex:                  new(sync.RWMutex),
 	}
 
@@ -106,14 +111,6 @@ func FromBytes(b []byte) (KEP, error) {
 	return fromBytes(b)
 }
 
-type kepSection struct {
-	FilenameField string `yaml:"filename"`
-	NameField     string `yaml:"name"`
-}
-
-func (s *kepSection) Name() string     { return s.NameField }
-func (s *kepSection) Filename() string { return s.FilenameField }
-
 type kep struct {
 	AuthorsField           []string    `yaml:"authors,omitempty"`
 	TitleField             string      `yaml:"title,omitempty"`
@@ -136,9 +133,13 @@ type kep struct {
 	KubernetesWideField      bool     `yaml:"kubernetes_wide,omitempty"`
 	SIGWideField             bool     `yaml:"sig_wide,omitempty"`
 
+	EventsField        []*kepEvent `yaml:"events,omitempty"`
+	AssociatedPRsField []string    `yaml:"associated_prs,omitempty"`
+
 	inApproversSet        map[string]bool `yaml:"-"` // do not persist this
 	inReviewersSet        map[string]bool `yaml:"-"` // do not persist this
 	inSectionLocationsSet map[string]bool `yaml:"-"` // do not persist this
+	inAssociatedPrsSet    map[string]bool `yaml:"-"` // do not persist this
 	contentDir            string          `yaml:"-"` // do not persist this
 
 	*sync.RWMutex `yaml:"-"` // do not persist this
@@ -171,11 +172,14 @@ func (k *kep) Persist() error {
 	}
 
 	// TODO write tests for this
+	// TODO ensure all section locations exist
 	sort.Sort(sections.ByOrder(k.SectionLocationsField))
+
+	// TODO write tests for this
+	sort.Sort(byOldestFirst(k.EventsField))
+
 	sort.Strings(k.ApproversField)
 	sort.Strings(k.ReviewersField)
-
-	// TODO ensure all section locations exist
 
 	loc := k.contentDir
 	filename := filepath.Join(loc, metadataFilename)
@@ -230,6 +234,37 @@ func (k *kep) State() states.Name {
 	defer k.RUnlock()
 
 	return k.StateField
+}
+
+// events
+
+func (k *kep) Events() []events.Occurrence {
+	k.Lock()
+	defer k.Unlock()
+
+	// TODO write tests for this
+	sort.Sort(byOldestFirst(k.EventsField))
+
+	var evts []events.Occurrence
+	for i := range k.EventsField {
+		evts = append(evts, k.EventsField[i])
+	}
+
+	return evts
+}
+
+func (k *kep) AddEvent(eventType events.Lifecycle, principal string, notes string) {
+	k.Lock()
+	defer k.Unlock()
+
+	evt := &kepEvent{
+		DateField:      time.Now().UTC(),
+		PrincipalField: principal,
+		TypeField:      eventType,
+		NotesField:     notes,
+	}
+
+	k.EventsField = append(k.EventsField, evt)
 }
 
 // owners
@@ -288,6 +323,15 @@ func (k *kep) Editors() []string {
 	defer k.RUnlock()
 
 	return k.EditorsField
+}
+
+// associated GitHub API objects
+
+func (k *kep) AssociatePR(prUrl string) {
+	k.RLock()
+	defer k.RUnlock()
+
+	k.inAssociatedPrsSet[prUrl] = true
 }
 
 // basic metadata
@@ -414,6 +458,7 @@ func fromBytes(b []byte) (*kep, error) {
 		inSectionLocationsSet: make(map[string]bool),
 		inApproversSet:        make(map[string]bool),
 		inReviewersSet:        make(map[string]bool),
+		inAssociatedPrsSet:    make(map[string]bool),
 		RWMutex:               new(sync.RWMutex),
 	}
 
@@ -432,6 +477,10 @@ func fromBytes(b []byte) (*kep, error) {
 
 	for _, r := range k.ReviewersField {
 		k.inReviewersSet[r] = true
+	}
+
+	for _, pr := range k.AssociatedPRsField {
+		k.inAssociatedPrsSet[pr] = true
 	}
 
 	return k, nil

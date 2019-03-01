@@ -5,7 +5,7 @@ type upstreamSIGList struct {
 }
 
 type upstreamSIGEntry struct {
-	Name string `yaml:"name"`// we actually want to look at what the SIG is called on disk
+	Name        string                    `yaml:"name"` // we actually want to look at what the SIG is called on disk
 	Subprojects []upstreamSubprojectEntry `yaml:"subprojects"`
 }
 
