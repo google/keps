@@ -29,3 +29,9 @@ content. At a high level the library is organized as follows
 └── wish_list.md            (ideas for new contributors)
 ```
 
+## Opportunties for Contribution
+
+- [Lead conversion of existing and proposed KEP content][] to the proposed format.
+
+[Lead conversion of existing and proposed KEP content]: https://github.com/calebamiles/keps/blob/master/contrib/role_descriptions/conversion_technical_program_manager.md
+
